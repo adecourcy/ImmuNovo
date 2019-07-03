@@ -1,0 +1,1 @@
+gcc driver.c linkedList.c node.c spectrum.c aminoStructs.c rejectedDatabase.c viablePeptides.c mergeRejected.c findPeptides.c inputFunctions.c -lm

@@ -1,0 +1,52 @@
+Node rescoreNode(Node node,
+                 AminoScores aminoScores,
+                 int averageMassTolerance,
+                 int maximumMassTolerance,
+                 float lowestPenalty);
+
+void addNodesToViablePeptides(ViablePeptides *viablePeptides,
+                              RejectedDatabase *rejectedDatabase,
+                              RejectedLinkedList *nodes);
+
+void iterateRejectedPeptides(RejectedDatabase* rejectedDatabase,
+                             ViablePeptides* viablePeptides,
+                             AminoMasses aminoMasses,
+                             AminoScores aminoScores,
+                             AminoAcids aminoAcids,
+                             SpectrumHash spectrumHash,
+                             SpectrumHash spectrumHashDouble,
+                             int maxInstanceMiscleavage,
+                             int maxTotalMiscleavage,
+                             int maxCharge,
+                             int precision,
+                             double BPenalty,
+                             float massTolerance,
+                             int averageMassTolerance,
+                             int maximumMassTolerance,
+                             float lowestPenalty,
+                             long peptideMass,
+                             long protonMass,
+                             long lowestSpecMass,
+                             int previousPeptideLength);
+
+void addAllToRejectedDatabase(ViablePeptides* viablePeptides,
+                              RejectedDatabase* rejectedDatabase);
+
+void mergeMiscleavages(ViablePeptides* viablePeptides,
+                       RejectedDatabase* rejectedDatabase,
+                       SpectrumBin oldMiscleavages,
+                       AminoScores aminoScores,
+                       SpectrumHash spectrumHash,
+                       SpectrumHash spectrumHashDouble,
+                       int maxInstanceMiscleavage,
+                       int maxTotalMiscleavage,
+                       int maxCharge,
+                       int BPenalty,
+                       int precision,
+                       float massTolerance,
+                       int averageMassTolerance,
+                       int maximumMassTolerance,
+                       float lowestPenalty,
+                       long peptideMass,
+                       long protonMass,
+                       long lowestSpecMass);
