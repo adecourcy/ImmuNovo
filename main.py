@@ -188,6 +188,10 @@ if __name__ == '__main__':
                                                   defaultParameters['COMP']),
               defaultParameters['PREC'])
 
+      if defaultParameters['END'] == 1:
+        spectrumMasses[-1] -= H2OMassAdjusted
+        spectrumMassesDouble[-1] -= H2OMassAdjusted
+
 
       for pssmTitle in allPSSM:
 
@@ -246,13 +250,14 @@ if __name__ == '__main__':
                                                       defaultParameters["maxP"],
                                                       H2OMassAdjusted,
                                                       protonMassAdjusted,
-                                                      1,
+                                                      defaultParameters["END"],
                                                       defaultParameters["BIN"]))
 
         if cOutput != 0:
           clean()
           exit()
 
+        spectrumMassesDouble = [mass - protonMassAdjusted for mass in spectrumMassesDouble]
         experimentalSpectrum = spectrumMasses + spectrumMassesDouble
         experimentalIntensities = spectrumIntensities + spectrumIntensitiesDouble
         results = ProcessResults.processResults(resultsFile,
@@ -264,11 +269,13 @@ if __name__ == '__main__':
                                                 int((NH3MASS * (10 ** defaultParameters["PREC"]))),
                                                 defaultParameters["MMT"],
                                                 defaultParameters["PREC"],
-                                                conversionTable)
+                                                conversionTable,
+                                                defaultParameters['END'],
+                                                defaultParameters['BPEN'])
 
 
         spectrumTitle = Spectrum.getTitle(spectrum)
-        spectrumTitle = spectrumTitle.replace(",", '').split()[0]
+        spectrumTitle = spectrumTitle.replace(",", '')
         if len(results) == 0:
           outputString = spectrumFileName + "," + spectrumTitle + \
                          ',' + pssmTitle + ",No Peptide Found" + "\n"

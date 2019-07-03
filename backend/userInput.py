@@ -31,8 +31,12 @@ def printOptionalArguments():
         'The mass tolerance limit (maximum mass tolerance)'))
   print(str.format(padding, 'AMT',
         'The average (ideal) mass tolerance limit'))
-  print('\nDon\'t touch these unless you know what you\'re doing:')
+  print(str.format(padding, 'PMT',
+        'The precursor mass tolerance limit'))
+  print(str.format(padding, 'END',
+        'Search from the y or b end of the ion. 0 for y, 1 for b'))
 
+  print('\nDon\'t touch these unless you know what you\'re doing:')
   print(str.format(padding, 'IMC',
         'Number of consectutive miscleavages before a peptide is discarded'))
   print(str.format(padding, 'TMC',
@@ -57,6 +61,7 @@ def parseParameterInput(args):
        "TMC": 3,
        "MMT": 35, # maximum mass tolerance rate
        "AMT": 10, # average mass tolerance rate
+       "PMT": 10,
        "minP": 9,
        "maxP": 12,
        "BIN": 5, # bin size
@@ -65,6 +70,7 @@ def parseParameterInput(args):
        "TOLP": 0.5, # mass tolerance penalty
        "DEBUG": 0,
        "PREC": 4,
+       "END": 0,
        "OUT": ".out.csv"}
 
   badArgs = []

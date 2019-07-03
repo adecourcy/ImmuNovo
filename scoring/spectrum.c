@@ -104,8 +104,7 @@ float massToleranceCalculation(long calculatedMass,
 
 /*
   Try to find a spectrum mass given a calculated mass. Return a node if
-  a spectrum mass is found within 1 dalton(?) of the calculated mass.
-  Otherwise return a dummy node with a mass of 0
+  a spectrum mass is found. Otherwise return a dummy node with a mass of 0
 */
 SpectrumNode lookupMass(long mass,
                         int precision,

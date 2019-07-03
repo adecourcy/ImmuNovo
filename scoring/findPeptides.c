@@ -58,15 +58,16 @@ Results findBestPeptides(ViablePeptides* viablePeptides,
     #include <stdio.h>
     printf("%d\n", currentPeptideLength);
     printf("########## ViablePeptides %d ##########\n", currentPeptideLength);
-    printViablePeptides(*viablePeptides, 1);
+    printViablePeptides(*viablePeptides, 0);
     printf("##########################################################\n");
     */
+    
     
 
     if (currentPeptideLength == 0) {
 
       Node seedNode = createNode(maxPeptideLength);
-      if (yFirst == 1) {
+      if (yFirst == 0) {
         seedNode.mass = H20Mass;
       }
       addLink(&viablePeptides->miscleavageBins.bin[0], seedNode);
@@ -101,6 +102,7 @@ Results findBestPeptides(ViablePeptides* viablePeptides,
       oldMiscleavages = viablePeptides->miscleavageBins;
       viablePeptides->miscleavageBins =
             createMiscleavageBins(peptideMass, precision);
+
       iterateRejectedPeptides(&rejectedDatabase,
                               viablePeptides,
                               aminoMasses,

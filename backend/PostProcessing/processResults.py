@@ -65,7 +65,9 @@ def processResults(resultsFile: str,
                    NH3MassModified: int,
                    maxMassTolerance: int,
                    precision: int,
-                   acidConversion: List[Tuple[str, str]]) -> List[Node]:
+                   acidConversion: List[Tuple[str, str]],
+                   yEnd,
+                   bPenalty) -> List[Node]:
 
   decPrec = Decimal(10 ** precision)
   results = open(resultsFile, "r")
@@ -85,6 +87,7 @@ def processResults(resultsFile: str,
     globalScore  = calculateGlobalScore(acidMassTable,
                                         experimentalSpectrum,
                                         experimentalScores,
+                                        bPenalty,
                                         peptideString[::-1],
                                         protonMassModified,
                                         H2OMassModified,
@@ -92,8 +95,11 @@ def processResults(resultsFile: str,
                                         maxMassTolerance)
 
     combinedScore = aminoScore * Decimal(globalScore)
+
+    if yEnd == 0:
+      peptideString = peptideString[::-1]
       
-    nodes.append(Node(deConvertPeptideString(peptideString[::-1], acidConversion),
+    nodes.append(Node(deConvertPeptideString(peptideString, acidConversion),
                       mass,
                       precursorMass,
                       adjustedScore,
@@ -107,10 +113,10 @@ def processResults(resultsFile: str,
 
   return nodes[::-1]
 
-
 def calculateGlobalScore(acidMassTable: Dict[str, int],
                          experimentalSpectrum: List[int],
-                         experimentalIntensities: List[int],
+                         experimentalScores: List[int],
+                         bPenalty: float,
                          peptideString: str,
                          protonMassModified: int,
                          H2OMassModified: int,
@@ -125,79 +131,147 @@ def calculateGlobalScore(acidMassTable: Dict[str, int],
                                   NH3MassModified,
                                   peptideString)
 
-  experimentalVector, experimentalIntenseVector = \
-        createExperimentalVector(theoreticalSpectrum,
-                                 experimentalSpectrum,
-                                 experimentalIntensities,
-                                 maxMassTolerance)
+  theoreticalVector = createTheoreticalVector(theoreticalSpectrum,
+                                              experimentalSpectrum,
+                                              maxMassTolerance)
   
   theoreticalMassToleranceDifferences = []
-  for i in range(len(theoreticalSpectrum)):
-    if experimentalVector[i] == 0:
+  for i in range(len(experimentalSpectrum)):
+    if theoreticalVector[i] == 0:
       theoreticalMassToleranceDifferences.append(maxMassTolerance)
     else:
       massToleranceResult = \
-        massTolerance(theoreticalSpectrum[i], experimentalVector[i])
+        massTolerance(theoreticalVector[i], experimentalSpectrum[i])
       theoreticalMassToleranceDifferences.append(massToleranceResult)
   
 
-  sumIntensities = sum(experimentalIntenseVector)
-  if sumIntensities == 0:
-    return 0
-  spectrumIntensitiesNormalized = \
-    [x / sumIntensities for x in experimentalIntenseVector]
+  sumSpectrumScores = sum(experimentalScores)
+  if sumSpectrumScores == 0:
+    sumSpectrumScores = 1
+  spectrumScoresNormalized = \
+    [x / sumSpectrumScores for x in experimentalScores]
 
 
   euclideanDistance = 0
 
+
   for mt, weight in zip(theoreticalMassToleranceDifferences,
-                        spectrumIntensitiesNormalized):
-    euclideanDistance += (1 - mt/maxMassTolerance) * weight
-
-  return euclideanDistance
+                        spectrumScoresNormalized):
+    euclideanDistance += mt * weight
 
 
-def createExperimentalVector(theoreticalSpectrum: List[int],
-                             experimentalSpectrum: List[int],
-                             experimentalIntensities: List[int],
-                             maxMassTolerance: int) -> List[int]:
+  return (1 - (euclideanDistance / maxMassTolerance))
 
-  theoreticalSpectrum.sort()
+# def calculateGlobalScore(acidMassTable: Dict[str, int],
+#                          experimentalSpectrum: List[int],
+#                          experimentalIntensities: List[int],
+#                          peptideString: str,
+#                          protonMassModified: int,
+#                          H2OMassModified: int,
+#                          NH3MassModified: int,
+#                          maxMassTolerance: int) -> float:
 
-  expSpecIntense = []
-  for x,y in zip(experimentalSpectrum, experimentalIntensities):
-    expSpecIntense.append((x, y))
+#   theoreticalMasses, theoreticalIntensities = \
+#       generateTheoreticalSpectrum(acidMassTable,
+#                                   peptideString,
+#                                   protonMassModified,
+#                                   H2OMassModified,
+#                                   NH3MassModified,
+#                                   peptideString)
 
-  expSpecIntense.sort(key=lambda x: x[0])
+
+#   experimentalVector, experimentalIntenseVector = \
+#         createExperimentalVector(theoreticalMasses,
+#                                  experimentalSpectrum,
+#                                  experimentalIntensities,
+#                                  maxMassTolerance)
   
-  experimentalVector = []
-  experimentalIntenseVector = []
+#   massDifferences = \
+#       calculateMassDifferences(theoreticalMasses,
+#                                experimentalVector,
+#                                maxMassTolerance)
 
-  i = 0
-  k = 0
-  while (i < len(theoreticalSpectrum)) and (k < len(expSpecIntense)):
 
-    if massTolerance(theoreticalSpectrum[i], expSpecIntense[k][0]) \
-        < maxMassTolerance:
+#   return calculateDistance(massDifferences,
+#                            theoreticalIntensities,
+#                            experimentalIntenseVector,
+#                            maxMassTolerance)
 
-      experimentalVector.append(expSpecIntense[k][0])
-      experimentalIntenseVector.append(expSpecIntense[k][1])
-      i += 1
-      k += 1
 
-    elif expSpecIntense[k][0] > theoreticalSpectrum[i]:
-      i += 1
-      experimentalVector.append(0)
-      experimentalIntenseVector.append(0)
+def calculateMassDifferences(theoreticalSpectrum,
+                             experimentalVector,
+                             maxMassTolerance):
 
+  massDifferences = []
+
+  for i in range(len(theoreticalSpectrum)):
+    if experimentalVector[i] == 0:
+      massDifferences.append(maxMassTolerance)
     else:
-      k += 1
+      massToleranceResult = \
+        massTolerance(theoreticalSpectrum[i], experimentalVector[i])
+      massDifferences.append(massToleranceResult) 
 
-  while len(experimentalVector) < len(theoreticalSpectrum):
-    experimentalVector.append(0)
-    experimentalIntenseVector.append(0)
+  return massDifferences
 
-  return experimentalVector, experimentalIntenseVector
+
+def calculateDistance(massDifferences,
+                      theoreticalIntensities,
+                      experimentalIntensities,
+                      maxMassTolerance):
+
+  distance = 0
+
+  for md, ti, ei in zip(massDifferences,
+                        theoreticalIntensities,
+                        experimentalIntensities):
+    distance += (1 - md/maxMassTolerance) * ti * ei
+
+  theoDenom = sqrt(sum([x**2 for x in theoreticalIntensities]))
+  expDenom = sqrt(sum([x**2 for x in experimentalIntensities]))
+
+  return distance / (theoDenom * expDenom)
+
+
+# def createExperimentalVector(theoreticalSpectrum: List[int],
+#                              experimentalSpectrum: List[int],
+#                              experimentalIntensities: List[int],
+#                              maxMassTolerance: int) -> List[int]:
+
+#   expSpecIntense = []
+#   for x,y in zip(experimentalSpectrum, experimentalIntensities):
+#     expSpecIntense.append((x, y))
+
+#   expSpecIntense.sort(key=lambda x: x[0])
+  
+#   experimentalVector = []
+#   experimentalIntenseVector = []
+
+#   i = 0
+#   k = 0
+#   while (i < len(theoreticalSpectrum)) and (k < len(expSpecIntense)):
+
+#     if massTolerance(theoreticalSpectrum[i], expSpecIntense[k][0]) \
+#         < maxMassTolerance:
+
+#       experimentalVector.append(expSpecIntense[k][0])
+#       experimentalIntenseVector.append(expSpecIntense[k][1])
+#       i += 1
+#       k += 1
+
+#     elif expSpecIntense[k][0] > theoreticalSpectrum[i]:
+#       i += 1
+#       experimentalVector.append(0)
+#       experimentalIntenseVector.append(0)
+
+#     else:
+#       k += 1
+
+#   while len(experimentalVector) < len(theoreticalSpectrum):
+#     experimentalVector.append(0)
+#     experimentalIntenseVector.append(0)
+
+#   return experimentalVector, experimentalIntenseVector
 
 
 def massTolerance(calculatedMass: int,
@@ -245,6 +319,42 @@ def massTolerance(calculatedMass: int,
               * 1000000))
 
 
+# def generateTheoreticalSpectrum(acidMassTable: Dict[str, int],
+#                                 peptideString: str,
+#                                 protonMassModified: int,
+#                                 H2OMassModified: int,
+#                                 NH3MassModified: int,
+#                                 peptideCharge: int) -> List[int]:
+
+#   bEnd = generateSpectrumList(acidMassTable,
+#                               peptideString,
+#                               protonMassModified,
+#                               H2OMassModified,
+#                               NH3MassModified,
+#                               peptideCharge,
+#                               False)
+
+#   yEnd = generateSpectrumList(acidMassTable,
+#                               peptideString[::-1],
+#                               protonMassModified,
+#                               H2OMassModified,
+#                               NH3MassModified,
+#                               peptideCharge,
+#                               True)
+
+#   spectrum = yEnd + bEnd
+
+#   spectrum.sort(key=lambda x: x[0])
+
+#   theoreticalMasses = []
+#   theoreticalIntensities = []
+
+#   for mass, intensity in spectrum:
+#     theoreticalMasses.append(mass)
+#     theoreticalIntensities.append(intensity)
+
+#   return theoreticalMasses, theoreticalIntensities
+
 def generateTheoreticalSpectrum(acidMassTable: Dict[str, int],
                                 peptideString: str,
                                 protonMassModified: int,
@@ -278,6 +388,38 @@ def generateTheoreticalSpectrum(acidMassTable: Dict[str, int],
 
   return (spectrum, yEnd, bEnd)
 
+
+# def generateSpectrumList(aminoMassesModified: Dict[str, int],
+#                          peptideString: str,
+#                          protonMassModified: int,
+#                          H2OMassModified: int,
+#                          NH3MassModified: int,
+#                          peptideCharge: int,
+#                          yEnd: bool) -> List[int]:
+
+#   if yEnd:
+#     additiveMass = H2OMassModified + protonMassModified
+#     intensity = 4
+#   else:
+#     additiveMass = protonMassModified
+#     intensity = 2
+
+#   spectrum = [aminoMassesModified[peptideString[0]] + additiveMass]
+
+#   for i in range(1, len(peptideString)-1):
+#     spectrum.append(spectrum[-1] + aminoMassesModified[peptideString[i]])
+
+#   spectrumMinusNH3 = [x - NH3MassModified for x in spectrum]
+#   spectrumMinusH2O = [x - H2OMassModified for x in spectrum]
+
+#   spectrum = [(mass, intensity) for mass in spectrum]
+
+#   spectrumNeutralLoss = spectrumMinusNH3 + spectrumMinusH2O
+#   spectrumNeutralLoss = [(mass, 1) for mass in spectrumNeutralLoss]
+
+#   spectrum += spectrumNeutralLoss
+
+#   return spectrum
 
 def generateSpectrumList(aminoMassesModified: Dict[str, int],
                          peptideString: str,

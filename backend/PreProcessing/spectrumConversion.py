@@ -19,7 +19,6 @@ def processSpectrum(spectrumMasses: List[Decimal],
                                                     H2OMass,
                                                     charge)
 
-
   if compressionRate !=0:
     spectrumScores = _compressScores(spectrumScores, compressionRate)
 
@@ -146,12 +145,12 @@ def _createDoubleChargeMassSpectrum(spectrumMasses: List[Decimal],
 
 
 def _addFinalMass(spectrumMasses: List[Decimal],
-                 spectrumMassesDouble: List[Decimal],
-                 spectrumScores: List[Decimal],
-                 pepMass: Decimal,
-                 charge: int,
-                 protonMass: Decimal,
-                 H2OMass: Decimal) -> Tuple[List[Decimal], List[Decimal]]:
+                  spectrumMassesDouble: List[Decimal],
+                  spectrumScores: List[Decimal],
+                  pepMass: Decimal,
+                  charge: int,
+                  protonMass: Decimal,
+                  H2OMass: Decimal) -> Tuple[List[Decimal], List[Decimal]]:
 
   spectrumScoresDouble = [x for x in spectrumScores]
   pepMass = (pepMass * charge) - (protonMass * (charge - 1))

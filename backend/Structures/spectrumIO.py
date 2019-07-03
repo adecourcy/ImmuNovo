@@ -32,12 +32,11 @@ def _parseSpectrumFile(spectrumFile):
               'intensities': []}
 
   nextLine = spectrumFile.readline()
-  while nextLine.isspace():
-	nextLine = spectrumFile.readline()
   if nextLine == '':
     return ''
 
   while "END IONS" not in nextLine:
+    nextLine = nextLine.strip()
     if '###' in nextLine:
       nextLine = spectrumFile.readline()
       continue
@@ -46,7 +45,7 @@ def _parseSpectrumFile(spectrumFile):
     elif 'CHARGE=' in nextLine:
       spectrum['charge'] = int(nextLine.split('=')[1][0])
     elif 'TITLE=' in nextLine:
-      spectrum['title'] = nextLine.split('=')[1]
+      spectrum['title'] = nextLine[6:]
     elif nextLine[0].isdigit():
       mass, intensity = nextLine.split()
       spectrum['masses'].append(Decimal(mass))
