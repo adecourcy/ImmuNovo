@@ -32,6 +32,8 @@ def _parseSpectrumFile(spectrumFile):
               'intensities': []}
 
   nextLine = spectrumFile.readline()
+  while nextLine.isspace():
+	nextLine = spectrumFile.readline()
   if nextLine == '':
     return ''
 
