@@ -104,6 +104,8 @@ def getUniqueFileName(numChars=10):
     name += random.choice(string.ascii_letters)
   if os.path.isfile(name):
     return getUniqueFileName(numChars)
+  else:
+    return name
 
 
 
