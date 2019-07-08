@@ -111,7 +111,12 @@ def getUniqueFileName(numChars=10):
 
 if __name__ == "__main__":
   inputFileName = getUniqueFileName()
+  with open(inputFileName, 'w') as f:
+    f.write('')
   outputFileName = getUniqueFileName()
+  with open(outputFileName, 'w') as f:
+    f.write('')
+
   ImmunovoDataFrame = createImmunovoDataFrame('outputFiles')
 
   alleles = setUpData(ImmunovoDataFrame, inputFileName)
@@ -119,7 +124,12 @@ if __name__ == "__main__":
   mixedDataFrame = createMixDataFrame(outputFileName)
 
   mergedDF = pd.concat([ImmunovoDataFrame, mixedDataFrame])
-  mergedDF.to_csv(index=False)
+
+  os.remove(inputFileName)
+  os.remove(outputFileName)
+
+  with open('data_out.csv', 'w') as f:
+    f.write(mergedDF.to_csv(index=False))
 
 
   
