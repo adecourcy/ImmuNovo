@@ -33,7 +33,7 @@ def _parseSpectrumFile(spectrumFile):
 
   nextLine = spectrumFile.readline()
   while nextLine.isspace():
-	nextLine = spectrumFile.readline()
+    nextLine = spectrumFile.readline()
   if nextLine == '':
     return ''
 
