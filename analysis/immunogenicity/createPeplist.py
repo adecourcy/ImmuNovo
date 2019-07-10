@@ -110,6 +110,7 @@ def getUniqueFileName(numChars=10):
 
 
 if __name__ == "__main__":
+  # Peptides of length 6???
   inputFileName = getUniqueFileName()
   with open(inputFileName, 'w') as f:
     f.write('')

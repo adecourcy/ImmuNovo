@@ -144,33 +144,32 @@ void iterateRejectedPeptides(RejectedDatabase* rejectedDatabase,
       printf("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&\n");
       printViablePeptides(*viablePeptides, 1);
       */
-      
-      *viablePeptides = getNextGeneration(viablePeptides,
-                                          rejectedDatabase,
-                                          aminoMasses,
-                                          aminoScores,
-                                          aminoAcids,
-                                          spectrumHash,
-                                          spectrumHashDouble,
-                                          maxInstanceMiscleavage,
-                                          maxTotalMiscleavage,
-                                          maxCharge,
-                                          precision,
-                                          BPenalty,
-                                          massTolerance,
-                                          averageMassTolerance,
-                                          maximumMassTolerance,
-                                          lowestPenalty,
-                                          peptideMass,
-                                          protonMass,
-                                          lowestSpecMass);
+    }
+	*viablePeptides = getNextGeneration(viablePeptides,
+									  rejectedDatabase,
+									  aminoMasses,
+									  aminoScores,
+									  aminoAcids,
+									  spectrumHash,
+									  spectrumHashDouble,
+									  maxInstanceMiscleavage,
+									  maxTotalMiscleavage,
+									  maxCharge,
+									  precision,
+									  BPenalty,
+									  massTolerance,
+									  averageMassTolerance,
+									  maximumMassTolerance,
+									  lowestPenalty,
+									  peptideMass,
+									  protonMass,
+									  lowestSpecMass);
       
       /*
       printf("###############################################\n");
       printViablePeptides(*viablePeptides, 1);
       */
-      
-    }
+
   }
 
   head = rejectedPeptides =
