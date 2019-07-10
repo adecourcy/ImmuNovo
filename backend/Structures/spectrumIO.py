@@ -27,7 +27,7 @@ def _parseSpectrumFile(spectrumFile):
 
   spectrum = {'title': '',
               'pepMass': '',
-              'charge': '',
+              'charge': '2',
               'masses': [],
               'intensities': []}
 
