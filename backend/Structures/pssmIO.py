@@ -52,7 +52,8 @@ def _parsePSSM(file):
     else:
       lineList = line.split()
       acid = lineList[0]
-      scores = lineList[1:]
+      # We're just always assuming a y-end peptide for now
+      scores = lineList[1:].reverse()
 
       if len(scores) != length:
         print(str.format("Table length for '{}' in file {} should be {} but is {}",
