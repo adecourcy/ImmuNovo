@@ -110,7 +110,7 @@ def processResults(resultsFile: str,
 
 def calculateGlobalScore(acidMassTable: Dict[str, int],
                          experimentalSpectrum: List[int],
-                         experimentalIntensities: List[int],
+                         experimentalScores: List[int],
                          peptideString: str,
                          protonMassModified: int,
                          H2OMassModified: int,
@@ -125,36 +125,36 @@ def calculateGlobalScore(acidMassTable: Dict[str, int],
                                   NH3MassModified,
                                   peptideString)
 
-  experimentalVector, experimentalIntenseVector = \
-        createExperimentalVector(theoreticalSpectrum,
-                                 experimentalSpectrum,
-                                 experimentalIntensities,
-                                 maxMassTolerance)
+  theoreticalVector = createTheoreticalVector(theoreticalSpectrum,
+                                              experimentalSpectrum,
+                                              maxMassTolerance)
   
   theoreticalMassToleranceDifferences = []
-  for i in range(len(theoreticalSpectrum)):
-    if experimentalVector[i] == 0:
+  for i in range(len(experimentalSpectrum)):
+    if theoreticalVector[i] == 0:
       theoreticalMassToleranceDifferences.append(maxMassTolerance)
     else:
       massToleranceResult = \
-        massTolerance(theoreticalSpectrum[i], experimentalVector[i])
+        massTolerance(theoreticalVector[i], experimentalSpectrum[i])
       theoreticalMassToleranceDifferences.append(massToleranceResult)
   
 
-  sumIntensities = sum(experimentalIntenseVector)
-  if sumIntensities == 0:
-    return 0
-  spectrumIntensitiesNormalized = \
-    [x / sumIntensities for x in experimentalIntenseVector]
+  sumSpectrumScores = sum(experimentalScores)
+  if sumSpectrumScores == 0:
+    sumSpectrumScores = 1
+  spectrumScoresNormalized = \
+    [x / sumSpectrumScores for x in experimentalScores]
 
 
   euclideanDistance = 0
 
-  for mt, weight in zip(theoreticalMassToleranceDifferences,
-                        spectrumIntensitiesNormalized):
-    euclideanDistance += (1 - mt/maxMassTolerance) * weight
 
-  return euclideanDistance
+  for mt, weight in zip(theoreticalMassToleranceDifferences,
+                        spectrumScoresNormalized):
+    euclideanDistance += mt * weight
+
+
+  return (1 - (euclideanDistance / maxMassTolerance))
 
 
 def createExperimentalVector(theoreticalSpectrum: List[int],
