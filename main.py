@@ -172,8 +172,8 @@ if __name__ == '__main__':
                         spectrumFileName))
       continue
 
-    outputFile.write("Filename,Spectrum Title,PSSM Name,Peptide,Global Score,"
-                     "Positional Score,Combined Score,Precursor Mass,Precursor Error\n")
+    outputFile.write("Filename,Spectrum Title,PSSM Name,Peptide,{},{},{},"
+                     "Precursor Mass,Precursor Error\n".format(SCORE_GLOBAL, SCORE_PSSM, SCORE_COMBINED))
 
     for spectrum in SpectrumIO.getSpectrums(spectrumFile):
       spectrumMasses, spectrumMassesDouble, \

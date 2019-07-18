@@ -28,7 +28,7 @@ def massToleranceMaxDiff(calculatedMass, massTolerance):
   return (minExp, maxExp)
 
 
-def getDecoys(mass, peptideDict, massTolerance):
+def getDecoys(mass, peptideDict, massTolerance, maxDecoys):
   possibles = []
 
   minDiff, maxDiff = massToleranceMaxDiff(mass, massTolerance)
@@ -37,11 +37,11 @@ def getDecoys(mass, peptideDict, massTolerance):
     if mass in peptideDict:
       possibles += peptideDict[mass]
 
-  if len(possibles) <= 10:
+  if len(possibles) <= maxDecoys:
     return possibles
 
   else:
-    return random.sample(possibles, 10)
+    return random.sample(possibles, maxDecoys)
 
 
 def calculatedAminoScore(peptide, aminoScoreList):
@@ -133,6 +133,8 @@ def programUsageOutput():
   print(str.format(padding, 'REVERSE',
         'Should decoy peptides be reversed?'))
   print('{:<20}{}'.format('','"t" or "true" or "f" or "false" (not case sensitive)'))
+  print(str.format(padding, 'MAX DECOYS',
+        'What is the maximum number of decoy peptides we consider for a spectrum?'))
 
   printOptionalArguments()
   exit()
@@ -142,8 +144,8 @@ def checkInputLength(args):
   if len(args) == 1:
     programUsageOutput()
 
-  elif len(args) < 6:
-    print("\nThis script takes at least 6 arguments.\n")
+  elif len(args) < 7:
+    print("\nThis script takes at least 7 arguments.\n")
     print("Call this script with no arguments for usage details\n")
     print("Exiting...\n")
 
@@ -154,9 +156,10 @@ if __name__ == '__main__':
   checkInputLength(sys.argv)
 
   spectrumDirectory, acidMassFile, \
-  pssmDirectory, decoyPeptideDirectory, \
-  reverse = sys.argv[1:6]
-  defaultParameters = parseParameterInput(sys.argv[6:])
+    pssmDirectory, decoyPeptideDirectory, \
+    reverse, maxDecoys = sys.argv[1:7]
+  maxDecoys = int(maxDecoys)
+  defaultParameters = parseParameterInput(sys.argv[7:])
 
   MMTString = str(defaultParameters['MMT'])
   massTolerance = '0.' + ('0' * (6 - len(MMTString))) + MMTString
@@ -257,7 +260,8 @@ if __name__ == '__main__':
                             defaultParameters['COMP']),
               defaultParameters['PREC'])
 
-        peptides = getDecoys(spectrumMasses[-1], decoys, massTolerance)
+        peptides = \
+            getDecoys(spectrumMasses[-1], decoys, massTolerance, maxDecoys)
 
         for peptide in peptides:
 
@@ -282,25 +286,17 @@ if __name__ == '__main__':
 
   for spectrumFileName in allDecoyPeptides:
     globalBest = []
+    
+    for spectrumTitle in allDecoyPeptides[spectrumFileName]:
 
-    # Code for global best scores is here
-    #
-    # for spectrumTitle in allDecoyPeptides[spectrumFileName]:
+      if allDecoyPeptides[spectrumFileName][spectrumTitle] == []:
+        continue
 
-    #   if allDecoyPeptides[spectrumFileName][spectrumTitle] == []:
-    #     continue
+        list.sort(allDecoyPeptides[spectrumFileName][spectrumTitle],
+                  key=lambda x: x[1],
+                  reverse=True)
+      globalBest.append(allDecoyPeptides[spectrumFileName][spectrumTitle][0])
 
-    #     list.sort(allDecoyPeptides[spectrumFileName][spectrumTitle],
-    #               key=lambda x: x[1],
-    #               reverse=True)
-    #   globalBest.append(allDecoyPeptides[spectrumFileName][spectrumTitle][0])
-
-    # globalBestOut = open(spectrumFileName + ".decoys.globalBest", 'w')
-
-    # for best in globalBest:
-    #   globalBestOut.write(str(best[0]) + ',' + str(best[1]) + '\n')
-
-    # globalBestOut.close()
 
     for pssmTitle in allPSSM:
       ignoredLengths = PSSM.getIgnoredLengths(pssmTitle, allPSSM)
@@ -322,26 +318,36 @@ if __name__ == '__main__':
                               positionalScore * peptide[1]))
 
         addedScores.sort(key=lambda x: x[1], reverse=True)
-        bestAminos.append(addedScores[0])
+        bestAminos.append((addedScores[0][0], addedScores[0][1]))
         addedScores.sort(key=lambda x: x[2], reverse=True)
-        bestCombined.append(addedScores[0])
+        bestCombined.append((addedScores[0][0], addedScores[0][2]))
 
       # aminoBestFileName = \
       #     str.format('{}.{}.decoys.aminoBest',
       #                spectrumFileName,
       #                pssmTitle)
-      combinedBestFileName = \
-          str.format('{}.{}.decoys',
-                     spectrumFileName,
-                     pssmTitle)
+      #combinedBestFileName = \
+      #    str.format('{}.{}.decoys',
+      #               spectrumFileName,
+      #               pssmTitle)
 
       #aminoBestOut = open(aminoBestFileName, 'w')
-      combinedBestOut = open(combinedBestFileName, 'w')
+      #combinedBestOut = open(combinedBestFileName, 'w')
 
       # for best in bestAminos:
       #   aminoBestOut.write(str(best[0]) + ',' + str(best[1]) + '\n')
-      for best in bestCombined:
-        combinedBestOut.write(str(best[0]) + ',' + str(best[2]) + '\n')
+      #for best in bestCombined:
+      #  combinedBestOut.write(str(best[0]) + ',' + str(best[2]) + '\n')
 
       #aminoBestOut.close()
-      combinedBestOut.close()
+      #combinedBestOut.close()
+    
+      with open('{}.{}.decoys.csv'.format(spectrumFileName,
+                                          pssmTitle.replace('.pssm', '')), 'w') as f:
+        f.write('{},{},{},{},{},{}\n'.format(PEPTIDE_GLOBAL_BEST, SCORE_GLOBAL,
+                                             PEPTIDE_PSSM_BEST, SCORE_PSSM,
+                                             PEPTIDE_COMBINED_BEST, SCORE_COMBINED))
+        for gBest, aBest, cBest in zip(globalBest, bestAminos, bestCombined):
+          f.write('{},{},{},{},{},{}\n'.format(gBest[0], gBest[1],
+                                             aBest[0], aBest[1],
+                                             cBest[0], cBest[1]))
