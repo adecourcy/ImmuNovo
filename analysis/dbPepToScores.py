@@ -153,6 +153,8 @@ def checkInputLength(args):
 
 if __name__ == '__main__':
 
+  fileLocation = 'analysis'
+  fileName = 'decoyScores.csv'
   checkInputLength(sys.argv)
 
   spectrumDirectory, acidMassFile, \
@@ -232,6 +234,7 @@ if __name__ == '__main__':
                         conversionOrder,
                         acidMassTable,
                         reverse)
+    
 
     for spectrumFileName in os.listdir(spectrumDirectory):
 
@@ -284,70 +287,56 @@ if __name__ == '__main__':
                                                                    globalScore))
 
 
-  for spectrumFileName in allDecoyPeptides:
-    globalBest = []
-    
-    for spectrumTitle in allDecoyPeptides[spectrumFileName]:
+  with open(os.path.join(fileLocation, fileName), 'w') as f:
 
-      if allDecoyPeptides[spectrumFileName][spectrumTitle] == []:
-        continue
-
-        list.sort(allDecoyPeptides[spectrumFileName][spectrumTitle],
-                  key=lambda x: x[1],
-                  reverse=True)
-      globalBest.append(allDecoyPeptides[spectrumFileName][spectrumTitle][0])
-
+    f.write('{},{},{},{},{},{},{},{},{}\n'.format(PEPTIDE_GLOBAL_BEST, SCORE_GLOBAL,
+                                  PEPTIDE_PSSM_BEST, SCORE_PSSM,
+                                  PEPTIDE_COMBINED_BEST, SCORE_COMBINED,
+                                  TITLE_PSSM, TITLE_SPECTRUM,
+                                  FILE_SPECTRUM))
 
     for pssmTitle in allPSSM:
       ignoredLengths = PSSM.getIgnoredLengths(pssmTitle, allPSSM)
       bestAminos = []
       bestCombined = []
+      bestGlobal = []
+      spectrums = []
 
-      for spectrumTitle in allDecoyPeptides[spectrumFileName]:
-        addedScores = []
-        if allDecoyPeptides[spectrumFileName][spectrumTitle] == []:
-          continue
+      for spectrumFileName in allDecoyPeptides:
 
-        for peptide in allDecoyPeptides[spectrumFileName][spectrumTitle]:
-          positionalScore = \
-            getPSSMScore(peptide[0], pssmTitle, allPSSM) / \
-            (10 ** defaultParameters['PREC'] * len(peptide[0]))
+        for spectrumTitle in allDecoyPeptides[spectrumFileName]:
+          addedScores = []
 
-          addedScores.append((peptide[0],
-                              positionalScore,
-                              positionalScore * peptide[1]))
+          if allDecoyPeptides[spectrumFileName][spectrumTitle] == []:
+            continue
 
-        addedScores.sort(key=lambda x: x[1], reverse=True)
-        bestAminos.append((addedScores[0][0], addedScores[0][1]))
-        addedScores.sort(key=lambda x: x[2], reverse=True)
-        bestCombined.append((addedScores[0][0], addedScores[0][2]))
+          for peptide in allDecoyPeptides[spectrumFileName][spectrumTitle]:
+            positionalScore = \
+              getPSSMScore(peptide[0], pssmTitle, allPSSM) / \
+              (10 ** defaultParameters['PREC'] * len(peptide[0]))
 
-      # aminoBestFileName = \
-      #     str.format('{}.{}.decoys.aminoBest',
-      #                spectrumFileName,
-      #                pssmTitle)
-      #combinedBestFileName = \
-      #    str.format('{}.{}.decoys',
-      #               spectrumFileName,
-      #               pssmTitle)
+            addedScores.append((peptide[0],
+                                peptide[1],
+                                positionalScore,
+                                positionalScore * peptide[1]))
 
-      #aminoBestOut = open(aminoBestFileName, 'w')
-      #combinedBestOut = open(combinedBestFileName, 'w')
-
-      # for best in bestAminos:
-      #   aminoBestOut.write(str(best[0]) + ',' + str(best[1]) + '\n')
-      #for best in bestCombined:
-      #  combinedBestOut.write(str(best[0]) + ',' + str(best[2]) + '\n')
-
-      #aminoBestOut.close()
-      #combinedBestOut.close()
+          addedScores.sort(key=lambda x: x[1], reverse=True)
+          bestGlobal.append((addedScores[0][0],
+                              addedScores[0][1]))
+          addedScores.sort(key=lambda x: x[2], reverse=True)
+          bestAminos.append((addedScores[0][0],
+                              addedScores[0][2]))
+          addedScores.sort(key=lambda x: x[3], reverse=True)
+          bestCombined.append((addedScores[0][0],
+                                addedScores[0][3]))
+          spectrums.append((spectrumTitle, spectrumFileName))
     
-      with open('{}.{}.decoys.csv'.format(spectrumFileName,
-                                          pssmTitle.replace('.pssm', '')), 'w') as f:
-        f.write('{},{},{},{},{},{}\n'.format(PEPTIDE_GLOBAL_BEST, SCORE_GLOBAL,
-                                             PEPTIDE_PSSM_BEST, SCORE_PSSM,
-                                             PEPTIDE_COMBINED_BEST, SCORE_COMBINED))
-        for gBest, aBest, cBest in zip(globalBest, bestAminos, bestCombined):
-          f.write('{},{},{},{},{},{}\n'.format(gBest[0], gBest[1],
-                                             aBest[0], aBest[1],
-                                             cBest[0], cBest[1]))
+      for gBest, aBest, cBest, spec in zip(bestGlobal,
+                                           bestAminos,
+                                           bestCombined,
+                                           spectrums):
+        f.write('{},{},{},{},{},{},{},{},{}\n'.format(gBest[0], gBest[1],
+                                                      aBest[0], aBest[1],
+                                                      cBest[0], cBest[1],
+                                                      pssmTitle, spec[0],
+                                                      spec[1]))

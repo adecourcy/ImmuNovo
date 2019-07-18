@@ -172,8 +172,13 @@ if __name__ == '__main__':
                         spectrumFileName))
       continue
 
-    outputFile.write("Filename,Spectrum Title,PSSM Name,Peptide,{},{},{},"
-                     "Precursor Mass,Precursor Error\n".format(SCORE_GLOBAL, SCORE_PSSM, SCORE_COMBINED))
+    outputFile.write("Filename,{},{},{},{},{},{},"
+                     "Precursor Mass,Precursor Error\n".format(TITLE_SPECTRUM,
+                                                               TITLE_PSSM,
+                                                               PEPTIDE,
+                                                               SCORE_GLOBAL,
+                                                               SCORE_PSSM,
+                                                               SCORE_COMBINED))
 
     for spectrum in SpectrumIO.getSpectrums(spectrumFile):
       spectrumMasses, spectrumMassesDouble, \
@@ -271,7 +276,7 @@ if __name__ == '__main__':
         spectrumTitle = spectrumTitle.replace(",", '').split()[0]
         if len(results) == 0:
           outputString = spectrumFileName + "," + spectrumTitle + \
-                         ',' + pssmTitle + ",No Peptide Found" + "\n"
+                         ',' + pssmTitle + ",{}".format(NO_PEP) + "\n"
           outputFile.write(outputString)
 
         else:
