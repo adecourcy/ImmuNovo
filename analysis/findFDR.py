@@ -138,10 +138,10 @@ if __name__ == '__main__':
   ## Add PSSM detection to this
   arguments = parseArguments()
 
-  resultsDirectory = pd.read_csv(arguments.results_directory)
+  resultsDirectory = arguments.results_directory
   combinedResults = []
   for fileName in os.listdir(resultsDirectory):
-    combinedResults.append(fileName)
+    combinedResults.append(pd.read_csv(os.path.join(resultsDirectory, fileName)))
   resultsDF = pd.concat(combinedResults)
   decoyDF = pd.read_csv(arguments.decoy_file)
 
