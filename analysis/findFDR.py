@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 # Find the scores associated with a given FDR
 # Right now, this file is hard-coded to use the combined peptide score
 #
@@ -7,6 +9,7 @@
 # Or use a score of 0 if no decoy was found?
 
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 import pandas as pd
 import sys, os
 import argparse
@@ -88,12 +91,16 @@ def findFDR(resultScores, decoyScores, FDR):
       else:
         haveFound = True
         fdrScores.append(resultScores[i])
+    
+    for i in range(len(fdrScores)-1, 0, -1):
+      if (fdrScores[i] - fdrScores[i-1]) < 0.03:
+        del fdrScores[i]
 
     return fdrScores
 
 
-  sortedResults = sorted(list(resultScores))
-  sortedDecoy = sorted(list(decoyScores))
+  sortedResults = sorted([round(x, 3) for x in list(resultScores)])
+  sortedDecoy = sorted([round(x,3) for x in list(decoyScores)])
 
   currentScore = sortedResults[0]
   fdrIndex = [False for x in range(len(resultScores))]
@@ -111,7 +118,8 @@ def findFDR(resultScores, decoyScores, FDR):
         break
 
     resultSum = len(sortedResults[resultsIndex:])
-    currentFDR = resultSum / (resultSum + len(sortedDecoy[decoyIndex:]))
+    decoySum = len(sortedDecoy[decoyIndex:])
+    currentFDR = round(decoySum / (resultSum + decoySum), 2)
     
     if currentFDR <= FDR:
       fdrIndex[resultsIndex] = True
@@ -126,15 +134,52 @@ def plotResults(resultScores,
                 decoyScores,
                 sortedResults,
                 sortedDecoys,
+                scoreType,
+                fileName,
                 fdrScores,
                 FDR):
   
-  plt.hist(resultScores, histtype='step', color='blue')
-  plt.hist(decoyScores, histtype='step', color='red')
+  plt.hist(resultScores,
+            bins=50,
+            histtype='step',
+            color='blue',
+            label='ImmuNovo')
+
+  plt.hist(decoyScores,
+            bins=50,
+            histtype='step',
+            color='red',
+            label='Decoys')
+
+  blue_patch = mpatches.Patch(color="blue", label="ImmuNovo Scores")
+  red_patch = mpatches.Patch(color="red", label="Decoy Scores")
+
+  plt.legend(handles=[blue_patch, red_patch])
+  plt.title('ImmuNovo Results vs Decoy')
+  plt.xlabel(scoreType)
+  plt.ylabel("Frequency")
+
+  fdrScoresString = '\n'.join([str(round(x,3)) for x in fdrScores])
+
+  plt.text(0.62,
+           0.75,
+           'FDR Scores at {}:\n{}'.format(FDR, fdrScoresString),
+            va='top',
+            ha='left',
+            fontsize=12,
+            transform=plt.gcf().transFigure)
+
+  for fdrScore in fdrScores:
+    plt.axvline(x=fdrScore, color='g', linestyle='dashed', linewidth=1)
+
+  #plt.savefig(fileName + '.png', dpi=300)
   plt.show()
 
 
 if __name__ == '__main__':
+
+  scoreType = SCORE_COMBINED
+  fileName = 'FDRPlot'
   ## Add PSSM detection to this
   arguments = parseArguments()
 
@@ -147,15 +192,16 @@ if __name__ == '__main__':
 
   resultScores, decoyScores = getScores(resultsDF,
                                           decoyDF,
-                                          SCORE_COMBINED)
+                                          scoreType)
   
   fdrScores, sortedResults, sortedDecoys = \
           findFDR(resultScores, decoyScores, arguments.FDR)
-  print(fdrScores)
   
   plotResults(resultScores,
               decoyScores,
               sortedResults,
               sortedDecoys,
+              scoreType,
+              fileName,
               fdrScores,
               arguments.FDR)
