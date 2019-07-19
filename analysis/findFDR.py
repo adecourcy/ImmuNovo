@@ -24,8 +24,8 @@ def parseArguments():
   parser.add_argument('-f', '--FDR',
                         default = 0.05,
                         help='The target FDR (default=0.05)', type=float)
-  parser.add_argument('results_file',
-                        help='The results file from ImmuNovo')
+  parser.add_argument('results_directory',
+                        help='A directory of results files from ImmuNovo')
   parser.add_argument('decoy_file',
                         help='A decoy scores file from dbPepToScores')
 
@@ -138,7 +138,11 @@ if __name__ == '__main__':
   ## Add PSSM detection to this
   arguments = parseArguments()
 
-  resultsDF = pd.read_csv(arguments.results_file)
+  resultsDirectory = pd.read_csv(arguments.results_directory)
+  combinedResults = []
+  for fileName in os.listdir(resultsDirectory):
+    combinedResults.append(fileName)
+  resultsDF = pd.concat(combinedResults)
   decoyDF = pd.read_csv(arguments.decoy_file)
 
   resultScores, decoyScores = getScores(resultsDF,
