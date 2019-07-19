@@ -179,7 +179,7 @@ def plotResults(resultScores,
 if __name__ == '__main__':
 
   scoreType = SCORE_COMBINED
-  fileName = 'FDRPlot'
+  plotName = 'FDRPlot'
   ## Add PSSM detection to this
   arguments = parseArguments()
 
@@ -202,6 +202,6 @@ if __name__ == '__main__':
               sortedResults,
               sortedDecoys,
               scoreType,
-              fileName,
+              plotName,
               fdrScores,
               arguments.FDR)
