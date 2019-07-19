@@ -84,6 +84,8 @@ def fileToDict(pepFile,
     if pepLine == "":
       break
     peptide = pepLine.strip()
+    if 'U' in peptide:
+      continue
     if len(peptide) < minP or len(peptide) > maxP:
       continue
     peptide = convertPeptide(peptide,

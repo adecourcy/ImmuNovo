@@ -104,7 +104,7 @@ def findFDR(resultScores, decoyScores, FDR):
   while resultsIndex < len(sortedResults):
     if sortedDecoy[decoyIndex] < currentScore:
       decoyIndex = findNextIndex(sortedDecoy, currentScore)
-      if decoyIndex == len(sortedDecoy):
+      if decoyIndex >= len(sortedDecoy):
         # Everything following has an FDR less than our desired rate
         for i in range(resultsIndex, len(fdrIndex)):
           fdrIndex[i] = True
