@@ -172,8 +172,8 @@ def plotResults(resultScores,
   for fdrScore in fdrScores:
     plt.axvline(x=fdrScore, color='g', linestyle='dashed', linewidth=1)
 
-  #plt.savefig(fileName + '.png', dpi=300)
-  plt.show()
+  plt.savefig(fileName + '.png', dpi=300)
+  #plt.show()
 
 
 if __name__ == '__main__':
