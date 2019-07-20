@@ -49,7 +49,7 @@ def getResultsScores(dataFrame, scoreType):
       df_filtered.groupby(TITLE_SPECTRUM)[scoreType].transform(max) == \
           df_filtered[scoreType]
 
-  return df_filtered[df_grouped][scoreType]
+  return df_filtered[df_grouped][[scoreType, TITLE_SPECTRUM]]
 
 
 def getDecoyScores(dataFrame, scoreType):
@@ -60,7 +60,7 @@ def getDecoyScores(dataFrame, scoreType):
       df_filtered.groupby(TITLE_SPECTRUM)[scoreType].transform(max) == \
           df_filtered[scoreType]
 
-  return df_filtered[df_grouped][scoreType]
+  return df_filtered[df_grouped][[scoreType, TITLE_SPECTRUM]]
 
 
 def getScores(resultsDF, decoyDF, scoreType):
