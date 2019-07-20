@@ -67,10 +67,10 @@ def getScores(resultsDF, decoyDF, scoreType):
   results = getResultsScores(resultsDF, scoreType)
   decoy = getDecoyScores(decoyDF, scoreType)
   resultsFiltered = \
-      results[results[TITLE_SPECTRUM].isin(decoy[TITLE_SPECTRUM])][scoreType]
+      results[results[TITLE_SPECTRUM].isin(decoy[TITLE_SPECTRUM])]
   decoyFiltered = \
-      decoy[decoy[TITLE_SPECTRUM].isin(resultsFiltered[TITLE_SPECTRUM])][scoreType]
-  return resultsFiltered, decoyFiltered
+      decoy[decoy[TITLE_SPECTRUM].isin(resultsFiltered[TITLE_SPECTRUM])]
+  return resultsFiltered[scoreType], decoyFiltered[scoreType]
 
 
 def findFDR(resultScores, decoyScores, FDR):
