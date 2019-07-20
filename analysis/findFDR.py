@@ -64,8 +64,13 @@ def getDecoyScores(dataFrame, scoreType):
 
 
 def getScores(resultsDF, decoyDF, scoreType):
-  return (getResultsScores(resultsDF, scoreType),
-          getDecoyScores(decoyDF, scoreType))
+  results = getResultsScores(resultsDF, scoreType)
+  decoy = getDecoyScores(decoyDF, scoreType)
+  resultsFiltered = \
+      results[results[TITLE_SPECTRUM].isin(decoy[TITLE_SPECTRUM])]
+  decoyFiltered = \
+      decoy[decoy[TITLE_SPECTRUM].isin(resultsFiltered[TITLE_SPECTRUM])]
+  return resultsFiltered, decoyFiltered
 
 
 def findFDR(resultScores, decoyScores, FDR):
