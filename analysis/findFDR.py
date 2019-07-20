@@ -41,7 +41,7 @@ def parseArguments():
   return arguments
 
 
-def getResultsScores(dataFrame, scoreType):
+def getScores(dataFrame, scoreType):
   df_filtered = \
       dataFrame[dataFrame[PEPTIDE] != NO_PEP][[scoreType, TITLE_SPECTRUM]]
 
@@ -50,15 +50,6 @@ def getResultsScores(dataFrame, scoreType):
           df_filtered[scoreType]
 
   return df_filtered[df_grouped][scoreType]
-
-
-def getDecoyScores(dataFrame, scoreType):
-  return dataFrame[scoreType]
-
-
-def getScores(resultsDF, decoyDF, scoreType):
-  return (getResultsScores(resultsDF, scoreType),
-          getDecoyScores(decoyDF, scoreType))
 
 
 def findFDR(resultScores, decoyScores, FDR):
@@ -190,9 +181,8 @@ if __name__ == '__main__':
   resultsDF = pd.concat(combinedResults)
   decoyDF = pd.read_csv(arguments.decoy_file)
 
-  resultScores, decoyScores = getScores(resultsDF,
-                                          decoyDF,
-                                          scoreType)
+  resultScores = getScores(resultsDF, scoreType)
+  decoyScores = getScores(decoyDF, scoreType)
   
   fdrScores, sortedResults, sortedDecoys = \
           findFDR(resultScores, decoyScores, arguments.FDR)
