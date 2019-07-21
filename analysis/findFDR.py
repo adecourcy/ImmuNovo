@@ -223,6 +223,7 @@ if __name__ == '__main__':
   resultScores, decoyScores, mergedScores = \
           getScores(resultsDF, decoyDF, scoreType)
   
+  print(max(list(mergedScores[RESULTS_RATIO])))
   plt.hist(mergedScores[RESULTS_RATIO], bins = 100)
   plt.savefig('ratio.png', dpi=300)
   exit()
