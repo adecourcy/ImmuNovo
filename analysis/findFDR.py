@@ -222,11 +222,9 @@ if __name__ == '__main__':
 
   resultScores, decoyScores, mergedScores = \
           getScores(resultsDF, decoyDF, scoreType)
-  
-  print(max(list(mergedScores[RESULTS_RATIO])))
-  print(max(list(mergedScores[RESULT_IMMUNO])))
-  print(min(list(mergedScores[RESULTS_DECOY])))
+
   plt.hist(mergedScores[RESULTS_RATIO], bins = 100)
+  plt.axvline(x=1, color='g', linestyle='dashed', linewidth=1)
   plt.savefig('ratio.png', dpi=300)
   exit()
   
