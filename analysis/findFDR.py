@@ -81,7 +81,7 @@ def getScores(resultsDF, decoyDF, scoreType):
               decoyFiltered.rename(columns={scoreType: RESULTS_DECOY}))
   
   merged[RESULTS_DECOY] = \
-    merged.apply(lambda row: 0.01 if row[RESULTS_DECOY] == 0 else row[RESULTS_DECOY], axis=1)
+    merged.apply(lambda row: 0.01 if row[RESULTS_DECOY] < 0.01 else row[RESULTS_DECOY], axis=1)
 
   merged[RESULTS_RATIO] = \
       merged.apply(lambda row: row[RESULT_IMMUNO] / row[RESULTS_DECOY], axis=1)
