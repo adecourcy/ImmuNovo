@@ -81,7 +81,7 @@ def getScores(resultsDF, decoyDF, scoreType):
               decoyFiltered.rename(columns={scoreType: RESULTS_DECOY}))
   
   merged[RESULTS_DECOY] = \
-    merged.apply(lambda row: 0.0001 if row[RESULTS_DECOY] == 0 else row[RESULTS_DECOY], axis=1)
+    merged.apply(lambda row: 0.01 if row[RESULTS_DECOY] == 0 else row[RESULTS_DECOY], axis=1)
 
   merged[RESULTS_RATIO] = \
       merged.apply(lambda row: row[RESULT_IMMUNO] / row[RESULTS_DECOY], axis=1)
@@ -223,7 +223,7 @@ if __name__ == '__main__':
   resultScores, decoyScores, mergedScores = \
           getScores(resultsDF, decoyDF, scoreType)
   
-  plt.hist(mergedScores[RESULTS_RATIO])
+  plt.hist(mergedScores[RESULTS_RATIO], bins = 100)
   plt.savefig('ratio.png', dpi=300)
   exit()
   
