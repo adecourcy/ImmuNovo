@@ -234,7 +234,7 @@ if __name__ == '__main__':
   totalNum = len(ratios)
 
   ratioFDR = []
-  scoreCheck = zip(trueScores, ratios)
+  scoreCheck = list(zip(trueScores, ratios))
   scoreCheck.sort(key=lambda x: x[0])
   for entry in scoreCheck:
     if trueNum / totalNum >= 0.95:
