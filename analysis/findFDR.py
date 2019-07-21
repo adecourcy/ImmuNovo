@@ -75,11 +75,11 @@ def getScores(resultsDF, decoyDF, scoreType):
       results[results[TITLE_SPECTRUM].isin(decoy[TITLE_SPECTRUM])]
   decoyFiltered = \
       decoy[decoy[TITLE_SPECTRUM].isin(resultsFiltered[TITLE_SPECTRUM])]
-  
-  resultsFiltered.rename(columns={scoreType: RESULT_IMMUNO})
-  decoyFiltered.rename(columns={scoreType: RESULTS_DECOY})
+      
+  merged = \
+    pd.merge(resultsFiltered.rename(columns={scoreType: RESULT_IMMUNO}),
+              decoyFiltered.rename(columns={scoreType: RESULTS_DECOY}))
 
-  merged = pd.merge(resultsFiltered, decoyFiltered)
   merged[RESULTS_RATIO] = \
       merged.apply(lambda row: row[RESULT_IMMUNO] / row[RESULTS_DECOY], axis=1)
 
