@@ -223,10 +223,31 @@ if __name__ == '__main__':
   resultScores, decoyScores, mergedScores = \
           getScores(resultsDF, decoyDF, scoreType)
 
+  #### BEGIN IMPROVISED CODE
   plt.hist(mergedScores[RESULTS_RATIO], bins = 100)
   plt.axvline(x=1, color='g', linestyle='dashed', linewidth=1)
   plt.savefig('ratio.png', dpi=300)
+
+  trueScores = list(mergedScores[RESULT_IMMUNO])
+  ratios = [1 if x > 1 else 0 for x in list(mergedScores[RESULTS_RATIO])]
+  trueNum = sum(ratios)
+  totalNum = len(ratios)
+
+  ratioFDR = []
+  scoreCheck = zip(trueScores, ratios)
+  scoreCheck.sort(key=lambda x: x[0])
+  for entry in scoreCheck:
+    if trueNum / totalNum >= 0.95:
+      if len(ratioFDR)== 0:
+        ratioFDR.append(entry[0])
+      elif entry[0] - ratioFDR[-1] > 0.03:
+        ratioFDR.append(entry[0])
+    trueNum -= entry[1]
+    totalNum -= 1
+  
+  print(ratioFDR)
   exit()
+  #### END IMPROVISED CODE
   
   fdrScores, sortedResults, sortedDecoys = \
           findFDR(resultScores, decoyScores, arguments.FDR)
