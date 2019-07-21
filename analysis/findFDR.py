@@ -21,6 +21,11 @@ sys.path.append(os.path.split(os.path.split(os.path.realpath(__file__))[0])[0])
 from backend.constants import *
 
 
+RESULT_IMMUNO = 'IMMUNOSCORES'
+RESULTS_DECOY = 'DECOYSCORES'
+RESULTS_RATIO = 'SCORERATIO'
+
+
 
 def parseArguments():
   parser = argparse.ArgumentParser()
@@ -70,7 +75,17 @@ def getScores(resultsDF, decoyDF, scoreType):
       results[results[TITLE_SPECTRUM].isin(decoy[TITLE_SPECTRUM])]
   decoyFiltered = \
       decoy[decoy[TITLE_SPECTRUM].isin(resultsFiltered[TITLE_SPECTRUM])]
-  return resultsFiltered[scoreType], decoyFiltered[scoreType]
+  
+  resultsFiltered.rename(columns={scoreType: RESULT_IMMUNO})
+  decoyFiltered.rename(columns={scoreType: RESULTS_DECOY})
+
+  merged = pd.merge(resultsFiltered, decoyFiltered)
+  merged[RESULTS_RATIO] = \
+      merged.apply(lambda row: row[RESULT_IMMUNO] / row[RESULTS_DECOY], axis=1)
+
+  return (resultsFiltered[scoreType],
+          decoyFiltered[scoreType],
+          merged)
 
 
 def findFDR(resultScores, decoyScores, FDR):
@@ -202,7 +217,12 @@ if __name__ == '__main__':
   resultsDF = pd.concat(combinedResults)
   decoyDF = pd.read_csv(arguments.decoy_file)
 
-  resultScores, decoyScores = getScores(resultsDF, decoyDF, scoreType)
+  resultScores, decoyScores, mergedScores = \
+          getScores(resultsDF, decoyDF, scoreType)
+  
+  plt.hist(mergedScores[RESULTS_RATIO])
+  plt.show()
+  exit()
   
   fdrScores, sortedResults, sortedDecoys = \
           findFDR(resultScores, decoyScores, arguments.FDR)

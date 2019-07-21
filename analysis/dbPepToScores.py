@@ -134,7 +134,7 @@ def programUsageOutput():
         'A directory containing a databases of decoy peptides'))
   print(str.format(padding, 'REVERSE',
         'Should decoy peptides be reversed?'))
-  print('{:<20}{}'.format('','"t" or "true" or "f" or "false" (not case sensitive)\nAlways use a reversed database, and set to false.'))
+  print('{:<20}{}'.format('','"t" or "true" or "f" or "false" (not case sensitive)\nWith a pre-reversed database, set to true.'))
   print(str.format(padding, 'MAX DECOYS',
         'What is the maximum number of decoy peptides we consider for a spectrum?'))
 
