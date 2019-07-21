@@ -80,7 +80,7 @@ def getScores(resultsDF, decoyDF, scoreType):
     pd.merge(resultsFiltered.rename(columns={scoreType: RESULT_IMMUNO}),
               decoyFiltered.rename(columns={scoreType: RESULTS_DECOY}))
   
-  merged[RESULT_IMMUNO] = \
+  merged[RESULT_DECOY] = \
     merged.apply(lambda row: 0.0001 if row[RESULTS_DECOY] == 0 else row[RESULTS_DECOY], axis=1)
 
   merged[RESULTS_RATIO] = \
