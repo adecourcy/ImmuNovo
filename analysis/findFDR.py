@@ -224,7 +224,7 @@ if __name__ == '__main__':
           getScores(resultsDF, decoyDF, scoreType)
   
   plt.hist(mergedScores[RESULTS_RATIO])
-  plt.show()
+  plt.savefig('ratio.png', dpi=300)
   exit()
   
   fdrScores, sortedResults, sortedDecoys = \
