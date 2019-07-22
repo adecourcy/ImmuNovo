@@ -128,9 +128,10 @@ def findFDR(dataFrame, FDR, fdrDelta=0.005, precision=3):
     print(decoys)
     print(forward)
     print(decoys / forward)
-    input()
     if decoys / forward <= FDR:
       fdrScores.append(entry[0])
+    print(entry)
+    input()
     forward -= entry[1]
     decoys - (entry[1] - 1)
   
