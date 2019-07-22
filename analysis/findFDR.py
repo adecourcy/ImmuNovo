@@ -103,13 +103,15 @@ def getScores(resultsDF, decoyDF, scoreType, deltaThreshold=0):
 def findFDR(dataFrame, FDR, fdrDelta=0.005, precision=3):
   
   def reduceFDR(fdrScores, fdrDelta, precision):
-    fdrScores = [round(x, precision) for x in fdrScores]
 
     for i in range(len(fdrScores) - 1, 0, -1):
+      if fdrScores[i] == 1:
+        del fdrScores[i]
+        continue
       if fdrScores[i] - fdrScores[i-1] <= fdrDelta:
         del fdrScores[i]
     
-    return fdrScores
+    return [round(x, precision) for x in fdrScores]
   
 
   immuNovoScores = list(mergedScores[RESULT_IMMUNO])
