@@ -91,110 +91,48 @@ def getScores(resultsDF, decoyDF, scoreType, deltaThreshold=0):
   return merged
 
 
-def findFDR(dataFrame, FDR):
-
-  def findNextIndex(scoreList, currentScore):
-    if currentScore > scoreList[-1]:
-      return len(scoreList)
-    for i in range(len(scoreList)):
-      if scoreList[i] >= currentScore:
-        return i
+def findFDR(dataFrame, FDR, fdrDelta=0.005, precision=3):
   
-  def findNextScore(scoresList, currentScore, currentIndex):
-    if currentScore >= scoresList[-1]:
-      return currentScore, len(scoresList)
-    for i in range(currentIndex, len(scoresList)):
-      if scoresList[i] > currentScore:
-        return scoresList[i], i
-  
-  def convertFDRScores(fdrIndex, resultScores):
-    fdrScores = []
+  def reduceFDR(fdrScores, fdrDelta, precision):
+    fdrScores = [round(x, precision) for x in fdrScores]
 
-    # If we have multiple valid FDR scores in a row, take the lowest
-    haveFound = False
-    for i in range(len(fdrIndex)):
-      if fdrIndex[i] == False:
-        haveFound = False
-        continue
-      elif fdrIndex[i] == True and haveFound == True:
-        continue
-      else:
-        haveFound = True
-        fdrScores.append(resultScores[i])
-    
-    for i in range(len(fdrScores)-1, 0, -1):
-      if (fdrScores[i] - fdrScores[i-1]) < 0.03:
+    for i in range(len(fdrScores) - 1, 0, -1):
+      if fdrScores[i] - fdrScores[i-1] <= fdrDelta:
         del fdrScores[i]
-
+    
     return fdrScores
-
+  
 
   immuNovoScores = list(mergedScores[RESULT_IMMUNO])
   deltas = [1 if x == True else 0 for x in list(mergedScores[RESULTS_RATIO])]
   forward = sum(ratios)
   decoys = len(ratios) - trueNum
 
-  deltaFDR = []
+  fdrScores = []
   scoreCheck = list(zip(immuNovoScores, deltas))
   scoreCheck.sort(key=lambda x: x[0])
 
   for entry in scoreCheck:
     if decoys / forward <= FDR:
-      deltaFDR.append(entry[0])
+      fdrScores.append(entry[0])
     forward -= entry[1]
     decoys - (entry[1] - 1)
   
-  print(ratioFDR)
-  exit()
+  return reduceFDR(fdrScores, fdrDelta, precision)
 
 
-  sortedResults = sorted([round(x, 3) for x in list(resultScores)])
-  sortedDecoy = sorted([round(x,3) for x in list(decoyScores)])
-
-  currentScore = sortedResults[0]
-  fdrIndex = [False for x in range(len(resultScores))]
-
-  resultsIndex = 0
-  decoyIndex = 0
-
-  while resultsIndex < len(sortedResults):
-    if sortedDecoy[decoyIndex] < currentScore:
-      decoyIndex = findNextIndex(sortedDecoy, currentScore)
-      if decoyIndex >= len(sortedDecoy):
-        # Everything following has an FDR less than our desired rate
-        for i in range(resultsIndex, len(fdrIndex)):
-          fdrIndex[i] = True
-        break
-
-    resultSum = len(sortedResults[resultsIndex:])
-    decoySum = len(sortedDecoy[decoyIndex:])
-    currentFDR = round(decoySum / (resultSum + decoySum), 2)
-    
-    if currentFDR <= FDR:
-      fdrIndex[resultsIndex] = True
-    
-    currentScore, resultsIndex = \
-        findNextScore(sortedResults, currentScore, resultsIndex)
-
-  return convertFDRScores(fdrIndex, sortedResults), sortedResults, sortedDecoy
-
-
-def plotResults(resultScores,
-                decoyScores,
-                sortedResults,
-                sortedDecoys,
-                scoreType,
+def plotResults(mergedScores,
                 fileName,
                 fdrScores,
                 FDR):
   
-  plt.hist(resultScores,
+  plt.hist(mergedScores[RESULT_IMMUNO],
             bins=50,
             histtype='step',
             color='blue',
             label='ImmuNovo')
 
-  plt.hist(decoyScores,
+  plt.hist(mergedScores[RESULTS_DECOY],
             bins=50,
             histtype='step',
             color='red',
@@ -240,41 +178,10 @@ if __name__ == '__main__':
   decoyDF = pd.read_csv(arguments.decoy_file)
 
   mergedScores = getScores(resultsDF, decoyDF, scoreType)
-
-  #### BEGIN IMPROVISED CODE
-  plt.hist(mergedScores[RESULTS_RATIO], bins = 100)
-  plt.axvline(x=1, color='g', linestyle='dashed', linewidth=1)
-  plt.savefig('ratio.png', dpi=300)
-
-  trueScores = list(mergedScores[RESULT_IMMUNO])
-  ratios = [1 if x > 1 else 0 for x in list(mergedScores[RESULTS_RATIO])]
-  trueNum = sum(ratios)
-  totalNum = len(ratios)
-
-  ratioFDR = []
-  scoreCheck = list(zip(trueScores, ratios))
-  scoreCheck.sort(key=lambda x: x[0])
-  for entry in scoreCheck:
-    if trueNum / totalNum >= 0.95:
-      if len(ratioFDR)== 0:
-        ratioFDR.append(entry[0])
-      elif entry[0] - ratioFDR[-1] > 0.03:
-        ratioFDR.append(entry[0])
-    trueNum -= entry[1]
-    totalNum -= 1
   
-  print(ratioFDR)
-  exit()
-  #### END IMPROVISED CODE
+  fdrScores = findFDR(mergedScores)
   
-  fdrScores, sortedResults, sortedDecoys = \
-          findFDR(resultScores, decoyScores, arguments.FDR)
-  
-  plotResults(resultScores,
-              decoyScores,
-              sortedResults,
-              sortedDecoys,
-              scoreType,
+  plotResults(mergedScores,
               plotName,
               fdrScores,
               arguments.FDR)
