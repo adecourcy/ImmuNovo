@@ -68,9 +68,10 @@ def getDecoyScores(dataFrame, scoreType):
   return df_filtered[df_grouped][[scoreType, TITLE_SPECTRUM]]
 
 
-def getScores(resultsDF, decoyDF, scoreType):
+def getScores(resultsDF, decoyDF, scoreType, deltaThreshold=0):
   results = getResultsScores(resultsDF, scoreType)
   decoy = getDecoyScores(decoyDF, scoreType)
+
   resultsFiltered = \
       results[results[TITLE_SPECTRUM].isin(decoy[TITLE_SPECTRUM])]
   decoyFiltered = \
@@ -80,18 +81,17 @@ def getScores(resultsDF, decoyDF, scoreType):
     pd.merge(resultsFiltered.rename(columns={scoreType: RESULT_IMMUNO}),
               decoyFiltered.rename(columns={scoreType: RESULTS_DECOY}))
   
-  merged[RESULTS_DECOY] = \
-    merged.apply(lambda row: 0.01 if row[RESULTS_DECOY] < 0.01 else row[RESULTS_DECOY], axis=1)
+  thresholdCalc = \
+    lambda row: True if row[RESULT_IMMUNO] - row[RESULTS_DECOY] > deltaThreshold \
+                     else False
 
   merged[RESULTS_RATIO] = \
-      merged.apply(lambda row: row[RESULT_IMMUNO] / row[RESULTS_DECOY], axis=1)
+      merged.apply(thresholdCalc, axis=1)
 
-  return (resultsFiltered[scoreType],
-          decoyFiltered[scoreType],
-          merged)
+  return merged
 
 
-def findFDR(resultScores, decoyScores, FDR):
+def findFDR(dataFrame, FDR):
 
   def findNextIndex(scoreList, currentScore):
     if currentScore > scoreList[-1]:
@@ -127,6 +127,25 @@ def findFDR(resultScores, decoyScores, FDR):
         del fdrScores[i]
 
     return fdrScores
+
+
+  immuNovoScores = list(mergedScores[RESULT_IMMUNO])
+  deltas = [1 if x == True else 0 for x in list(mergedScores[RESULTS_RATIO])]
+  forward = sum(ratios)
+  decoys = len(ratios) - trueNum
+
+  deltaFDR = []
+  scoreCheck = list(zip(immuNovoScores, deltas))
+  scoreCheck.sort(key=lambda x: x[0])
+
+  for entry in scoreCheck:
+    if decoys / forward <= FDR:
+      deltaFDR.append(entry[0])
+    forward -= entry[1]
+    decoys - (entry[1] - 1)
+  
+  print(ratioFDR)
+  exit()
 
 
   sortedResults = sorted([round(x, 3) for x in list(resultScores)])
@@ -220,8 +239,7 @@ if __name__ == '__main__':
   resultsDF = pd.concat(combinedResults)
   decoyDF = pd.read_csv(arguments.decoy_file)
 
-  resultScores, decoyScores, mergedScores = \
-          getScores(resultsDF, decoyDF, scoreType)
+  mergedScores = getScores(resultsDF, decoyDF, scoreType)
 
   #### BEGIN IMPROVISED CODE
   plt.hist(mergedScores[RESULTS_RATIO], bins = 100)
