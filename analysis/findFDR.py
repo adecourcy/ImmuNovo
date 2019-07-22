@@ -105,7 +105,6 @@ def findFDR(dataFrame, FDR, fdrDelta=0.005, precision=3):
   def reduceFDR(fdrScores, fdrDelta, precision):
 
     for i in range(len(fdrScores) - 1, 0, -1):
-      print(fdrScores[i])
       if fdrScores[i] == 1:
         del fdrScores[i]
         continue
