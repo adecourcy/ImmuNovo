@@ -117,11 +117,18 @@ def findFDR(dataFrame, FDR, fdrDelta=0.005, precision=3):
   forward = sum(deltas)
   decoys = len(deltas) - forward
 
+  print(forward)
+  print(decoys)
+
   fdrScores = []
   scoreCheck = list(zip(immuNovoScores, deltas))
   scoreCheck.sort(key=lambda x: x[0])
 
   for entry in scoreCheck:
+    print(decoys)
+    print(forward)
+    print(decoys / forward)
+    input()
     if decoys / forward <= FDR:
       fdrScores.append(entry[0])
     forward -= entry[1]
