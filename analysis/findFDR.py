@@ -48,8 +48,8 @@ def parseArguments():
 
   arguments = parser.parse_args()
   
-  if not (0 < arguments.FDR < 1):
-    print(str.format('{} is not a valid FDR. Should be between (0, 1)', arguments.FDR))
+  if not (0 < arguments.fdr < 1):
+    print(str.format('{} is not a valid FDR. Should be between (0, 1)', arguments.fdr))
     exit()
   
   return arguments
@@ -195,4 +195,4 @@ if __name__ == '__main__':
   plotResults(mergedScores,
               plotName,
               fdrScores,
-              arguments.FDR)
+              fdr)
