@@ -133,7 +133,7 @@ def findFDR(dataFrame, FDR, fdrDelta=0.005, precision=3):
     print(entry)
     input()
     forward -= entry[1]
-    decoys -= (entry[1] - 1)
+    decoys -= (1 - entry[1])
   
   return reduceFDR(fdrScores, fdrDelta, precision)
 
