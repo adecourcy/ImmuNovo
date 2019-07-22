@@ -32,6 +32,12 @@ def parseArguments():
   parser.add_argument('-f', '--FDR',
                         default = 0.05,
                         help='The target FDR (default=0.05)', type=float)
+  parser.add_argument('-pn', '--Plot-Name',
+                        default='fdrPlot',
+                        help='Output name of our FDR plot (default="fdrPlot")')
+  parser.add_argument('-st', '--Score-Type',
+                        default=SCORE_COMBINED,
+                        help='Score type to compare (defaults to combined score)')
   parser.add_argument('results_directory',
                         help='A directory of results files from ImmuNovo')
   parser.add_argument('decoy_file',
@@ -165,10 +171,12 @@ def plotResults(mergedScores,
 
 if __name__ == '__main__':
 
-  scoreType = SCORE_COMBINED
-  plotName = 'FDRPlot'
-  ## Add PSSM detection to this
-  arguments = parseArguments()
+  ## Add PSSM detection to this?
+  arguments = parseArguments
+
+  scoreType = arguments.st
+  plotName = arguments.pn
+  fdr = arguments.fdr
 
   resultsDirectory = arguments.results_directory
   combinedResults = []
@@ -179,7 +187,7 @@ if __name__ == '__main__':
 
   mergedScores = getScores(resultsDF, decoyDF, scoreType)
   
-  fdrScores = findFDR(mergedScores)
+  fdrScores = findFDR(mergedScores, fdr)
   
   plotResults(mergedScores,
               plotName,
