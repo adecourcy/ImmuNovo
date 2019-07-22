@@ -23,7 +23,7 @@ from backend.constants import *
 
 RESULT_IMMUNO = 'IMMUNOSCORES'
 RESULTS_DECOY = 'DECOYSCORES'
-RESULTS_RATIO = 'SCORERATIO'
+RESULTS_DELTA = 'SCOREDELTA'
 
 
 
@@ -94,7 +94,7 @@ def getScores(resultsDF, decoyDF, scoreType, deltaThreshold=0):
     lambda row: True if row[RESULT_IMMUNO] - row[RESULTS_DECOY] > deltaThreshold \
                      else False
 
-  merged[RESULTS_RATIO] = \
+  merged[RESULTS_DELTA] = \
       merged.apply(thresholdCalc, axis=1)
 
   return merged
@@ -113,9 +113,9 @@ def findFDR(dataFrame, FDR, fdrDelta=0.005, precision=3):
   
 
   immuNovoScores = list(mergedScores[RESULT_IMMUNO])
-  deltas = [1 if x == True else 0 for x in list(mergedScores[RESULTS_RATIO])]
-  forward = sum(ratios)
-  decoys = len(ratios) - trueNum
+  deltas = [1 if x == True else 0 for x in list(mergedScores[RESULTS_DELTA])]
+  forward = sum(deltas)
+  decoys = len(deltas) - forward
 
   fdrScores = []
   scoreCheck = list(zip(immuNovoScores, deltas))
@@ -175,7 +175,7 @@ def plotResults(mergedScores,
 if __name__ == '__main__':
 
   ## Add PSSM detection to this?
-  arguments = parseArguments
+  arguments = parseArguments()
 
   scoreType = arguments.scoreType
   plotName = arguments.plotName
