@@ -30,12 +30,15 @@ RESULTS_RATIO = 'SCORERATIO'
 def parseArguments():
   parser = argparse.ArgumentParser()
   parser.add_argument('-f', '--FDR',
+                        dest='fdr',
                         default = 0.05,
                         help='The target FDR (default=0.05)', type=float)
   parser.add_argument('-pn', '--Plot-Name',
+                        dest='plotName',
                         default='fdrPlot',
                         help='Output name of our FDR plot (default="fdrPlot")')
   parser.add_argument('-st', '--Score-Type',
+                        dest='scoreType',
                         default=SCORE_COMBINED,
                         help='Score type to compare (defaults to combined score)')
   parser.add_argument('results_directory',
@@ -174,8 +177,8 @@ if __name__ == '__main__':
   ## Add PSSM detection to this?
   arguments = parseArguments
 
-  scoreType = arguments.st
-  plotName = arguments.pn
+  scoreType = arguments.scoreType
+  plotName = arguments.plotName
   fdr = arguments.fdr
 
   resultsDirectory = arguments.results_directory
