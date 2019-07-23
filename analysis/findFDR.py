@@ -91,7 +91,7 @@ def getScores(resultsDF, decoyDF, scoreType, deltaThreshold=0):
               decoyFiltered.rename(columns={scoreType: RESULTS_DECOY}))
   
   thresholdCalc = \
-    lambda row: True if row[RESULT_IMMUNO] - row[RESULTS_DECOY] > deltaThreshold \
+    lambda row: True if row[RESULT_IMMUNO] - row[RESULTS_DECOY] >= deltaThreshold \
                      else False
 
   merged[RESULTS_DELTA] = \
