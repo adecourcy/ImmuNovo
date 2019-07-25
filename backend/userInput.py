@@ -1,5 +1,7 @@
 from decimal import Decimal
 
+import argparse
+
 def tryFiles(files):
   cannotOpen = []
   for file in files:
@@ -47,7 +49,69 @@ def printOptionalArguments():
         'The maximum mass tolerance penalty'))
 
 
+def parseArguments():
+  parser = argparse.ArgumentParser()
 
+  parser.add_argument('SpecDir',
+      help='A directory containing 1 ar more spectrum files')
+  parser.add_argument('AcidMassFile',
+      help='A file containing mass spectrometry data')
+  parser.add_argument('PssmDir',
+      help='A directory containing a positional scoring matrix')
+
+  defaultParameters = \
+    {"DEBUG": 0}
+  
+  parser.add_argument('-minP', '--Minimum-Peptide-Length',
+      type=int,
+      default=9,
+      help='The minimum length of a peptide in our search')
+  parser.add_argument('-maxP', '--Maximum-Peptide-Length',
+      type=int,
+      default=12,
+      help='The maximum length of a peptide in our search')
+  parser.add_argument('-prec', '--Precision',
+      type=int,
+      default=4,
+      help='Decimial precision of our search')
+  parser.add_argument('-outS', '--Output-File-Suffix',
+      default='.out.csv',
+      help='Suffix of the output file')
+  parser.add_argument('-mmt', '--Maximum-Mass-Tolerance',
+      type=int,
+      default=35,
+      help='The maximum deviance between a peptide mass and spectrum mass '
+      'before we consider the masses to not be matched (PPM)')
+  parser.add_argument('-amt', '--Average-Mass-Tolerance',
+      type=int,
+      default=10,
+      help='The deviance between a peptide and spectrum mass we would expect '
+      'to see given instrument accuracy (PMM)')
+  
+  parser.add_argument('-imc', '--Intermediate-Miscleavage',
+      type=int,
+      default=1,
+      help='Number of consectutive miscleavages until a peptide is discarded')
+  parser.add_argument('-amc', '--Absolute-Miscleavage',
+      type=int,
+      default=3,
+      help='Number of total miscleavages before a peptide is discarded')
+  parser.add_argument('-bin', '--Number-of-Bins',
+      type=int,
+      default=5,
+      help='The maximum "bin" size of a spectrum mass')
+  parser.add_argument('-bPen', '--B-ion-Penalty',
+      type=float,
+      default=0.5,
+      help='The score reduction if a b-ion, but not a y-ion, is matched')
+  parser.add_argument('-comp', '--Spectrum-Compression',
+      type=int,
+      default=2,
+      help='The spectrum intensity log compression level')
+  parser.add_argument('-tolp', '--Total-Mass-Tolerance-Penalty',
+      type=float,
+      default=0.5,
+      help='The maximum mass tolerance penalty')
 
 
 def parseParameterInput(args):
