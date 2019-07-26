@@ -108,7 +108,12 @@ def processResults(resultsFile: str,
   return nodes[::-1]
 
 
+################################################################################
 # Taken directly from Lei's code
+
+# Spectrums should be sorted by m/z
+# Spectrums should be tuple format (m/z, intensity)
+
 def cosineSimilarity(spectrum_lhs: List[Tuple[int, int]],
                      spectrum_rhs: List[Tuple[int, int]],
                      maxMassTolerance) -> float:
@@ -153,6 +158,42 @@ def cosineSimilarity(spectrum_lhs: List[Tuple[int, int]],
 
   return round(similarity, 4)
 
+
+
+def keepTopKPeaks(spectrum: List[Tuple[int, int]],
+                  K: int):
+
+  spectrumSorted = sorted(spectrum, key=lambda x: x[1])
+  spectrumSorted = spectrumSorted[:K]
+  spectrumSorted.sort(lambda x: x[0])
+
+  return spectrumSorted
+
+
+def removeAdjacentPeaks(spectrum: List[Tuple[int, int]],
+                        precision):
+
+  def differenceCalc(mz1, mz2):
+    return massTolerance(mz1, mz2)
+  
+  filteredSpectrum = spectrum[:]
+  
+  for i in range(len(filteredSpectrum)-1):
+    if differenceCalc(filteredSpectrum[i][0], filteredSpectrum[i+1][0]) <= precision:
+      highestPeak = max(filteredSpectrum[i][0], filteredSpectrum[i+1][0])
+      filteredSpectrum[i][0] = highestPeak
+      filteredSpectrum[i+1][0] = highestPeak
+  
+  return filteredSpectrum
+
+
+def Normalize(spectrum: List[Tuple[int, int]], scale):
+  maxPeak = sorted(spectrum, key=lambda x: x[1])[0][1]
+  return [(x[0], x[1]/ (maxPeak * scale)) for x in spectrum]
+
+
+
+################################################################################
 
 def calculateGlobalScore(acidMassTable: Dict[str, int],
                          experimentalSpectrum: List[int],
