@@ -108,6 +108,52 @@ def processResults(resultsFile: str,
   return nodes[::-1]
 
 
+# Taken directly from Lei's code
+def cosineSimilarity(spectrum_lhs: List[Tuple[int, int]],
+                     spectrum_rhs: List[Tuple[int, int]],
+                     maxMassTolerance) -> float:
+
+  similarity = 0
+  magnitude_lhs = 0
+  magnitude_rhs = 0
+
+  i_lhs = 0
+  i_rhs = 0
+
+  while (i_lhs < len(spectrum_lhs) and i_rhs < len(spectrum_rhs)):
+
+    mz_lhs = spectrum_lhs[i_lhs][0]
+    mz_rhs = spectrum_rhs[i_rhs][0]
+
+    intensity_lhs = spectrum_lhs[i_lhs][1]
+    intensity_rhs = spectrum_rhs[i_rhs][1]
+
+    if massTolerance(mz_lhs, mz_rhs) < maxMassTolerance:
+      similarity += intensity_lhs * intensity_rhs
+      magnitude_lhs += intensity_lhs * intensity_lhs
+      magnitude_rhs += intensity_rhs * intensity_rhs
+      i_lhs += 1
+      i_rhs += 1
+    elif (mz_lhs < mz_rhs):
+      magnitude_lhs += intensity_lhs * intensity_lhs
+      i_lhs += 1
+    else:
+      magnitude_rhs += intensity_rhs * intensity_rhs
+      i_rhs += 1
+  
+  while (i_lhs < len(spectrum_lhs)):
+    magnitude_lhs += spectrum_lhs[i_lhs][1] ** 2
+    i_lhs += 1
+  
+  while (i_rhs < len(spectrum_rhs)):
+    magnitude_rhs += spectrum_rhs[i_rhs][1] ** 2
+    i_rhs += 1
+  
+  similarity /= (sqrt(magnitude_rhs) * sqrt(magnitude_lhs))
+
+  return round(similarity, 4)
+
+
 def calculateGlobalScore(acidMassTable: Dict[str, int],
                          experimentalSpectrum: List[int],
                          experimentalIntensities: List[int],
