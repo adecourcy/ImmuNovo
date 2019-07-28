@@ -211,7 +211,7 @@ def buildModel():
 
     pm = build()
     pm.compile(optimizer=k.optimizers.adam(lr=0.0003), loss='cosine')
-    pm.load_weights('pm.hdf5')
+    pm.load_weights('./pm.hdf5')
 
     return pm
 
