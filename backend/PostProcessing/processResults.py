@@ -166,6 +166,9 @@ def nnScoring(peptide,
   x = [predfull.embed(sp) for sp in sps]
   y = pm.predict(predfull.asnp32(x))
 
+  print(observedVector)
+  input()
+
   spectralVectors = [predfull.spectralVector(yi, precision) for yi in y]
   print(spectralVectors[0])
   input()

@@ -203,7 +203,7 @@ def spectralVector(y, precision):
 
     y = y ** 4 # re
     mzs, its = sparse(imz, y, th=0.001)
-    return [(int(mz * 10**precision), int(it * 10**precision)) for mz, it in zip(mzs, its)]
+    return [(int(mz), int(it * 10**precision)) for mz, it in zip(mzs, its)]
 
 
 def buildModel():
