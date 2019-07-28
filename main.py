@@ -266,8 +266,8 @@ if __name__ == '__main__':
           exit()
         
 
-        rawSpectralVector = [x for x in zip(float(Spectrum.getMasses(spectrum)),
-                                            float(Spectrum.getIntensities(spectrum)))]
+        rawSpectralVector = [x for x in zip(Spectrum.getMasses(spectrum),
+                                            Spectrum.getIntensities(spectrum))]
 
         experimentalSpectrum = spectrumMasses + spectrumMassesDouble
         experimentalIntensities = spectrumIntensities + spectrumIntensitiesDouble
