@@ -163,9 +163,9 @@ def cosineSimilarity(spectrum_lhs: List[Tuple[int, int]],
 def keepTopKPeaks(spectrum: List[Tuple[int, int]],
                   K: int):
 
-  spectrumSorted = sorted(spectrum, key=lambda x: x[1])
+  spectrumSorted = sorted(spectrum, key=lambda x: x[1], reverse=True)
   spectrumSorted = spectrumSorted[:K]
-  spectrumSorted.sort(lambda x: x[0])
+  spectrumSorted.sort(key=lambda x: x[0])
 
   return spectrumSorted
 
@@ -180,15 +180,15 @@ def removeAdjacentPeaks(spectrum: List[Tuple[int, int]],
   
   for i in range(len(filteredSpectrum)-1):
     if differenceCalc(filteredSpectrum[i][0], filteredSpectrum[i+1][0]) <= precision:
-      highestPeak = max(filteredSpectrum[i][0], filteredSpectrum[i+1][0])
-      filteredSpectrum[i][0] = highestPeak
-      filteredSpectrum[i+1][0] = highestPeak
+      highestPeak = max(filteredSpectrum[i][1], filteredSpectrum[i+1][1])
+      filteredSpectrum[i] = (filteredSpectrum[i][0], highestPeak)
+      filteredSpectrum[i+1] = (filteredSpectrum[i+1][0], highestPeak)
   
   return filteredSpectrum
 
 
-def Normalize(spectrum: List[Tuple[int, int]], scale):
-  maxPeak = sorted(spectrum, key=lambda x: x[1])[0][1]
+def Normalize(spectrum: List[Tuple[int, int]], scale=1):
+  maxPeak = sorted(spectrum, key=lambda x: x[1], reverse=True)[0][1]
   return [(x[0], x[1]/ (maxPeak * scale)) for x in spectrum]
 
 
