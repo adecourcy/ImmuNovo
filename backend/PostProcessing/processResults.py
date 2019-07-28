@@ -2,17 +2,23 @@ from typing import *
 from decimal import Decimal
 from math import sqrt
 
+import backend.PostProcessing.spectralPrediction.predfull as predfull
+
 class Node:
   def __init__(self,
                peptideString: str,
-               mass: Decimal,
-               precursorError: Decimal,
-               adjustedScore: Decimal,
-               unadjustedScore: Decimal,
-               massScore: Decimal,
-               aminoScore: Decimal,
-               globalScore,
-               combinedScore):
+               mass: float,
+               precursorError: float,
+               adjustedScore: float,
+               unadjustedScore: float,
+               massScore: float,
+               aminoScore: float,
+               globalScore: float,
+               etdScore: float,
+               hcdScore: float,
+               combinedScore: float,
+               combinedETD: float,
+               combinedHCD: float):
     self.peptideString = peptideString
     self.mass = mass
     self.precursorError = precursorError
@@ -21,7 +27,11 @@ class Node:
     self.massScore = massScore
     self.aminoScore = aminoScore
     self.globalScore = globalScore
+    self.etdScore = etdScore
+    self.hcdScore = hcdScore
     self.combinedScore = combinedScore
+    self.combinedETD = combinedETD
+    self.combinedHCD = combinedHCD
 
   def __eq__(self, other) -> bool:
     if type(other) is type(self):
@@ -43,6 +53,8 @@ class Node:
         return self.combinedScore < other.combinedScore
       else:
         return self.combinedScore < other.combinedScore
+
+
 
 def deConvertPeptideString(peptideString, acidConversion):
 
@@ -66,9 +78,11 @@ def processResults(resultsFile: str,
                    NH3MassModified: int,
                    maxMassTolerance: int,
                    precision: int,
-                   acidConversion: List[Tuple[str, str]]) -> List[Node]:
+                   acidConversion: List[Tuple[str, str]],
+                   charge,
+                   pm) -> List[Node]:
 
-  decPrec = Decimal(10 ** precision)
+  decPrec = 10 ** precision
   results = open(resultsFile, "r")
   nodes = []
 
@@ -81,12 +95,12 @@ def processResults(resultsFile: str,
     if peptideString == "":
       break
 
-    mass = Decimal(results.readline()) / decPrec
+    mass = float(results.readline()) / decPrec
     precursorMass = results.readline()
-    adjustedScore = Decimal(results.readline()) / decPrec
-    unadjustedScore = Decimal(results.readline()) / decPrec
-    massScore = Decimal(results.readline()) / decPrec
-    aminoScore = (Decimal(results.readline()) / decPrec) / len(peptideString)
+    adjustedScore = float(results.readline()) / decPrec
+    unadjustedScore = float(results.readline()) / decPrec
+    massScore = float(results.readline()) / decPrec
+    aminoScore = (float(results.readline()) / decPrec) / len(peptideString)
     globalScore  = calculateGlobalScore(acidMassTable,
                                         experimentalSpectrum,
                                         experimentalScores,
@@ -96,23 +110,67 @@ def processResults(resultsFile: str,
                                         NH3MassModified,
                                         maxMassTolerance)
     
-    # Put NN score code here
+    etdScore, hcdScore = nnScoring(peptideString[::-1],
+                                    rawSpectralVector,
+                                    massTolerance,
+                                    charge,
+                                    pm,
+                                    precision)
 
-    combinedScore = aminoScore * Decimal(globalScore)
+    combinedScore = aminoScore * globalScore
+    combinedETD = aminoScore * etdScore
+    combinedHCD = aminoScore * hcdScore
       
     nodes.append(Node(deConvertPeptideString(peptideString[::-1], acidConversion),
                       mass,
                       precursorMass,
                       adjustedScore,
-                      unadjustedScore,
-                      massScore,
-                      aminoScore,
-                      globalScore,
-                      combinedScore))
+                      round(unadjustedScore, 4),
+                      round(massScore, 4),
+                      round(aminoScore, 4),
+                      round(globalScore, 4),
+                      round(etdScore, 4),
+                      round(hcdScore, 4),
+                      round(combinedScore, 4),
+                      round(combinedETD, 4),
+                      round(combinedHCD, 4)))
 
   nodes.sort()
 
   return nodes[::-1]
+
+
+# Returns ETD score followed by HCD score
+def nnScoring(peptide,
+              observedVector,
+              maxMassTolerance,
+              charge,
+              pm,
+              precision,
+              collisionType='',
+              NCE=-1):
+
+  if NCE == -1:
+    NCE = 25
+  
+  # Naming from predfull conventions
+  sps = []
+  # For now, just run for both collision types (2: ETD, 3: HCD)
+  sps.append({'pep': peptide, 'charge': charge, 'type': 2,
+              'nce': NCE, 'mass': predfull.fastmass(peptide, 'M', charge)})
+  sps.append({'pep': peptide, 'charge': charge, 'type': 3,
+              'nce': NCE, 'mass': predfull.fastmass(peptide, 'M', charge)})
+
+  x = [predfull.embed(sp) for sp in sps]
+  y = pm.predict(predfull.asnp32(x))
+
+  spectralVectors = [predfull.spectralVector(yi, precision) for yi in y]
+
+  nnVectors = \
+      [Normalize(removeAdjacentPeaks(keepTopKPeaks(x, 100), maxMassTolerance)) \
+                for x in spectralVectors]
+  
+  return [cosineSimilarity(spectralVectors, x, maxMassTolerance) for x in nnVectors]
 
 
 ################################################################################

@@ -8,6 +8,10 @@ NH3MASS=Decimal("17.03052")
 SCORE_GLOBAL = 'Global Score'
 SCORE_PSSM = 'PSSM Score'
 SCORE_COMBINED = 'Combined Score'
+SCORE_ETD_NN = 'NN ETD Score'
+SCORE_ETD_COMBINED = 'NN ETD Combined Score'
+SCORE_HCD_NN = 'NN HCD Score'
+SCORE_HCD_COMBINED = 'NN HCD Combined Score'
 
 PEPTIDE = 'Peptide'
 PEPTIDE_GLOBAL_BEST = 'Peptide Global Best'

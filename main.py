@@ -11,6 +11,7 @@ import backend.Structures.spectrum as Spectrum
 import backend.PreProcessing.acidConversion as AcidConversion
 import backend.PreProcessing.spectrumConversion as SpectrumConversion
 import backend.PostProcessing.processResults as ProcessResults
+import backend.PostProcessing.spectralPrediction.predfull as predfull
 from backend.constants import *
 from backend.userInput import *
 
@@ -125,6 +126,8 @@ if __name__ == '__main__':
   spectrumDirectory, acidMassFile, pssmDirectory = sys.argv[1:4]
   defaultParameters = parseParameterInput(sys.argv[4:])
 
+  pm = predfull.buildModel()
+
   acidMassTable = \
       AcidMassTable.adjustForPrecision(
           AcidMassTableIO.getAminoMasses(acidMassFile),
@@ -172,13 +175,17 @@ if __name__ == '__main__':
                         spectrumFileName))
       continue
 
-    outputFile.write("Filename,{},{},{},{},{},{},"
+    outputFile.write("Filename,{},{},{},{},{},{},{},{},{},{}"
                      "Precursor Mass,Precursor Error\n".format(TITLE_SPECTRUM,
                                                                TITLE_PSSM,
                                                                PEPTIDE,
                                                                SCORE_GLOBAL,
                                                                SCORE_PSSM,
-                                                               SCORE_COMBINED))
+                                                               SCORE_COMBINED,
+                                                               SCORE_ETD_NN,
+                                                               SCORE_ETD_COMBINED,
+                                                               SCORE_HCD_NN,
+                                                               SCORE_HCD_COMBINED))
 
     for spectrum in SpectrumIO.getSpectrums(spectrumFile):
       spectrumMasses, spectrumMassesDouble, \
@@ -274,7 +281,9 @@ if __name__ == '__main__':
                                                 int((NH3MASS * (10 ** defaultParameters["PREC"]))),
                                                 defaultParameters["MMT"],
                                                 defaultParameters["PREC"],
-                                                conversionTable)
+                                                conversionTable,
+                                                Spectrum.getCharge(spectrum),
+                                                pm)
 
 
         spectrumTitle = Spectrum.getTitle(spectrum)
@@ -300,6 +309,10 @@ if __name__ == '__main__':
                          node.globalScore,
                          node.aminoScore,
                          node.combinedScore,
+                         node.etdScore,
+                         node.combinedETD,
+                         node.hcdScore,
+                         node.combinedHCD,
                          Spectrum.getPrecursorMass(spectrum),
                          node.precursorError)
 
