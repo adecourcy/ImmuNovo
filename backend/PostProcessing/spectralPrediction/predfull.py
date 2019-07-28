@@ -12,8 +12,8 @@ from keras.layers import Conv1D, MaxPooling1D, Input, Dense, LSTM, concatenate, 
 from keras import Model
 import tensorflow as tf
 
-from coord import CoordinateChannel2D, CoordinateChannel1D
-from position import Position_Embedding
+from backend.PostProcessing.spectralPrediction.coord import CoordinateChannel2D, CoordinateChannel1D
+from backend.PostProcessing.spectralPrediction.position import Position_Embedding
 
 # install cmass for better performance
 # pip install pyteomics.cythonize
