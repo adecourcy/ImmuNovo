@@ -167,10 +167,18 @@ def nnScoring(peptide,
   y = pm.predict(predfull.asnp32(x))
 
   spectralVectors = [predfull.spectralVector(yi, precision) for yi in y]
+  print(spectralVectors[0])
+  input()
+  print(spectralVectors[1])
+  input()
 
   nnVectors = \
       [Normalize(removeAdjacentPeaks(keepTopKPeaks(x, 100), maxMassTolerance)) \
                 for x in spectralVectors]
+  print(nnVectors[0])
+  input()
+  print(nnVectors[1])
+  input()
   
   return [cosineSimilarity(observedVector, x, maxMassTolerance) for x in nnVectors]
 
