@@ -245,11 +245,12 @@ def removeAdjacentPeaks(spectrum: List[Tuple[int, int]],
     return massTolerance(mz1, mz2)
   
   filteredSpectrum = spectrum[:]
-
-  print(filteredSpectrum[i][0])
-  print(filteredSpectrum[i+1][0])
   
   for i in range(len(filteredSpectrum)-1):
+    print(filteredSpectrum[i][0])
+    print(filteredSpectrum[i+1][0])
+    print(differenceCalc(filteredSpectrum[i][0], filteredSpectrum[i+1][0]))
+    print(precision)
     if differenceCalc(filteredSpectrum[i][0], filteredSpectrum[i+1][0]) <= precision:
       highestPeak = max(filteredSpectrum[i][1], filteredSpectrum[i+1][1])
       filteredSpectrum[i] = (filteredSpectrum[i][0], highestPeak)
