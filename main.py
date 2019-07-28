@@ -301,7 +301,7 @@ if __name__ == '__main__':
               continue
 
             outputString = \
-              str.format('{},{},{},{},{},{},{},{},{}\n',
+              str.format('{},{},{},{},{},{},{},{},{},{},{},{},{}',
                          spectrumFileName,
                          spectrumTitle,
                          pssmTitle,
