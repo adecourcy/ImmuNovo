@@ -58,6 +58,7 @@ def deConvertPeptideString(peptideString, acidConversion):
 
 def processResults(resultsFile: str,
                    acidMassTable: Dict[str, int],
+                   rawSpectralVector,
                    experimentalSpectrum: List[int],
                    experimentalScores: List[int],
                    protonMassModified: int,
@@ -70,6 +71,10 @@ def processResults(resultsFile: str,
   decPrec = Decimal(10 ** precision)
   results = open(resultsFile, "r")
   nodes = []
+
+  processedSpectralVector = \
+      Normalize(removeAdjacentPeaks(keepTopKPeaks(rawSpectralVector, 100),
+                                    maxMassTolerance))
 
   while True:
     peptideString = results.readline().strip()
@@ -90,6 +95,8 @@ def processResults(resultsFile: str,
                                         H2OMassModified,
                                         NH3MassModified,
                                         maxMassTolerance)
+    
+    # Put NN score code here
 
     combinedScore = aminoScore * Decimal(globalScore)
       

@@ -257,11 +257,16 @@ if __name__ == '__main__':
         if cOutput != 0:
           clean()
           exit()
+        
+
+        rawSpectralVector = [x for x in zip(Spectrum.getMasses(spectrum),
+                                            Spectrum.getIntensities(spectrum))]
 
         experimentalSpectrum = spectrumMasses + spectrumMassesDouble
         experimentalIntensities = spectrumIntensities + spectrumIntensitiesDouble
         results = ProcessResults.processResults(resultsFile,
                                                 acidMassTable,
+                                                rawSpectralVector,
                                                 experimentalSpectrum,
                                                 experimentalIntensities,
                                                 protonMassAdjusted,
