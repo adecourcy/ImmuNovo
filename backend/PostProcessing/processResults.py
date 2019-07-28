@@ -170,7 +170,7 @@ def nnScoring(peptide,
       [Normalize(removeAdjacentPeaks(keepTopKPeaks(x, 100), maxMassTolerance)) \
                 for x in spectralVectors]
   
-  return [cosineSimilarity(spectralVectors, x, maxMassTolerance) for x in nnVectors]
+  return [cosineSimilarity(observedVector, x, maxMassTolerance) for x in nnVectors]
 
 
 ################################################################################
