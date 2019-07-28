@@ -183,6 +183,9 @@ def cosineSimilarity(spectrum_lhs: List[Tuple[int, int]],
                      spectrum_rhs: List[Tuple[int, int]],
                      maxMassTolerance) -> float:
 
+  spectrum_lhs.sort(key=lambda x: x[0])
+  spectrum_rhs.sort(key=lambda x: x[0])
+
   similarity = 0
   magnitude_lhs = 0
   magnitude_rhs = 0
@@ -242,6 +245,9 @@ def removeAdjacentPeaks(spectrum: List[Tuple[int, int]],
     return massTolerance(mz1, mz2)
   
   filteredSpectrum = spectrum[:]
+
+  print(filteredSpectrum[i][0])
+  print(filteredSpectrum[i+1][0])
   
   for i in range(len(filteredSpectrum)-1):
     if differenceCalc(filteredSpectrum[i][0], filteredSpectrum[i+1][0]) <= precision:
