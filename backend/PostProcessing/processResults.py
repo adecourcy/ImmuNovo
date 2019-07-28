@@ -150,7 +150,7 @@ def nnScoring(peptide,
               collisionType='',
               NCE=-1):
 
-  peptide.replace('B', 'M')
+  peptide = peptide.replace('B', 'M')
 
   if NCE == -1:
     NCE = 25
