@@ -172,7 +172,7 @@ def nnScoring(peptide,
   input()
 
   #spectralVectors = [predfull.spectralVector(yi, precision) for yi in y]
-  output = [tomgf(sp, yi) for sp, yi in zip(sps, y)]
+  output = [predfull.tomgf(sp, yi) for sp, yi in zip(sps, y)]
   print(output[0])
   print(spectralVectors[0])
   input()
