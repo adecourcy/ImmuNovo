@@ -136,7 +136,7 @@ def processResults(resultsFile: str,
                       round(combinedETD, 4),
                       round(combinedHCD, 4)))
 
-  nodes.sort(key=lambda x: x.combinedHCD, reversed=True)
+  nodes.sort(key=lambda x: x.combinedHCD, reverse=True)
 
   return nodes
 
