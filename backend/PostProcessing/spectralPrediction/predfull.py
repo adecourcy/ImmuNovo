@@ -198,13 +198,13 @@ def tomgf(sp, y):
     return head + '\n'.join(peaks) + '\nEND IONS'
 
 
-def spectralVector(y, precision):
+def spectralVector(y):
 
     imz = np.arange(0, dim, dtype='int32') * precision + low # more acurate
 
     y = y ** 4 # re
     mzs, its = sparse(imz, y, th=0.001)
-    peaks = [(int(mz * 10**precision), it * 1000) for mz, it in zip(mzs, its)]
+    peaks = [(mz * 10, it * 1000) for mz, it in zip(mzs, its)]
 
     return peaks
 
