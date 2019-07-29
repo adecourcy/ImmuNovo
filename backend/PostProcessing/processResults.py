@@ -136,9 +136,9 @@ def processResults(resultsFile: str,
                       round(combinedETD, 4),
                       round(combinedHCD, 4)))
 
-  nodes.sort()
+  nodes.sort(key=lambda x: x.combinedHCD, reversed=True)
 
-  return nodes[::-1]
+  return nodes
 
 
 # Returns ETD score followed by HCD score
