@@ -199,11 +199,18 @@ def tomgf(sp, y):
 
 
 def spectralVector(y, precision):
+    head = ("BEGIN IONS\n"
+        f"Title={sp['pep']}\n"
+        f"CHARGE={sp['charge']}+\n"
+        f"PEPMASS={sp['mass']}\n")
+
     imz = np.arange(0, dim, dtype='int32') * precision + low # more acurate
 
     y = y ** 4 # re
     mzs, its = sparse(imz, y, th=0.001)
-    return [(mz, it) for mz, it in zip(mzs, its)]
+    peaks = [f"{f4(mz)} {f4(it * 1000)}" for mz, it in zip(mzs, its)]
+
+    return head + '\n'.join(peaks) + '\nEND IONS'
 
 
 def buildModel():
