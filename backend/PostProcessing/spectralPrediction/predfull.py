@@ -204,9 +204,9 @@ def spectralVector(sp, y):
 
     y = y ** 4 # re
     mzs, its = sparse(imz, y, th=0.001)
-    peaks = [f"{f4(mz)} {f4(it * 1000)}" for mz, it in zip(mzs, its)]
+    peaks = [(f4(mz), f4(it * 1000)) for mz, it in zip(mzs, its)]
 
-    return '\n'.join(peaks)
+    return peaks
 
 
 def buildModel():
