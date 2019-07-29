@@ -166,18 +166,13 @@ def nnScoring(peptide,
   x = [predfull.embed(sp) for sp in sps]
   y = pm.predict(predfull.asnp32(x))
 
-  print(peptide)
-  print(charge)
-  print(predfull.fastmass(peptide, 'M', charge))
-  input()
-
   spectralVectors = [predfull.spectralVector(yi, precision) for sp, yi in zip(sps, y)]
   output = [predfull.tomgf(sp, yi) for sp, yi in zip(sps, y)]
   print(output[0])
   input()
   print(spectralVectors[0])
   input()
-  print(spectralVectors[1])
+  print(observedVector)
   input()
 
   nnVectors = \
