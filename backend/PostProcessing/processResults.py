@@ -175,7 +175,7 @@ def nnScoring(peptide,
       [Normalize(removeAdjacentPeaks(keepTopKPeaks(x, 100), maxMassTolerance)) \
                 for x in spectralVectors]
   
-  return [cosineSimilarity(observedVector, x, maxMassTolerance) for x in nnVectors]
+  return [cosineSimilarity(observedVector, x, 0.1, 'difference') for x in nnVectors]
 
 
 ################################################################################
@@ -186,7 +186,14 @@ def nnScoring(peptide,
 
 def cosineSimilarity(spectrum_lhs: List[Tuple[int, int]],
                      spectrum_rhs: List[Tuple[int, int]],
-                     maxMassTolerance) -> float:
+                     maxDistance,
+                     distanceMetric: 'massTolerance') -> float:
+  
+  if distanceMetric == 'massTolerance':
+    distance = massTolerance
+  elif distanceMetric == 'difference':
+    distance = lambda x, y: abs(x - y) 
+  
 
   spectrum_lhs.sort(key=lambda x: x[0])
   spectrum_rhs.sort(key=lambda x: x[0])
@@ -210,7 +217,7 @@ def cosineSimilarity(spectrum_lhs: List[Tuple[int, int]],
     intensity_lhs = spectrum_lhs[i_lhs][1]
     intensity_rhs = spectrum_rhs[i_rhs][1]
 
-    if massTolerance(mz_lhs, mz_rhs) < maxMassTolerance:
+    if distance(mz_lhs, mz_rhs) < maxDistance:
       similarity += intensity_lhs * intensity_rhs
       magnitude_lhs += intensity_lhs * intensity_lhs
       magnitude_rhs += intensity_rhs * intensity_rhs
