@@ -158,8 +158,8 @@ def nnScoring(peptide,
   # Naming from predfull conventions
   sps = []
   # For now, just run for both collision types (2: ETD, 3: HCD)
-  sps.append({'pep': peptide, 'charge': charge, 'type': 2,
-              'nce': NCE, 'mass': predfull.fastmass(peptide, 'M', charge)})
+  #sps.append({'pep': peptide, 'charge': charge, 'type': 2,
+  #            'nce': NCE, 'mass': predfull.fastmass(peptide, 'M', charge)})
   sps.append({'pep': peptide, 'charge': charge, 'type': 3,
               'nce': NCE, 'mass': predfull.fastmass(peptide, 'M', charge)})
 
@@ -171,7 +171,8 @@ def nnScoring(peptide,
   print(predfull.fastmass(peptide, 'M', charge))
   input()
 
-  spectralVectors = [predfull.spectralVector(yi, precision) for yi in y]
+  #spectralVectors = [predfull.spectralVector(yi, precision) for yi in y]
+  print(predfull.tomgf(sps[0], y))
   print(spectralVectors[0])
   input()
   print(spectralVectors[1])
