@@ -204,7 +204,7 @@ def spectralVector(y):
 
     y = y ** 4 # re
     mzs, its = sparse(imz, y, th=0.001)
-    peaks = [(mz * 10, it * 1000) for mz, it in zip(mzs, its)]
+    peaks = [(mz, it * 1000) for mz, it in zip(mzs, its)]
 
     return peaks
 

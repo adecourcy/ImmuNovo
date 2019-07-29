@@ -158,7 +158,7 @@ def nnScoring(peptide,
   # Naming from predfull conventions
   sps = []
   # For now, just run for both collision types (2: ETD, 3: HCD)
-  sps.append({'pep': peptide, 'charge': charge, 'type': 3,
+  sps.append({'pep': peptide, 'charge': charge, 'type': 2,
               'nce': NCE, 'mass': predfull.fastmass(peptide, 'M', charge)})
   sps.append({'pep': peptide, 'charge': charge, 'type': 3,
               'nce': NCE, 'mass': predfull.fastmass(peptide, 'M', charge)})
@@ -167,21 +167,10 @@ def nnScoring(peptide,
   y = pm.predict(predfull.asnp32(x))
 
   spectralVectors = [predfull.spectralVector(yi) for yi in y]
-  output = [predfull.tomgf(sp, yi) for sp, yi in zip(sps, y)]
-  print(output[0])
-  input()
-  print(spectralVectors[0])
-  input()
-  print(observedVector)
-  input()
 
   nnVectors = \
       [Normalize(removeAdjacentPeaks(keepTopKPeaks(x, 100), maxMassTolerance)) \
                 for x in spectralVectors]
-  print(nnVectors[0])
-  input()
-  print(nnVectors[1])
-  input()
   
   return [cosineSimilarity(observedVector, x, maxMassTolerance) for x in nnVectors]
 
