@@ -188,6 +188,10 @@ def cosineSimilarity(spectrum_lhs: List[Tuple[int, int]],
   spectrum_lhs.sort(key=lambda x: x[0])
   spectrum_rhs.sort(key=lambda x: x[0])
 
+  print(spectrum_lhs)
+  print(spectrum_rhs)
+  input()
+
   similarity = 0
   magnitude_lhs = 0
   magnitude_rhs = 0
