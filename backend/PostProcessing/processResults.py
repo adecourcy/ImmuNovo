@@ -112,7 +112,7 @@ def processResults(resultsFile: str,
                                         maxMassTolerance)
     
     etdScore, hcdScore = nnScoring(peptideString[::-1],
-                                    rawSpectralVector,
+                                    processedSpectralVector,
                                     maxMassTolerance,
                                     charge,
                                     pm,
@@ -161,7 +161,7 @@ def nnScoring(peptide,
   # For now, just run for both collision types (2: ETD, 3: HCD)
 #  sps.append({'pep': peptide, 'charge': charge, 'type': 2,
 #              'nce': NCE, 'mass': predfull.fastmass(peptide, 'M', charge)})
-  sps.append({'pep': peptide, 'charge': charge, 'type': 3,
+  sps.append({'pep': peptide, 'charge': charge, 'type': 2,
               'nce': NCE, 'mass': predfull.fastmass(peptide, 'M', charge)})
   sps.append({'pep': peptide, 'charge': charge, 'type': 3,
               'nce': NCE, 'mass': predfull.fastmass(peptide, 'M', charge)})
