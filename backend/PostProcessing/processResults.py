@@ -151,6 +151,7 @@ def nnScoring(peptide,
               NCE=-1):
 
   peptide = peptide.replace('B', 'M')
+  print(peptide)
 
   if NCE == -1:
     NCE = 25
