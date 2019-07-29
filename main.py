@@ -126,8 +126,6 @@ if __name__ == '__main__':
   spectrumDirectory, acidMassFile, pssmDirectory = sys.argv[1:4]
   defaultParameters = parseParameterInput(sys.argv[4:])
 
-  pm = predfull.buildModel()
-
   acidMassTable = \
       AcidMassTable.adjustForPrecision(
           AcidMassTableIO.getAminoMasses(acidMassFile),
@@ -163,6 +161,7 @@ if __name__ == '__main__':
   NH3MassAdjusted = int(NH3MASS * (10**defaultParameters['PREC']))
   protonMassAdjusted = int(PROTONMASS * (10**defaultParameters['PREC']))
 
+  pm = predfull.buildModel()
 
   for spectrumFileName in os.listdir(spectrumDirectory):
     spectrumFile = os.path.join(spectrumDirectory, spectrumFileName)
