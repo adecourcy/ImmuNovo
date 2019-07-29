@@ -198,7 +198,7 @@ def tomgf(sp, y):
     return head + '\n'.join(peaks) + '\nEND IONS'
 
 
-def spectralVector(y, precision):
+def spectralVector(sp, y):
     head = ("BEGIN IONS\n"
         f"Title={sp['pep']}\n"
         f"CHARGE={sp['charge']}+\n"
