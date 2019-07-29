@@ -164,7 +164,7 @@ def nnScoring(peptide,
               'nce': NCE, 'mass': predfull.fastmass(peptide, 'M', charge)})
 
   x = [predfull.embed(sp) for sp in sps]
-  y = pm.predict(predfull.asnp32(x))
+  y = [pm.predict(predfull.asnp32(x))]
 
   print(peptide)
   print(charge)
