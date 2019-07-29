@@ -2,6 +2,7 @@ from typing import *
 from decimal import Decimal
 from math import sqrt
 
+from backend.constants import *
 import backend.PostProcessing.spectralPrediction.predfull as predfull
 
 class Node:
@@ -151,7 +152,6 @@ def nnScoring(peptide,
               NCE=-1):
 
   peptide = peptide.replace('B', 'M')
-  print(peptide)
 
   if NCE == -1:
     NCE = 25
@@ -175,7 +175,7 @@ def nnScoring(peptide,
       [Normalize(removeAdjacentPeaks(keepTopKPeaks(x, 100), maxMassTolerance)) \
                 for x in spectralVectors]
   
-  return [cosineSimilarity(observedVector, x, 0.2, 'difference') for x in nnVectors]
+  return [cosineSimilarity(observedVector, x, NN_COSINE_DIFFERENCE, 'difference') for x in nnVectors]
 
 
 ################################################################################

@@ -4,6 +4,9 @@ PROTONMASS=Decimal("1.0072766")
 H2OMASS=Decimal("18.01528")
 NH3MASS=Decimal("17.03052")
 
+
+NN_COSINE_DIFFERENCE = 0.1
+
 # Constants for CSV Headers
 SCORE_GLOBAL = 'Global Score'
 SCORE_PSSM = 'PSSM Score'
