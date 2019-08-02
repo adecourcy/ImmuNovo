@@ -108,7 +108,7 @@ def getSpectrumCharges(fileName):
                        Constants.CHARGE: charges})
 
 
-def reduceSpectrums(reducedResults, spectrums):
+def reduceSpectrums(results, spectrums):
   results = results[results[Constants.TITLE_SPECTRUM]].drop_duplicates()
 
   return spectrums[spectrums[Constants.TITLE_SPECTRUM].isin(results[Constants.TITLE_SPECTRUM])]
