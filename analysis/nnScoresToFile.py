@@ -193,7 +193,7 @@ if __name__ == '__main__':
   suffix = arguments.suffix
   
   for fragmentationType in fragTypes:
-    fragmentationType = arguments.fragmentation_type
+    fragmentationType = fragmentationType
     nnFormattedFile = \
       getNNFormattedDF(reducedResults, spectrumCharges, fragmentationType)
     writeNNFormattedFile(nnFormattedFile, tmpNNInput)
