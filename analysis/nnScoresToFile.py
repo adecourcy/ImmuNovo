@@ -171,12 +171,12 @@ if __name__ == '__main__':
   spectrumCharges = \
     reduceSpectrums(reducedResults, getSpectrumCharges(arguments.mgf_file))
   
-  if arguments.fragmentationType == 'BOTH':
+  if arguments.fragmentation_type == 'BOTH':
     fragTypes = ['HCD', 'ETD']
     if arguments.suffix == '':
       arguments.suffix = '-nn'
   else:
-    fragTypes = [arguments.fragmentationType]
+    fragTypes = [arguments.fragmentation_type]
     if arguments.suffix == '':
       arguments.suffix = '-' + arguments.suffix
   
