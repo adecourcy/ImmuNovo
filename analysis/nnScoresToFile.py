@@ -38,17 +38,17 @@ def callNN(inputFileName, outputFileName, predfullLocation):
 
 
 def getNNFormattedDF(reducedResultsDF, reducedSpectrums, collisionType):
-  pd.merge(reducedResultsDF,
-           reducedSpectrums,
-           how='left',
-           on=Constants.TITLE_SPECTRUM)
-  reducedResultsDF['Type'] = [collisionType for i in range(len(reducedResultsDF))]
-  reducedResultsDF['NCE'] = [25 for i in range(len(reducedResultsDF))]
+  nnDF = pd.merge(reducedResultsDF,
+                  reducedSpectrums,
+                  how='left',
+                  on=Constants.TITLE_SPECTRUM)
+  nnDF = nnDF['Type'] = [collisionType for i in range(len(nnDF))]
+  nnDF = nnDF['NCE'] = [25 for i in range(len(nnDF))]
   # Just in case the names don't match
-  reducedResultsDF.rename({Constants.PEPTIDE : 'Peptide'})
-  reducedResults.drop(columns='index')
+  nnDF = nnDF.rename({Constants.PEPTIDE : 'Peptide'})
+  nnDF = nnDF.drop(columns='index')
   
-  return reducedResultsDF
+  return nnDF
 
 
 def mergeCosineScores(resultsDF, reducedResultsDF, cosineScores, collisionType):
