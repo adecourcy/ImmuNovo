@@ -12,7 +12,6 @@ import backend.constants as Constants
 import backend.PostProcessing.processResults as ProcessResults
 
 
-
 def writeNNFormattedFile(nnResultsDF, tmpFileName):
   with open(tmpFileName, 'w') as f:
     f.write(nnResultsDF.to_csv(sep='\t', index=False))
@@ -33,15 +32,18 @@ def writeFinal(mergedResults, finalName):
 def callNN(inputFileName, outputFileName, predfullLocation):
   # /l/glibc-2.17/lib/ld-2.17.so --library-path /l/glibc-2.17/lib:/usr/lib64:/lib64
   # /l/python3.6.6/bin/python predfull.py --input single.tsv --output single.mgf
+  oldDir = os.getcwd()
+  os.chdir(predfullLocation)
   subprocess.run(['/l/glibc-2.17/lib/ld-2.17.so',
                   '--library-path',
                   '/l/glibc-2.17/lib:/usr/lib64:/lib64',
                   '/l/python3.6.6/bin/python',
                   os.path.join(predfullLocation, 'predfull.py'),
                   '--input',
-                  inputFileName,
+                  os.path.join(oldDir, inputFileName),
                   '--output',
-                  outputFileName])
+                  os.path.join(oldDir, outputFileName)])
+  os.chdir(oldDir)
 
 
 def getNNFormattedDF(reducedResultsDF, reducedSpectrums, collisionType):
