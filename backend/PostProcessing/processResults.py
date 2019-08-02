@@ -3,7 +3,7 @@ from decimal import Decimal
 from math import sqrt
 
 from backend.constants import *
-import backend.PostProcessing.spectralPrediction.predfull as predfull
+#import backend.PostProcessing.spectralPrediction.predfull as predfull
 
 class Node:
   def __init__(self,
@@ -142,40 +142,40 @@ def processResults(resultsFile: str,
 
 
 # Returns ETD score followed by HCD score
-def nnScoring(peptide,
-              observedVector,
-              maxMassTolerance,
-              charge,
-              pm,
-              precision,
-              collisionType='',
-              NCE=-1):
+# def nnScoring(peptide,
+#               observedVector,
+#               maxMassTolerance,
+#               charge,
+#               pm,
+#               precision,
+#               collisionType='',
+#               NCE=-1):
 
-  peptide = peptide.replace('B', 'M')
+#   peptide = peptide.replace('B', 'M')
 
-  if NCE == -1:
-    NCE = 25
+#   if NCE == -1:
+#     NCE = 25
   
-  # Naming from predfull conventions
-  sps = []
-  # For now, just run for both collision types (2: ETD, 3: HCD)
-#  sps.append({'pep': peptide, 'charge': charge, 'type': 2,
-#              'nce': NCE, 'mass': predfull.fastmass(peptide, 'M', charge)})
-  sps.append({'pep': peptide, 'charge': charge, 'type': 2,
-              'nce': NCE, 'mass': predfull.fastmass(peptide, 'M', charge)})
-  sps.append({'pep': peptide, 'charge': charge, 'type': 3,
-              'nce': NCE, 'mass': predfull.fastmass(peptide, 'M', charge)})
+#   # Naming from predfull conventions
+#   sps = []
+#   # For now, just run for both collision types (2: ETD, 3: HCD)
+# #  sps.append({'pep': peptide, 'charge': charge, 'type': 2,
+# #              'nce': NCE, 'mass': predfull.fastmass(peptide, 'M', charge)})
+#   sps.append({'pep': peptide, 'charge': charge, 'type': 2,
+#               'nce': NCE, 'mass': predfull.fastmass(peptide, 'M', charge)})
+#   sps.append({'pep': peptide, 'charge': charge, 'type': 3,
+#               'nce': NCE, 'mass': predfull.fastmass(peptide, 'M', charge)})
 
-  x = [predfull.embed(sp) for sp in sps]
-  y = pm.predict(predfull.asnp32(x))
+#   x = [predfull.embed(sp) for sp in sps]
+#   y = pm.predict(predfull.asnp32(x))
 
-  spectralVectors = [predfull.spectralVector(yi) for yi in y]
+#   spectralVectors = [predfull.spectralVector(yi) for yi in y]
 
-  nnVectors = \
-      [normalize(removeAdjacentPeaks(keepTopKPeaks(x, 100), maxMassTolerance)) \
-                for x in spectralVectors]
+#   nnVectors = \
+#       [normalize(removeAdjacentPeaks(keepTopKPeaks(x, 100), maxMassTolerance)) \
+#                 for x in spectralVectors]
   
-  return [cosineSimilarity(observedVector, x, NN_COSINE_DIFFERENCE, 'difference') for x in nnVectors]
+#   return [cosineSimilarity(observedVector, x, NN_COSINE_DIFFERENCE, 'difference') for x in nnVectors]
 
 
 ################################################################################
