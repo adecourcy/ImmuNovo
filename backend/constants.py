@@ -26,6 +26,8 @@ TITLE_SPECTRUM = 'Spectrum Title'
 
 FILE_SPECTRUM = 'Spectrum File'
 
+CHARGE = 'Charge'
+
 
 # Constants for CSV entries
 NO_PEP = 'No Peptide Found'

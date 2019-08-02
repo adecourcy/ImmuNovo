@@ -225,7 +225,7 @@ if __name__ == '__main__':
 
     pm = build()
     pm.compile(optimizer=k.optimizers.adam(lr=0.0003), loss='cosine')
-    pm.load_weights('pm.hdf5')
+    pm.load_weights('./pm.hdf5')
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--input', type=str, help='input file path', default='example.tsv')

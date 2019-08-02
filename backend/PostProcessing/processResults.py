@@ -88,7 +88,7 @@ def processResults(resultsFile: str,
   nodes = []
 
   processedSpectralVector = \
-      Normalize(removeAdjacentPeaks(keepTopKPeaks(rawSpectralVector, 100),
+      normalize(removeAdjacentPeaks(keepTopKPeaks(rawSpectralVector, 100),
                                     maxMassTolerance))
 
   while True:
@@ -172,7 +172,7 @@ def nnScoring(peptide,
   spectralVectors = [predfull.spectralVector(yi) for yi in y]
 
   nnVectors = \
-      [Normalize(removeAdjacentPeaks(keepTopKPeaks(x, 100), maxMassTolerance)) \
+      [normalize(removeAdjacentPeaks(keepTopKPeaks(x, 100), maxMassTolerance)) \
                 for x in spectralVectors]
   
   return [cosineSimilarity(observedVector, x, NN_COSINE_DIFFERENCE, 'difference') for x in nnVectors]
@@ -267,7 +267,7 @@ def removeAdjacentPeaks(spectrum: List[Tuple[int, int]],
   return filteredSpectrum
 
 
-def Normalize(spectrum: List[Tuple[int, int]], scale=1):
+def normalize(spectrum: List[Tuple[int, int]], scale=1):
   maxPeak = sorted(spectrum, key=lambda x: x[1], reverse=True)[0][1]
   return [(x[0], x[1]/ (maxPeak * scale)) for x in spectrum]
 
