@@ -1,6 +1,6 @@
 import argparse
 import subprocess
-import os
+import sys, os
 # cheap hack until I can figure out how to do this properly in
 # python 3.6
 sys.path.append(os.path.split(os.path.split(os.path.realpath(__file__))[0])[0])
