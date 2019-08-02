@@ -127,7 +127,7 @@ def parseResults(fileName):
 
 
 def reduceResults(results):
-  results = results[[Constants.TITLE_SPECTRUM, Constants.PEPTIDE]]
+  results = results[[Constants.TITLE_SPECTRUM, Constants.PEPTIDE, 'index']]
   results = results[results[Constants.PEPTIDE] != Constants.NO_PEP]
   
   return results
