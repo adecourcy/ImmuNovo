@@ -30,7 +30,7 @@ def callNN(inputFileName, outputFileName, predfullLocation):
                   '--library-path',
                   '/l/glibc-2.17/lib:/usr/lib64:/lib64',
                   '/l/python3.6.6/bin/python',
-                  os.join(predfullLocation, 'predfull.py'),
+                  os.path.join(predfullLocation, 'predfull.py'),
                   '--input',
                   inputFileName,
                   '--output',
@@ -139,7 +139,7 @@ def parseArguments():
   parser.add_argument('mgf_file',
                       help='The MGF file with the spectrums for the results file')
   parser.add_argument('predfull_location',
-                       help='The location of the predfull.py file')
+                       help='The directory containing the predfull.py file')
   parser.add_argument('fragmentation_type',
                       help='The fragmentation type to run for the NN (HCD or ETD)',
                       choices=['HCD', 'ETD', 'BOTH'])
