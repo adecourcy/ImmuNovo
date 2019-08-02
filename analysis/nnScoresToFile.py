@@ -46,7 +46,7 @@ def getNNFormattedDF(reducedResultsDF, reducedSpectrums, collisionType):
   nnDF['NCE'] = [25 for i in range(len(nnDF))]
   # Just in case the names don't match
   nnDF = nnDF.rename({Constants.PEPTIDE : 'Peptide'})
-  nnDF = nnDF.drop(columns='index')
+  nnDF = nnDF.drop(columns=['index', Constants.TITLE_SPECTRUM])
   
   return nnDF
 
