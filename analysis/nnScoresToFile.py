@@ -15,7 +15,7 @@ import backend.PostProcessing.processResults as ProcessResults
 
 def writeNNFormattedFile(nnResultsDF, tmpFileName):
   with open(tmpFileName, 'w') as f:
-    f.write(nnResultsDF.to_csv(sep='\t'))
+    f.write(nnResultsDF.to_csv(sep='\t', index=False))
 
 
 def writeFinal(mergedResults, finalName):
