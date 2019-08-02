@@ -116,7 +116,7 @@ def reduceSpectrums(reducedResults, spectrums):
   results = \
     reducedResults[Constants.TITLE_SPECTRUM].drop_duplicates()
 
-  return spectrums[spectrums[Constants.TITLE_SPECTRUM].isin(results[Constants.TITLE_SPECTRUM])]
+  return spectrums[spectrums[Constants.TITLE_SPECTRUM].isin(results)]
 
 
 def parseResults(fileName):
