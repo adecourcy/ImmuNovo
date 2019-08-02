@@ -13,6 +13,7 @@ import backend.PostProcessing.processResults as ProcessResults
 
 
 def writeNNFormattedFile(nnResultsDF, tmpFileName):
+  nnResultsDF = convertPeptides(nnResultsDF)
   with open(tmpFileName, 'w') as f:
     f.write(nnResultsDF.to_csv(sep='\t', index=False))
 
