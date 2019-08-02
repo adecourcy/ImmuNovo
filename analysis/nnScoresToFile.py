@@ -18,6 +18,13 @@ def writeNNFormattedFile(nnResultsDF, tmpFileName):
     f.write(nnResultsDF.to_csv(sep='\t', index=False))
 
 
+def convertPeptides(nnResultsDF):
+  # Convert the M+ to M
+  nnResultsDF[Constants.PEPTIDE] = \
+      nnResultsDF[Constants.PEPTIDE].apply(lambda x: x.replace('+15.995', ''))
+  return nnResultsDF
+
+
 def writeFinal(mergedResults, finalName):
   with open(finalName, 'w') as f:
     f.write(mergedResults.to_csv())
