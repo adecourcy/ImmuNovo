@@ -163,6 +163,10 @@ def parseArguments():
                       default = '',
                       dest='suffix',
                       help='The suffix of the output results file (defaults to -hcd, -etd, or -nn for the "both" option)')
+  parser.add_argument('-s', '--suffix',
+                      default = '',
+                      dest='suffix',
+                      help='The suffix of the output results file (defaults to -hcd, -etd, or -nn for the "both" option)')
   parser.add_argument('-sl', '--Save-Location',
                       default = './nnScores',
                       dest='location',
@@ -180,8 +184,9 @@ def parseArguments():
 
 
 # clean up the temporary files before exiting
-def clean():
-  pass
+def clean(*tmpFiles):
+  for f in tmpFiles:
+    os.remove(f)
   
 
 if __name__ == '__main__':
@@ -214,14 +219,14 @@ if __name__ == '__main__':
       getNNFormattedDF(reducedResults, spectrumCharges, fragmentationType)
     writeNNFormattedFile(nnFormattedFile, tmpNNInput)
 
-    #callNN(tmpNNInput, tmpNNOutput, arguments.predfull_location)
+    callNN(tmpNNInput, tmpNNOutput, arguments.predfull_location)
    
-    # cosineScores = \
-    #     getCosineScores(arguments.mgf_file,
-    #                     tmpNNOutput,
-    #                     arguments.dist,
-    #                     arguments.mt,
-    #                     reducedResults)
+    cosineScores = \
+        getCosineScores(arguments.mgf_file,
+                        tmpNNOutput,
+                        arguments.dist,
+                        arguments.mt,
+                        reducedResults)
     cosineScores = [1 for x in range(len(reducedResults))]
     
     mergedDF = mergeCosineScores(results,
