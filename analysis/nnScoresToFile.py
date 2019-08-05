@@ -199,7 +199,7 @@ if __name__ == '__main__':
       getNNFormattedDF(reducedResults, spectrumCharges, fragmentationType)
     writeNNFormattedFile(nnFormattedFile, tmpNNInput)
 
-    callNN(tmpNNInput, tmpNNOutput, arguments.predfull_location)
+    #callNN(tmpNNInput, tmpNNOutput, arguments.predfull_location)
 
     cosineScores = \
         getCosineScores(arguments.mgf_file,
