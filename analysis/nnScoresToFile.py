@@ -92,7 +92,7 @@ def getCosineScores(originalMGF,
   origSpectrumGenerator = SpectrumIO.getSpectrums(originalMGF)
   
   for nnSpectrum, resultTitle in zip(SpectrumIO.getSpectrums(nnMGF),
-                                     reduceResults[Constants.TITLE_SPECTRUM]):
+                                     reducedResults[Constants.TITLE_SPECTRUM]):
     origSpectrum = next(origSpectrumGenerator)
     while resultTitle != Spectrum.getTitle(origSpectrum):
       origSpectrum = next(origSpectrumGenerator)
