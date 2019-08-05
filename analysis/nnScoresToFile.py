@@ -97,6 +97,7 @@ def getCosineScores(originalMGF,
     print(resultTitle)
     input()
     while resultTitle != Spectrum.getTitle(origSpectrum):
+      print(Spectrum.getTitle(origSpectrum))
       origSpectrum = next(origSpectrumGenerator)
     cosineScore = \
       ProcessResults.cosineSimilarity(generateSpectralVector(origSpectrum, maxMassTolerance),
