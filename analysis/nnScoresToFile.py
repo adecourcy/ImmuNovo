@@ -94,6 +94,7 @@ def getCosineScores(originalMGF,
   
   for nnSpectrum, resultTitle in zip(SpectrumIO.getSpectrums(nnMGF),
                                      reducedResults[Constants.TITLE_SPECTRUM]):
+    print(resultTitle)
     while resultTitle != Spectrum.getTitle(origSpectrum):
       origSpectrum = next(origSpectrumGenerator)
     cosineScore = \
@@ -205,13 +206,14 @@ if __name__ == '__main__':
     writeNNFormattedFile(nnFormattedFile, tmpNNInput)
 
     #callNN(tmpNNInput, tmpNNOutput, arguments.predfull_location)
-
+    print('enter cosines')
     cosineScores = \
         getCosineScores(arguments.mgf_file,
                         tmpNNOutput,
                         arguments.dist,
                         arguments.mt,
                         reducedResults)
+    print('cosines done')
     
     mergedDF = mergeCosineScores(results,
                                 reducedResults,
