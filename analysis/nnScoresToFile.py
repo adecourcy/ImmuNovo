@@ -27,7 +27,7 @@ def convertPeptides(nnResultsDF):
 
 def writeFinal(mergedResults, finalName):
   with open(finalName, 'w') as f:
-    f.write(mergedResults.to_csv())
+    f.write(mergedResults.to_csv(index=False))
 
 
 def callNN(inputFileName, outputFileName, predfullLocation):
@@ -72,14 +72,14 @@ def mergeCosineScores(resultsDF, reducedResultsDF, cosineScores, collisionType):
   reducedResultsDF[nnScoreHeader] = cosineScores
 
   merged = pd.merge(resultsDF,
-                    reducedResultsDF.drop(columns=[Constants.PEPTIDE]),
+                    reducedResultsDF.drop(columns=[Constants.PEPTIDE, Constants.TITLE_SPECTRUM]),
                     how='left',
                     on='index')
   
   merged[nnCombinedHeader] = \
       merged[nnScoreHeader] * merged[Constants.SCORE_PSSM]
 
-  return merged
+  return merged.drop(columns='index')
 
 
 def getCosineScores(originalMGF,
