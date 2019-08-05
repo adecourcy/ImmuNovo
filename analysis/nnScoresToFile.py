@@ -163,7 +163,11 @@ def parseArguments():
                       default = '',
                       dest='suffix',
                       help='The suffix of the output results file (defaults to -hcd, -etd, or -nn for the "both" option)')
-  parser.add_argument('-d', '--Comparison-Distance',
+  parser.add_argument('-sl', '--Save-Location',
+                      default = './nnScores',
+                      dest='location',
+                      help='The location in whiche to save the program results (defaults to "nnScores" in the current directory')
+  parser.add_argument('-cd', '--Comparison-Distance',
                       default=0.1,
                       dest='dist',
                       help='The maximum comparison distance for the cosine correlation (daltons)')
@@ -220,7 +224,8 @@ if __name__ == '__main__':
                                 cosineScores,
                                 fragmentationType)
   
+  # just keep the file name, not the file path
   finalFileName = \
-    arguments.results_file.replace('.csv', arguments.suffix + '.csv')
+    os.path.split(arguments.results_file)[-1].replace('.csv', arguments.suffix + '.csv')
   writeFinal(mergedDF, finalFileName)
 
