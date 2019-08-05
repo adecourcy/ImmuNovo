@@ -206,12 +206,13 @@ if __name__ == '__main__':
 
     #callNN(tmpNNInput, tmpNNOutput, arguments.predfull_location)
    
-    cosineScores = \
-        getCosineScores(arguments.mgf_file,
-                        tmpNNOutput,
-                        arguments.dist,
-                        arguments.mt,
-                        reducedResults)
+    # cosineScores = \
+    #     getCosineScores(arguments.mgf_file,
+    #                     tmpNNOutput,
+    #                     arguments.dist,
+    #                     arguments.mt,
+    #                     reducedResults)
+    cosineScores = [1 for x in len(reduceResults)]
     
     mergedDF = mergeCosineScores(results,
                                 reducedResults,
