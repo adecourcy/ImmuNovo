@@ -163,10 +163,6 @@ def parseArguments():
                       default = '',
                       dest='suffix',
                       help='The suffix of the output results file (defaults to -hcd, -etd, or -nn for the "both" option)')
-  parser.add_argument('-s', '--suffix',
-                      default = '',
-                      dest='suffix',
-                      help='The suffix of the output results file (defaults to -hcd, -etd, or -nn for the "both" option)')
   parser.add_argument('-sl', '--Save-Location',
                       default = './nnScores',
                       dest='location',
