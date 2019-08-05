@@ -227,5 +227,5 @@ if __name__ == '__main__':
   # just keep the file name, not the file path
   finalFileName = \
     os.path.split(arguments.results_file)[-1].replace('.csv', arguments.suffix + '.csv')
-  writeFinal(mergedDF, finalFileName)
+  writeFinal(mergedDF, os.path.join(arguments.location, finalFileName))
 
