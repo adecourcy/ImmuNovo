@@ -82,17 +82,19 @@ def mergeCosineScores(resultsDF, reducedResultsDF, cosineScores, collisionType):
   return merged
 
 
-def getCosineScores(originalMGF, nnMGF, binSize, maxMassTolerance):
+def getCosineScores(originalMGF,
+                    nnMGF,
+                    binSize,
+                    maxMassTolerance,
+                    reducedResults):
   allScores = []
 
   origSpectrumGenerator = SpectrumIO.getSpectrums(originalMGF)
   
-  for nnSpectrum in SpectrumIO.getSpectrums(nnMGF):
+  for nnSpectrum, resultTitle in zip(SpectrumIO.getSpectrums(nnMGF),
+                                     reduceResults[Constants.TITLE_SPECTRUM]):
     origSpectrum = next(origSpectrumGenerator)
-    while Spectrum.getTitle(nnSpectrum) != Spectrum.getTitle(origSpectrum):
-      print(Spectrum.getTitle(nnSpectrum))
-      print(Spectrum.getTitle(origSpectrum))
-      input()
+    while resultTitle != Spectrum.getTitle(origSpectrum):
       origSpectrum = next(origSpectrumGenerator)
     cosineScore = \
       ProcessResults.cosineSimilarity(generateSpectralVector(origSpectrum, maxMassTolerance),
@@ -208,7 +210,8 @@ if __name__ == '__main__':
         getCosineScores(arguments.mgf_file,
                         tmpNNOutput,
                         arguments.dist,
-                        arguments.mt)
+                        arguments.mt,
+                        reducedResults)
     
     mergedDF = mergeCosineScores(results,
                                 reducedResults,
