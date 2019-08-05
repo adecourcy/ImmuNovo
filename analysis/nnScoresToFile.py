@@ -160,6 +160,7 @@ def parseArguments():
                       help='The fragmentation type to run for the NN (HCD or ETD)',
                       choices=['HCD', 'ETD', 'BOTH'])
   parser.add_argument('-s', '--suffix',
+                      default = '',
                       dest='suffix',
                       help='The suffix of the output results file (defaults to -hcd, -etd, or -nn for the "both" option)')
   parser.add_argument('-d', '--Comparison-Distance',
@@ -194,7 +195,7 @@ if __name__ == '__main__':
   else:
     fragTypes = [arguments.fragmentation_type]
     if arguments.suffix == '':
-      arguments.suffix = '-' + arguments.suffix
+      arguments.suffix = '-' + arguments.fragmentation_type
   
   suffix = arguments.suffix
   
