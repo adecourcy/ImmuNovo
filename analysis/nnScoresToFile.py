@@ -90,6 +90,7 @@ def getCosineScores(originalMGF, nnMGF, binSize, maxMassTolerance):
   for nnSpectrum in SpectrumIO.getSpectrums(nnMGF):
     origSpectrum = next(origSpectrumGenerator)
     while Spectrum.getTitle(nnSpectrum) != Spectrum.getTitle(origSpectrum):
+      print(Spectrum.getTitle(origSpectrum))
       origSpectrum = next(origSpectrumGenerator)
     cosineScore = \
       ProcessResults.cosineSimilarity(generateSpectralVector(origSpectrum, maxMassTolerance),
