@@ -177,6 +177,11 @@ def parseArguments():
                       help='The maximum mass tolerance for 2 m/z peaks to be considered the same (ppm)')
   
   return parser.parse_args()
+
+
+# clean up the temporary files before exiting
+def clean():
+  pass
   
 
 if __name__ == '__main__':
@@ -227,5 +232,8 @@ if __name__ == '__main__':
   # just keep the file name, not the file path
   finalFileName = \
     os.path.split(arguments.results_file)[-1].replace('.csv', arguments.suffix + '.csv')
+  if not os.path.exists(arguments.location):
+      os.makedirs(arguments.location)
   writeFinal(mergedDF, os.path.join(arguments.location, finalFileName))
+  clean()
 
