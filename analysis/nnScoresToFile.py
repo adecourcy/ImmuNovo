@@ -72,7 +72,7 @@ def mergeCosineScores(resultsDF, reducedResultsDF, cosineScores, collisionType):
   reducedResultsDF[nnScoreHeader] = cosineScores
 
   merged = pd.merge(resultsDF,
-                    reducedResultsDF.drop(columns=[Constants.PEPTIDE, Constants.CHARGE]),
+                    reducedResultsDF.drop(columns=[Constants.PEPTIDE]),
                     how='left',
                     on='index')
   
@@ -94,7 +94,6 @@ def getCosineScores(originalMGF,
   
   for nnSpectrum, resultTitle in zip(SpectrumIO.getSpectrums(nnMGF),
                                      reducedResults[Constants.TITLE_SPECTRUM]):
-    print(resultTitle)
     while resultTitle != Spectrum.getTitle(origSpectrum):
       origSpectrum = next(origSpectrumGenerator)
     cosineScore = \
@@ -206,14 +205,13 @@ if __name__ == '__main__':
     writeNNFormattedFile(nnFormattedFile, tmpNNInput)
 
     #callNN(tmpNNInput, tmpNNOutput, arguments.predfull_location)
-    print('enter cosines')
+   
     cosineScores = \
         getCosineScores(arguments.mgf_file,
                         tmpNNOutput,
                         arguments.dist,
                         arguments.mt,
                         reducedResults)
-    print('cosines done')
     
     mergedDF = mergeCosineScores(results,
                                 reducedResults,
