@@ -223,7 +223,6 @@ if __name__ == '__main__':
                         arguments.dist,
                         arguments.mt,
                         reducedResults)
-    cosineScores = [1 for x in range(len(reducedResults))]
     
     mergedDF = mergeCosineScores(results,
                                 reducedResults,
