@@ -183,12 +183,24 @@ def parseArguments():
 def clean(*tmpFiles):
   for f in tmpFiles:
     os.remove(f)
+
+
+def getUniqueFileName(numChars=10):
+  # Just try random file names until a non-existant one is found
+  name = ''
+  for i in range(numChars):
+    name += random.choice(string.ascii_letters)
+  if os.path.isfile(name):
+    return getUniqueFileName(numChars)
+  else:
+    return name
   
 
 if __name__ == '__main__':
 
-  tmpNNInput = 'tmp.tsv'
-  tmpNNOutput = 'tmp.mgf'
+  tmpName = getUniqueFileName()
+  tmpNNInput = tmpName + '.tsv'
+  tmpNNOutput = tmpName + '.mgf'
   
   arguments = parseArguments()
 
