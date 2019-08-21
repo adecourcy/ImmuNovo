@@ -1,5 +1,6 @@
 import argparse
 import subprocess
+import random
 import sys, os
 # cheap hack until I can figure out how to do this properly in
 # python 3.6
