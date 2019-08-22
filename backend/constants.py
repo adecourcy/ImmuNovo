@@ -9,7 +9,7 @@ NN_COSINE_DIFFERENCE = 0.1
 
 # Constants for CSV Headers
 SCORE_GLOBAL = 'Global Score'
-SCORE_PSSM = 'PSSM Score'
+SCORE_PSSM = 'Positional Score'
 SCORE_COMBINED = 'Combined Score'
 SCORE_ETD_NN = 'NN ETD Score'
 SCORE_ETD_COMBINED = 'NN ETD Combined Score'
