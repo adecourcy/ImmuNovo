@@ -18,11 +18,12 @@ def getAllPSSM(directory, minPepLength, maxPepLength):
                        minPepLength,
                        maxPepLength)
 
-    if missing == [] or _promptUser(missing, file) == 'uniform':
+    if missing == []: #or _promptUser(missing, file) == 'uniform':
       allPSSM[file] = ([], pssm)
     else:
       allPSSM[file] = (missing, pssm)
 
+  allPSSM['uniform'] = _adjustPSSM({}, minPepLength, maxPepLength)
 
   return allPSSM
 
