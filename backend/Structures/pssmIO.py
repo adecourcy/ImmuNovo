@@ -24,7 +24,8 @@ def getAllPSSM(directory, minPepLength, maxPepLength):
       allPSSM[file] = (missing, pssm)
   
   for key in allPSSM:
-    aminoAcids = _getAminoAcids(allPSSM[file][1])
+    aminoAcids = _getAminoAcids(allPSSM[key][1])
+    break
 
   allPSSM['uniform'] = ([], _createUniformPSSM({}, minPepLength, maxPepLength, aminoAcids))
 
