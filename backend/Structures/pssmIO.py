@@ -23,7 +23,7 @@ def getAllPSSM(directory, minPepLength, maxPepLength):
     else:
       allPSSM[file] = (missing, pssm)
 
-  #allPSSM['uniform'] = _adjustPSSM({}, minPepLength, maxPepLength)
+  allPSSM['uniform'] = ([], _adjustPSSM({}, minPepLength, maxPepLength))
 
   return allPSSM
 
