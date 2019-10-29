@@ -1,7 +1,7 @@
 from decimal import Decimal
 from os import listdir, path
 
-def getAllPSSM(directory, minPepLength, maxPepLength):
+def getAllPSSM(directory, minPepLength, maxPepLength, acids):
   allPSSM = {}
   missing = {}
 
@@ -16,30 +16,18 @@ def getAllPSSM(directory, minPepLength, maxPepLength):
 
     pssm = _adjustPSSM(pssm,
                        minPepLength,
-                       maxPepLength)
+                       maxPepLength,
+                       acids)
 
     if missing == [] or _promptUser(missing, file) == 'uniform':
       allPSSM[file] = ([], pssm)
     else:
       allPSSM[file] = (missing, pssm)
-  
-  for key in allPSSM:
-    aminoAcids = _getAminoAcids(allPSSM[key][1])
-    break
 
-  allPSSM['uniform'] = ([], _createUniformPSSM({}, minPepLength, maxPepLength, aminoAcids))
+  allPSSM['uniform'] = ([], _adjustPSSM({}, minPepLength, maxPepLength, acids))
+  print(allPSSM['uniform'])
 
   return allPSSM
-
-
-def _getAminoAcids(pssm):
-  aminoAcids = []
-  for key in pssm:
-    for acid in pssm[key]:
-      aminoAcids.append(acid)
-    break
-  return aminoAcids
-
 
 
 def _parsePSSM(file):
@@ -98,6 +86,8 @@ def _assessPSSM(missing,
 
 
 def _promptUser(missing, title):
+  return 'ignore'
+
   print(str.format("For {} there is no PSSM information for peptides of length {}",
                    title,
                    " ".join([str(x) for x in missing])))
@@ -117,7 +107,7 @@ def _promptUser(missing, title):
       print("Please choose a valid response")
 
 
-def _adjustPSSM(pssm, minPepLength, maxPepLength):
+def _adjustPSSM(pssm, minPepLength, maxPepLength, aminoAcids):
   
   newPSSM = {}
 
@@ -125,19 +115,12 @@ def _adjustPSSM(pssm, minPepLength, maxPepLength):
     if i in pssm:
       newPSSM[i] = pssm[i]
     else:
-      newPSSM[i] = _createUniformMatrix(pssm, i)
+      newPSSM[i] = _createUniformMatrix(pssm, i, aminoAcids)
 
   return newPSSM
 
-def _createUniformMatrix(pssm, length):
+def _createUniformMatrix(pssm, length, aminoAcids):
   newMatrix = {}
-
-  # weird work-around to get the amino acids we need
-  aminoAcids = []
-  for key in pssm:
-    for acid in pssm[key]:
-      aminoAcids.append(acid)
-    break
 
   numAcids = len(aminoAcids)
   for acid in aminoAcids:
@@ -146,31 +129,3 @@ def _createUniformMatrix(pssm, length):
       newMatrix[acid].append(1/numAcids)
 
   return newMatrix
-
-def _createUniformPSSM(pssm, minPepLength, maxPepLength, aminoAcids):
-  # This is a mess
-
-  def __adjustPSSM(pssm, minPepLength, maxPepLength, aminoAcids):
-    
-    newPSSM = {}
-
-    for i in range(minPepLength, maxPepLength+1):
-      if i in pssm:
-        newPSSM[i] = pssm[i]
-      else:
-        newPSSM[i] = __createUniformMatrix(pssm, i, aminoAcids)
-
-    return newPSSM
-
-  def __createUniformMatrix(pssm, length, aminoAcids):
-    newMatrix = {}
-
-    numAcids = len(aminoAcids)
-    for acid in aminoAcids:
-      newMatrix[acid] = []
-      for i in range(0, length):
-        newMatrix[acid].append(1/numAcids)
-    
-    return newMatrix
-
-  return __adjustPSSM(pssm, minPepLength, maxPepLength, aminoAcids)
