@@ -162,12 +162,12 @@ def _createUniformPSSM(pssm, minPepLength, maxPepLength, aminoAcids):
     return newPSSM
 
   def __createUniformMatrix(pssm, length, aminoAcids):
-  newMatrix = {}
+    newMatrix = {}
 
-  numAcids = len(aminoAcids)
-  for acid in aminoAcids:
-    newMatrix[acid] = []
-    for i in range(0, length):
-      newMatrix[acid].append(1/numAcids)
+    numAcids = len(aminoAcids)
+    for acid in aminoAcids:
+      newMatrix[acid] = []
+      for i in range(0, length):
+        newMatrix[acid].append(1/numAcids)
 
   return __adjustPSSM(pssm, minPepLength, maxPepLength, aminoAcids)
