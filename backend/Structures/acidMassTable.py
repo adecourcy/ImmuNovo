@@ -1,6 +1,12 @@
 def getMass(masses, acid):
   return masses[acid]
 
+def getAcids(table):
+  acids = []
+  for key in table:
+    acids.append(key)
+  return acids
+
 def adjustForPrecision(masses, precision):
   newMasses = {}
 
