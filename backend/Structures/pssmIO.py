@@ -25,7 +25,6 @@ def getAllPSSM(directory, minPepLength, maxPepLength, acids):
       allPSSM[file] = (missing, pssm)
 
   allPSSM['uniform'] = ([], _adjustPSSM({}, minPepLength, maxPepLength, acids))
-  print(allPSSM['uniform'])
 
   return allPSSM
 
