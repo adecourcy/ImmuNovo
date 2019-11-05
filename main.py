@@ -98,12 +98,13 @@ def improperNumArgumentsOutput():
   exit()
 
 def clean():
-  os.remove(specFile)
-  os.remove(specDoubleFile)
-  os.remove(acidFile)
-  os.remove(massFile)
-  os.remove(scoreFile)
-  os.remove(resultsFile)
+  fileList = [specFile, specDoubleFile, acidFile,
+              massFile, scoreFile, resultsFile]
+  for f in fileList:
+    try:
+      os.remove(f)
+    except:
+      continue
 
 
 def checkInputLength(args):
