@@ -13,6 +13,9 @@ import matplotlib.patches as mpatches
 import pandas as pd
 import sys, os
 import argparse
+import math
+
+from copy import deepcopy
 
 # cheap hack until I can figure out how to do this properly in
 # python 3.6
@@ -24,6 +27,7 @@ from backend.constants import *
 RESULT_IMMUNO = 'IMMUNOSCORES'
 RESULTS_DECOY = 'DECOYSCORES'
 RESULTS_DELTA = 'SCOREDELTA'
+FDR = 'FDR'
 
 
 
@@ -33,10 +37,13 @@ def parseArguments():
                         dest='fdr',
                         default = 0.05,
                         help='The target FDR (default=0.05)', type=float)
-  parser.add_argument('-pn', '--Plot-Name',
-                        dest='plotName',
-                        default='fdrPlot',
-                        help='Output name of our FDR plot (default="fdrPlot")')
+  # parser.add_argument('-pn', '--Plot-Name',
+  #                       dest='plotName',
+  #                       default='fdrPlot',
+  #                       help='Output name of our FDR plot (default="fdrPlot")')
+  parser.add_argument('-o', '--Output-File',
+                      dest='output_file',
+                      default='added_fdrs.csv')
   parser.add_argument('-st', '--Score-Type',
                         dest='scoreType',
                         default=SCORE_COMBINED,
@@ -47,6 +54,11 @@ def parseArguments():
                         help='A decoy scores file from dbPepToScores')
 
   arguments = parser.parse_args()
+  arguments.results_directory = os.path.abspath(arguments.results_directory)
+  arguments.decoy_file = os.path.abspath(arguments.decoy_file)
+
+  if not arguments.output_file.endswith('.csv'):
+    arguments.output_file += '.csv'
   
   if not (0 < arguments.fdr < 1):
     print(str.format('{} is not a valid FDR. Should be between (0, 1)', arguments.fdr))
@@ -100,36 +112,121 @@ def getScores(resultsDF, decoyDF, scoreType, deltaThreshold=0):
   return merged
 
 
-def findFDR(dataFrame, FDR, fdrDelta=0.005, precision=3):
-  
-  def reduceFDR(fdrScores, fdrDelta, precision):
+def dynamicFDR(maxFDR, scoreList, calculatedFDRs, increment=0.01, scoreIndex=0, fdrIndex=1):
+  # Given a sets of scores vs FDR calculations, use dynamic programming to find
+  # an optimal, monotonically decreasing step function to match scores vs FDRs
 
-    for i in range(len(fdrScores) - 1, 0, -1):
-      if fdrScores[i] == 1:
-        del fdrScores[i]
-        continue
-      if fdrScores[i] - fdrScores[i-1] <= fdrDelta:
-        del fdrScores[i]
-    
-    return [round(x, precision) for x in fdrScores]
+  def getMinScoreIndex(calcs):
+    minScore = math.inf
+    minIndex = -1
+    for i in range(len(calcs)):
+      if calcs[i] < minScore:
+        minScore = calcs[i]
+        minIndex = i
+    return minScore, minIndex
   
+
+  def createThresholdList(theoreticalFDRs):
+    thresholds = {}
+    for tFDR in theoreticalFDRs:
+      thresholds[tFDR] = 0
+    thresholdList = {}
+    for tFDR in theoreticalFDRs:
+      thresholdList[tFDR] = deepcopy(thresholds)
+    return thresholdList
+
+  maxFDR = round(maxFDR, 2)
+  calculatedFDRs = [round(x, 2) for x in calculatedFDRs]
+  theoreticalFDRs = [round((x * increment), 2) for x in range(1, round((maxFDR+increment)/increment))]
+  # print(calculatedFDRs)
+  # input()
+  # print(theoreticalFDRs)
+  # input()
+
+  # (pathIndex, calculation)
+  prevCalc = [abs(calculatedFDRs[0] - x) for x in theoreticalFDRs]
+
+  # We don't need to track paths, only score to FDR thresholds
+  prevThresholdList = createThresholdList(theoreticalFDRs)
+
+  for cIndex in range(1, len(calculatedFDRs)):
+    currentCalc = []
+    cFDR = calculatedFDRs[cIndex]
+    prevScore = scoreList[cIndex - 1]
+    #print(prevScore)
+    newThresholdList = {}
+    # print(prevCalc)
+    # input()
+    for tIndex in range(len(theoreticalFDRs)):
+      minPrevScore, minPrevIndex = getMinScoreIndex(prevCalc[:tIndex+1])
+      tFDR = theoreticalFDRs[tIndex]
+      prevFDR = theoreticalFDRs[minPrevIndex]
+      # print(minPrevScore)
+      # print(minPrevIndex)
+      # print(prevFDR)
+      # input()
+
+      currentCalc.append(abs(cFDR - tFDR) + minPrevScore)
+      newThresholdList[tFDR] = deepcopy(prevThresholdList[prevFDR])
+      newThresholdList[tFDR][prevFDR] = prevScore
+    
+    prevThresholdList = deepcopy(newThresholdList)
+    prevCalc = deepcopy(currentCalc)
+  
+  finalThresholds = prevThresholdList[maxFDR]
+  if finalThresholds[maxFDR] == 0:
+    finalThresholds[maxFDR] = scoreList[-1]
+  
+  thresholdList = []
+  for fdr in finalThresholds:
+    if finalThresholds[fdr] == 0:
+      continue
+    else:
+      thresholdList.append((finalThresholds[fdr], fdr))
+  
+  thresholdList.sort(key=lambda x: x[1])
+
+  return thresholdList
+
+
+def findFDR(dataFrame, FDR, fdrDelta=0.005, precision=3):
 
   immuNovoScores = list(mergedScores[RESULT_IMMUNO])
   deltas = [1 if x == True else 0 for x in list(mergedScores[RESULTS_DELTA])]
-  forward = sum(deltas)
-  decoys = len(deltas) - forward
+  forward = sum(deltas) # How many scores >= decoy scores
+  decoys = len(deltas) - forward # How many scores < decoy scores
 
-  fdrScores = []
+  fdrList = []
   scoreCheck = list(zip(immuNovoScores, deltas))
   scoreCheck.sort(key=lambda x: x[0])
+  immuNovoScores.sort()
 
   for entry in scoreCheck:
-    if decoys / forward <= FDR:
-      fdrScores.append(entry[0])
+    fdrList.append(decoys / forward)
     forward -= entry[1]
     decoys -= (1 - entry[1])
+
   
-  return reduceFDR(fdrScores, fdrDelta, precision)
+  immuNovoScores, fdrList = zip(*sorted(zip(immuNovoScores, fdrList), reverse=True))
+  maxFDR = max(fdrList)
+
+  return dynamicFDR(maxFDR, immuNovoScores, fdrList)
+
+
+def addFDR(dataFrame, fdrCutoffs, scoreType, increment=0.01):
+  # fdrCutoffs = (scores, fdr)
+
+  def findCutoff(score, fdrCutoffs, increment):
+    for elm in fdrCutoffs:
+      if score > elm[0]:
+        return round(elm[1] + increment, 2)
+
+  fdrCutoffs.sort(key=lambda x: x[0], reverse=True)
+  
+  dataFrame[FDR] = \
+    dataFrame.apply(lambda row: findCutoff(row[scoreType], fdrCutoffs, increment), axis=1)
+  
+  return dataFrame
 
 
 def plotResults(mergedScores,
@@ -180,7 +277,7 @@ if __name__ == '__main__':
   arguments = parseArguments()
 
   scoreType = arguments.scoreType
-  plotName = arguments.plotName
+  #plotName = arguments.plotName
   fdr = arguments.fdr
 
   resultsDirectory = arguments.results_directory
@@ -192,9 +289,12 @@ if __name__ == '__main__':
 
   mergedScores = getScores(resultsDF, decoyDF, scoreType)
   
-  fdrScores = findFDR(mergedScores, fdr)
+  fdrCutoffs = findFDR(mergedScores, fdr)
+
+  finalResults = addFDR(resultsDF, fdrCutoffs, scoreType)
+  finalResults[finalResults[PEPTIDE] != NO_PEP].to_csv(arguments.output_file)
   
-  plotResults(mergedScores,
-              plotName,
-              fdrScores,
-              fdr)
+  # plotResults(mergedScores,
+  #             plotName,
+  #             fdrScores,
+  #             fdr)

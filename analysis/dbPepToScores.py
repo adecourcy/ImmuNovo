@@ -155,7 +155,7 @@ def checkInputLength(args):
 
 if __name__ == '__main__':
 
-  fileLocation = 'analysis'
+  fileLocation = ''
   fileName = 'decoyScores.csv'
   checkInputLength(sys.argv)
 
@@ -185,12 +185,15 @@ if __name__ == '__main__':
       AcidMassTable.adjustForPrecision(
           AcidMassTableIO.getAminoMasses(acidMassFile),
           defaultParameters['PREC'])
+  
+  aminoAcids = AcidMassTable.getAcids(acidMassTable)
 
   allPSSM = \
       PSSM.adjustForPrecision(
           PSSMIO.getAllPSSM(pssmDirectory,
                             defaultParameters['minP'],
-                            defaultParameters['maxP']),
+                            defaultParameters['maxP'],
+                            aminoAcids),
           defaultParameters['PREC'])
 
   conversionTable = \
