@@ -72,56 +72,69 @@ def parseDefaultArguments(parser):
 def parseOptionalArguments(parser):
   
   parser.add_argument('-minP', '--Minimum-Peptide-Length',
+      dest='minP',
       type=int,
       default=9,
       help='The minimum length of a peptide in our search')
   parser.add_argument('-maxP', '--Maximum-Peptide-Length',
+      dest='maxP',
       type=int,
       default=12,
       help='The maximum length of a peptide in our search')
   parser.add_argument('-prec', '--Precision',
+      dest='prec',
       type=int,
       default=4,
       help='Decimial precision of our search')
   parser.add_argument('-os', '--Output-File-Suffix',
+      dest='os',
       default='.out.csv',
       help='Suffix of the output file')
   parser.add_argument('-mmt', '--Maximum-Mass-Tolerance',
+      dest='mmt',
       type=int,
       default=35,
       help='The maximum deviance between a peptide mass and spectrum mass '
       'before we consider the masses to not be matched (PPM)')
   parser.add_argument('-amt', '--Average-Mass-Tolerance',
+      dest='amt',
       type=int,
       default=10,
       help='The deviance between a peptide and spectrum mass we would expect '
       'to see given instrument accuracy (PMM)')
   
   parser.add_argument('-imc', '--Intermediate-Miscleavage',
+      dest='imc',
       type=int,
       default=1,
       help='Number of consectutive miscleavages until a peptide is discarded')
   parser.add_argument('-amc', '--Absolute-Miscleavage',
+      dest='amc',
       type=int,
       default=3,
       help='Number of total miscleavages before a peptide is discarded')
   parser.add_argument('-bin', '--Number-of-Bins',
+      dest='bin',
       type=int,
       default=5,
       help='The maximum "bin" size of a spectrum mass')
   parser.add_argument('-bPen', '--B-ion-Penalty',
+      dest='bPen',
       type=float,
       default=0.5,
       help='The score reduction if a b-ion, but not a y-ion, is matched')
   parser.add_argument('-comp', '--Spectrum-Compression',
+      dest='comp',
       type=int,
       default=2,
       help='The spectrum intensity log compression level')
   parser.add_argument('-tolp', '--Total-Mass-Tolerance-Penalty',
+      dest='tolp',
       type=float,
       default=0.5,
       help='The maximum mass tolerance penalty')
   parser.add_argument('-db', '--debug',
+      dest='db',
       type=bool,
       default=False,
       help='Run the program in debug mode')
