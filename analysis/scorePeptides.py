@@ -97,14 +97,7 @@ def globalScore(acidMassTable,
   return globalScore
 
 
-if __name__ == '__main__':
-  """
-  pass a CSV with headers for spectra and peptides, headers should conform to
-  the constants file standards
-
-  Pass directory of spectra files, and a directory of PSSMs
-  """
-  arguments = parseArguments()
+def scorePeptides(arguments):
 
   peptideDF = pd.read_csv(arguments.peptide_file)
 
@@ -188,4 +181,19 @@ if __name__ == '__main__':
     peptideDF.apply(lambda row: deConvertPeptideString(row[PEPTIDE],
                                                        conversionTable),
                     axis=1)
+
+  return peptideDF
+
+
+if __name__ == '__main__':
+  """
+  pass a CSV with headers for spectra and peptides, headers should conform to
+  the constants file standards
+
+  Pass directory of spectra files, and a directory of PSSMs
+  """
+  arguments = parseArguments()
+
+  peptideDF = scorePeptides(arguments)
+  
   peptideDF.to_csv(arguments.output_file, index=False)
