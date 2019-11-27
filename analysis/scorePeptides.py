@@ -27,17 +27,6 @@ def parseArguments():
                       default='scored_peptides.csv')
   parser.add_argument('peptide_file',
                         help='A csv of peptides to be scored')
-<<<<<<< HEAD
-  parser.add_argument('spectra_directory',
-                        help='A directory of spectra to use in scoring')
-  parser.add_argument('PSSM_directory',
-                        help='A directory of PSSM files for scoring')
-
-  arguments = parser.parse_args()
-  arguments.peptide_file = os.path.abspath(arguments.peptide_file)
-  arguments.spectra_directory = os.path.abspath(arguments.spectra_directory)
-  arguments.PSSM_directory = os.path.abspath(arguments.PSSM_directory)
-=======
   parser.add_argument('spec_dir',
                         help='A directory of spectra to use in scoring')
   parser.add_argument('pssm_dir',
@@ -50,7 +39,6 @@ def parseArguments():
   arguments.peptide_file = os.path.abspath(arguments.peptide_file)
   arguments.spec_dir = os.path.abspath(arguments.spec_dir)
   arguments.pssm_dir = os.path.abspath(arguments.pssm_dir)
->>>>>>> argParseConversion
 
   if not arguments.output_file.endswith('.csv'):
     arguments.output_file += '.csv'
@@ -58,8 +46,6 @@ def parseArguments():
   return arguments
 
 
-<<<<<<< HEAD
-=======
 def deConvertPeptideString(peptideString, acidConversion):
 
   reverseConversionTable = {acidConversion[x]: x for x in acidConversion}
@@ -111,7 +97,6 @@ def globalScore(acidMassTable,
   return globalScore
 
 
->>>>>>> argParseConversion
 if __name__ == '__main__':
   """
   pass a CSV with headers for spectra and peptides, headers should conform to
@@ -119,9 +104,6 @@ if __name__ == '__main__':
 
   Pass directory of spectra files, and a directory of PSSMs
   """
-<<<<<<< HEAD
-  pass
-=======
   arguments = parseArguments()
 
   peptideDF = pd.read_csv(arguments.peptide_file)
@@ -207,4 +189,3 @@ if __name__ == '__main__':
                                                        conversionTable),
                     axis=1)
   peptideDF.to_csv(arguments.output_file, index=False)
->>>>>>> argParseConversion
