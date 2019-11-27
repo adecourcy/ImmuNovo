@@ -115,19 +115,26 @@ def checkInputLength(args):
     improperNumArgumentsOutput()
 
 
-def getAminoVariables(arguments):
+def getAminoVariables(acidMassFile,
+                      precision,
+                      pssmDir,
+                      minPepLength,
+                      maxPepLength):
 
   acidMassTable = \
       AcidMassTable.adjustForPrecision(
-          AcidMassTableIO.getAminoMasses(arguments.acid_mass_file),
-          arguments.prec)
+          AcidMassTableIO.getAminoMasses(acidMassFile),
+          precision)
+  
+  aminoAcids = AcidMassTable.getAcids(acidMassTable)
 
   allPSSM = \
       PSSM.adjustForPrecision(
-          PSSMIO.getAllPSSM(arguments.pssm_dir,
-                            arguments.minP,
-                            arguments.maxP),
-          arguments.prec)
+          PSSMIO.getAllPSSM(pssmDir,
+                            minPepLength,
+                            maxPepLength,
+                            aminoAcids),
+          precision)
 
   conversionTable = \
       AcidConversion.createAcidConversionTable([acid for acid in acidMassTable])
@@ -149,8 +156,6 @@ def getAminoVariables(arguments):
                                               conversionTable)
   
   return allPSSM, acidMassTable, conversionTable
-  
-
 
 
 if __name__ == '__main__':
@@ -161,7 +166,13 @@ if __name__ == '__main__':
     pass
 
   arguments = parseArguments()
-  allPSSM, acidMassTable, conversionTable = getAminoVariables(arguments)
+  allPSSM, acidMassTable, conversionTable = \
+                              getAminoVariables(arguments.acid_mass_file,
+                                                arguments.prec,
+                                                arguments.pssm_dir,
+                                                arguments.minP,
+                                                arguments.maxP)
+
 
   H2OMassAdjusted = int(H2OMASS * (10**arguments.prec))
   NH3MassAdjusted = int(NH3MASS * (10**arguments.prec))

@@ -97,21 +97,34 @@ def globalScore(acidMassTable,
   return globalScore
 
 
-def scorePeptides(arguments):
+def scorePeptides(peptideFile,
+                  acidMassFile,
+                  pssmDir,
+                  spectrumDirectory,
+                  precision,
+                  minPepLength,
+                  maxPepLength,
+                  maxMassTolerance,
+                  compression):
 
-  peptideDF = pd.read_csv(arguments.peptide_file)
+  peptideDF = pd.read_csv(peptideFile)
 
   peptideDF = peptideDF[peptideDF[PEPTIDE] != NO_PEP]
   pepBySpectrum = {}
 
-  allPSSM, acidMassTable, conversionTable = getAminoVariables(arguments)
+  allPSSM, acidMassTable, conversionTable = \
+                              getAminoVariables(acidMassFile,
+                                                precision,
+                                                pssmDir,
+                                                minPepLength,
+                                                maxPepLength)
   peptideDF[PEPTIDE] = \
     peptideDF.apply(lambda row: convertPeptidString(row[PEPTIDE],
                     conversionTable),
                     axis=1)
   peptideDF['pepFilter'] = \
-    peptideDF.apply(lambda row: False if len(row[PEPTIDE]) < arguments.minP or \
-                                         len(row[PEPTIDE]) > arguments.maxP else True,
+    peptideDF.apply(lambda row: False if len(row[PEPTIDE]) < minPepLength or \
+                                         len(row[PEPTIDE]) > maxPepLength else True,
                     axis=1)
   peptideDF = peptideDF[peptideDF['pepFilter'] == True]
   peptideDF = peptideDF.drop(columns=['pepFilter'])
@@ -119,14 +132,14 @@ def scorePeptides(arguments):
   for item in peptideDF.groupby(by=TITLE_SPECTRUM):
     pepBySpectrum[item[0]] = item[1]
 
-  H2OMassAdjusted = int(H2OMASS * (10**arguments.prec))
-  NH3MassAdjusted = int(NH3MASS * (10**arguments.prec))
-  protonMassAdjusted = int(PROTONMASS * (10**arguments.prec))
+  H2OMassAdjusted = int(H2OMASS * (10**precision))
+  NH3MassAdjusted = int(NH3MASS * (10**precision))
+  protonMassAdjusted = int(PROTONMASS * (10**precision))
 
   processedPeptides = []
 
-  for spectrumFileName in os.listdir(arguments.spec_dir):
-    spectrumFile = os.path.join(arguments.spec_dir, spectrumFileName)
+  for spectrumFileName in os.listdir(spectrumDirectory):
+    spectrumFile = os.path.join(spectrumDirectory, spectrumFileName)
     for spectrum in SpectrumIO.getSpectrums(spectrumFile):
       spectrumTitle = Spectrum.getTitle(spectrum)
       # I don't remember why I was doing this
@@ -144,8 +157,8 @@ def scorePeptides(arguments):
                                                   H2OMASS,
                                                   PROTONMASS,
                                                   Spectrum.getCharge(spectrum),
-                                                  arguments.comp),
-              arguments.prec)
+                                                  compression),
+              precision)
 
       experimentalSpectrum = spectrumMasses + spectrumMassesDouble
       experimentalIntensities = spectrumIntensities + spectrumIntensitiesDouble
@@ -155,7 +168,7 @@ def scorePeptides(arguments):
                                                protonMassAdjusted,
                                                H2OMassAdjusted,
                                                NH3MassAdjusted,
-                                               arguments.mmt,
+                                               maxMassTolerance,
                                                x)
 
       spectrumPeptides[SCORE_GLOBAL] = \
@@ -170,7 +183,7 @@ def scorePeptides(arguments):
                          )
       spectrumPeptides = \
         spectrumPeptides.rename(columns = {'pt': TITLE_PSSM, 'ps': SCORE_PSSM})
-      spectrumPeptides[SCORE_PSSM] /= 10**arguments.prec
+      spectrumPeptides[SCORE_PSSM] /= 10**precision
       spectrumPeptides[SCORE_COMBINED] = \
             spectrumPeptides[SCORE_GLOBAL] * spectrumPeptides[SCORE_PSSM]
       
@@ -194,6 +207,14 @@ if __name__ == '__main__':
   """
   arguments = parseArguments()
 
-  peptideDF = scorePeptides(arguments)
-  
+  peptideDF = scorePeptides(arguments.peptide_file,
+                            arguments.acid_mass_file,
+                            arguments.pssm_dir,
+                            arguments.spec_dir,
+                            arguments.prec,
+                            arguments.minP,
+                            arguments.maxP,
+                            arguments.mmt,
+                            arguments.comp)
+
   peptideDF.to_csv(arguments.output_file, index=False)
