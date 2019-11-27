@@ -60,11 +60,11 @@ def parseArguments():
 
 def parseDefaultArguments(parser):
 
-  parser.add_argument('SpecDir',
-      help='A directory containing 1 ar more spectrum files')
-  parser.add_argument('AcidMassFile',
+  parser.add_argument('spec_dir',
+      help='A directory containing 1 or more spectrum files')
+  parser.add_argument('acid_mass_file',
       help='A file containing amino acid mass data')
-  parser.add_argument('PssmDir',
+  parser.add_argument('pssm_dir',
       help='A directory containing a positional scoring matrix')
   return parser
 
@@ -83,7 +83,7 @@ def parseOptionalArguments(parser):
       type=int,
       default=4,
       help='Decimial precision of our search')
-  parser.add_argument('-outS', '--Output-File-Suffix',
+  parser.add_argument('-os', '--Output-File-Suffix',
       default='.out.csv',
       help='Suffix of the output file')
   parser.add_argument('-mmt', '--Maximum-Mass-Tolerance',
@@ -127,7 +127,6 @@ def parseOptionalArguments(parser):
       help='Run the program in debug mode')
       
   return parser
-
 
 def parseParameterInput(args):
 

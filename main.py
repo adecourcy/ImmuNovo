@@ -114,28 +114,19 @@ def checkInputLength(args):
     improperNumArgumentsOutput()
 
 
-if __name__ == '__main__':
-
-  try:
-    clean()
-  except:
-    pass
-
-  checkInputLength(sys.argv)
-  spectrumDirectory, acidMassFile, pssmDirectory = sys.argv[1:4]
-  defaultParameters = parseParameterInput(sys.argv[4:])
+def getAminoVariables(arguments):
 
   acidMassTable = \
       AcidMassTable.adjustForPrecision(
-          AcidMassTableIO.getAminoMasses(acidMassFile),
-          defaultParameters['PREC'])
+          AcidMassTableIO.getAminoMasses(arguments.acid_mass_file),
+          arguments.prec)
 
   allPSSM = \
       PSSM.adjustForPrecision(
-          PSSMIO.getAllPSSM(pssmDirectory,
-                            defaultParameters['minP'],
-                            defaultParameters['maxP']),
-          defaultParameters['PREC'])
+          PSSMIO.getAllPSSM(arguments.pssm_dir,
+                            arguments.minP,
+                            arguments.maxP),
+          arguments.prec)
 
   conversionTable = \
       AcidConversion.createAcidConversionTable([acid for acid in acidMassTable])
@@ -155,20 +146,35 @@ if __name__ == '__main__':
       AcidConversion.convertAcidModifications(acidMassTable,
                                               allPSSM,
                                               conversionTable)
+  
+  return allPSSM, acidMassTable, conversionTable
+  
 
-  H2OMassAdjusted = int(H2OMASS * (10**defaultParameters['PREC']))
-  NH3MassAdjusted = int(NH3MASS * (10**defaultParameters['PREC']))
-  protonMassAdjusted = int(PROTONMASS * (10**defaultParameters['PREC']))
 
 
-  for spectrumFileName in os.listdir(spectrumDirectory):
-    spectrumFile = os.path.join(spectrumDirectory, spectrumFileName)
+if __name__ == '__main__':
+
+  try:
+    clean()
+  except:
+    pass
+
+  arguments = parseArguments()
+  allPSSM, acidMassTable, conversionTable = getAminoVariables(arguments)
+
+  H2OMassAdjusted = int(H2OMASS * (10**arguments.prec))
+  NH3MassAdjusted = int(NH3MASS * (10**arguments.prec))
+  protonMassAdjusted = int(PROTONMASS * (10**arguments.prec))
+
+
+  for spectrumFileName in os.listdir(arguments.spec_dir):
+    spectrumFile = os.path.join(arguments.spec_dir, spectrumFileName)
 
     try:
-      outputFile = open(spectrumFileName + defaultParameters['OUT'], 'w')
+      outputFile = open(spectrumFileName + arguments.os, 'w')
     except:
       print(str.format("Error opening {} to write output, skpping {} spectrum file",
-                        spectrumFileName + defaultParameters['OUT'],
+                        spectrumFileName + arguments.os,
                         spectrumFileName))
       continue
 
@@ -190,8 +196,8 @@ if __name__ == '__main__':
                                                   H2OMASS,
                                                   PROTONMASS,
                                                   Spectrum.getCharge(spectrum),
-                                                  defaultParameters['COMP']),
-              defaultParameters['PREC'])
+                                                  arguments.comp),
+              arguments.prec)
 
 
       for pssmTitle in allPSSM:
@@ -236,23 +242,23 @@ if __name__ == '__main__':
                                                       massFile,
                                                       scoreFile,
                                                       resultsFile,
-                                                      defaultParameters["IMC"],
-                                                      defaultParameters["TMC"],
+                                                      arguments.imc,
+                                                      arguments.amc,
                                                       Spectrum.getCharge(spectrum) - 1,
-                                                      defaultParameters["PREC"],
-                                                      float(defaultParameters["BPEN"]),
-                                                      defaultParameters["MMT"],
-                                                      defaultParameters["AMT"],
-                                                      defaultParameters["MMT"],
-                                                      defaultParameters["TOLP"],
+                                                      arguments.prec,
+                                                      float(arguments.bPen),
+                                                      arguments.mmt,
+                                                      arguments.amt,
+                                                      arguments.mmt,
+                                                      arguments.tolp,
                                                       spectrumMasses[-1],
                                                       spectrumMasses[0],
-                                                      defaultParameters["minP"],
-                                                      defaultParameters["maxP"],
+                                                      arguments.minP,
+                                                      arguments.maxP,
                                                       H2OMassAdjusted,
                                                       protonMassAdjusted,
                                                       1,
-                                                      defaultParameters["BIN"]))
+                                                      arguments.bin))
 
         if cOutput != 0:
           clean()
@@ -266,9 +272,9 @@ if __name__ == '__main__':
                                                 experimentalIntensities,
                                                 protonMassAdjusted,
                                                 H2OMassAdjusted,
-                                                int((NH3MASS * (10 ** defaultParameters["PREC"]))),
-                                                defaultParameters["MMT"],
-                                                defaultParameters["PREC"],
+                                                int((NH3MASS * (10 ** arguments.prec))),
+                                                arguments.mmt,
+                                                arguments.prec,
                                                 conversionTable)
 
 
