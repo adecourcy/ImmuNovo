@@ -2,6 +2,8 @@ from decimal import Decimal
 
 import argparse
 
+# Keep the legacy, dictionary-based argument parser for dependent files
+
 def tryFiles(files):
   cannotOpen = []
   for file in files:
@@ -49,18 +51,25 @@ def printOptionalArguments():
         'The maximum mass tolerance penalty'))
 
 
+
 def parseArguments():
   parser = argparse.ArgumentParser()
+  parser = parseDefaultArguments(parser)
+  parser = parseOptionalArguments(parser)
+
+
+def parseDefaultArguments(parser):
 
   parser.add_argument('SpecDir',
       help='A directory containing 1 ar more spectrum files')
   parser.add_argument('AcidMassFile',
-      help='A file containing mass spectrometry data')
+      help='A file containing amino acid mass data')
   parser.add_argument('PssmDir',
       help='A directory containing a positional scoring matrix')
+  return parser
 
-  defaultParameters = \
-    {"DEBUG": 0}
+
+def parseOptionalArguments(parser):
   
   parser.add_argument('-minP', '--Minimum-Peptide-Length',
       type=int,
@@ -112,6 +121,12 @@ def parseArguments():
       type=float,
       default=0.5,
       help='The maximum mass tolerance penalty')
+  parser.add_argument('-db', '--debug',
+      type=bool,
+      default=False,
+      help='Run the program in debug mode')
+      
+  return parser
 
 
 def parseParameterInput(args):
