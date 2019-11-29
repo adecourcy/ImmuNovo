@@ -24,26 +24,22 @@ sys.path.append(os.path.split(os.path.split(os.path.realpath(__file__))[0])[0])
 from backend.constants import *
 
 
-RESULT_IMMUNO = 'IMMUNOSCORES'
-RESULTS_DECOY = 'DECOYSCORES'
-RESULTS_DELTA = 'SCOREDELTA'
-FDR = 'FDR'
-
-
-
 def parseArguments():
+  abspath = os.path.abspath(__file__)
+  dname = os.path.dirname(abspath)
+
   parser = argparse.ArgumentParser()
   parser.add_argument('-f', '--FDR',
                         dest='fdr',
-                        default = 0.05,
-                        help='The target FDR (default=0.05)', type=float)
+                        default = 0.01,
+                        help='The target FDR', type=float)
   # parser.add_argument('-pn', '--Plot-Name',
   #                       dest='plotName',
   #                       default='fdrPlot',
   #                       help='Output name of our FDR plot (default="fdrPlot")')
   parser.add_argument('-o', '--Output-File',
                       dest='output_file',
-                      default='added_fdrs.csv')
+                      default=os.path.join(dname, 'added_fdrs.csv'))
   parser.add_argument('-st', '--Score-Type',
                         dest='scoreType',
                         default=SCORE_COMBINED,

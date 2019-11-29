@@ -21,9 +21,12 @@ from backend.constants import *
 
 
 def parseArguments():
+  abspath = os.path.abspath(__file__)
+  dname = os.path.dirname(abspath)
+
   parser = argparse.ArgumentParser()
   parser.add_argument('-o', '--Output-File',
-                      dest='output_file',
+                      dest=os.path.join(dname, 'output_file'),
                       default='scored_peptides.csv')
   parser.add_argument('peptide_file',
                         help='A csv of peptides to be scored')
@@ -97,7 +100,7 @@ def globalScore(acidMassTable,
   return globalScore
 
 
-def scorePeptides(peptideFile,
+def scorePeptides(peptideDF,
                   acidMassFile,
                   pssmDir,
                   spectrumDirectory,
@@ -106,8 +109,6 @@ def scorePeptides(peptideFile,
                   maxPepLength,
                   maxMassTolerance,
                   compression):
-
-  peptideDF = pd.read_csv(peptideFile)
 
   peptideDF = peptideDF[peptideDF[PEPTIDE] != NO_PEP]
   pepBySpectrum = {}
@@ -207,7 +208,7 @@ if __name__ == '__main__':
   """
   arguments = parseArguments()
 
-  peptideDF = scorePeptides(arguments.peptide_file,
+  peptideDF = scorePeptides(pd.read_csv(arguments.peptide_file),
                             arguments.acid_mass_file,
                             arguments.pssm_dir,
                             arguments.spec_dir,

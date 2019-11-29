@@ -139,7 +139,7 @@ def programUsageOutput():
         'What is the maximum number of decoy peptides we consider for a spectrum?'))
 
   printOptionalArguments()
-  exit()
+  sys.exit()
 
 
 def checkInputLength(args):
@@ -154,8 +154,13 @@ def checkInputLength(args):
 
 
 if __name__ == '__main__':
+  '''
+  Needs to be updated to use argparse. Also might have some weird file location
+  issues
+  '''
 
-  fileLocation = ''
+  abspath = os.path.abspath(__file__)
+  fileLocation = os.path.dirname(abspath)
   fileName = 'decoyScores.csv'
   checkInputLength(sys.argv)
 
@@ -210,7 +215,7 @@ if __name__ == '__main__':
     print("Other files may also have too "
           "many masses but haven't been checked\n"
           "by the program at this time\n")
-    exit()
+    sys.exit()
 
   # quick and dirty way to make sure all our amino masses match for now
   sanityCheck(allPSSM, acidMassTable)
