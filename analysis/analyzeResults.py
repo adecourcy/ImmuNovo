@@ -107,6 +107,11 @@ def parseArguments():
       type=int,
       default=4,
       help='Decimial precision of our search')
+  parser.add_argument('-comp', '--Spectrum-Compression',
+      dest='comp',
+      type=int,
+      default=2,
+      help='The spectrum intensity log compression level')
 
 
   arguments = parser.parse_args()
@@ -310,7 +315,8 @@ if __name__ == '__main__':
   abspath = os.path.abspath(__file__)
   dname = os.path.dirname(abspath)
 
-  decoyPeptides = runPepToScores(arguments, dname)
+  #decoyPeptides = runPepToScores(arguments, dname)
+  decoyPeptides = os.path.join(arguments.output_dir, 'decoyScores.csv')
 
   fdrCutoffs, fdrImmuNovo = runFDR(arguments, decoyPeptides)
   fdrDatabase = \
