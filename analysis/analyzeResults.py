@@ -148,7 +148,7 @@ def runPepToScores(arguments, dname):
   #                 arguments.decoys])
   
   # Keep the decoy search results in case we want to re-run anything later
-  os.rename('decoyScores.csv', os.path.join(arguments.output_dir, 'decoyScores.csv'))
+  os.rename(os.path.join(dname, 'decoyScores.csv'), os.path.join(arguments.output_dir, 'decoyScores.csv'))
 
   return os.path.join(arguments.output_dir, 'decoyScores.csv')
 
