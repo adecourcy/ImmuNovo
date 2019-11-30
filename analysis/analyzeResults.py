@@ -222,6 +222,7 @@ def compareResults(immuNovoDict, databaseDict):
         distance += 1
       if distance > maxDist:
         return distance
+    return distance
 
   numIdentical = 0
   num2AA = 0
@@ -336,7 +337,6 @@ if __name__ == '__main__':
     findUniquePeptides.getPeptideDict(fdrImmuNovo, arguments.fdr, False)
   databaseDict, fdrCutoff = \
     findUniquePeptides.getPeptideDict(fdrDatabase, fdrCutoff)
-
 
   numIdentical, num2AA = compareResults(immuNovoDict, databaseDict)
 
