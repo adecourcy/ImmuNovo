@@ -276,6 +276,8 @@ def pepCountToString(immuNovoDict, databaseDict, numMatch, num2AA):
   outString += 'Database Lengths\n'
   outString += ' '.join(['{}: {}'.format(x, len(databaseDict[x])) for x in databaseDict])
 
+  return outString
+
 
 def plotMatches(immuNovoDict, numMatch, num2AA, outputDir, plotTitle):
   totalPeptides = sum([len(immuNovoDict[x]) for x in immuNovoDict])
