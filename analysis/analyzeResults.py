@@ -278,7 +278,7 @@ def pepCountToString(immuNovoDict, databaseDict, numMatch, num2AA):
 
 
 def plotMatches(immuNovoDict, numMatch, num2AA, outputDir, plotTitle):
-  totalPeptides = sum([len(immuNovoDict[x] for x in immuNovoDict)])
+  totalPeptides = sum([len(immuNovoDict[x]) for x in immuNovoDict])
 
   matchString = 'Identical'
   less2AAString = 'Different with\nno more than 2AA'
