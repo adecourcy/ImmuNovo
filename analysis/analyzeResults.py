@@ -165,7 +165,6 @@ def runFDR(arguments, decoyPeptides):
   fdrCutoffs = findFDR.findFDR(mergedScores, arguments.fdr)
 
   finalResults = findFDR.addFDR(resultsDF, fdrCutoffs, arguments.scoreType)
-  finalResults[finalResults[PEPTIDE] != NO_PEP].to_csv(arguments.output_file)
 
   return fdrCutoffs, finalResults
 
