@@ -291,7 +291,7 @@ def plotMatches(immuNovoDict, numMatch, num2AA, outputDir, plotTitle):
   plt.ylabel('count')
   plt.title(plotTitle)
 
-  plt.savefig(os.path.join(outputDir, 'matches.png', dpi=600))
+  plt.savefig(os.path.join(outputDir, 'matches.png'), dpi=600)
 
 
 def plotLengths(immuNovoDict, outputDir, plotTitle):
@@ -307,7 +307,7 @@ def plotLengths(immuNovoDict, outputDir, plotTitle):
   plt.ylabel('count')
   plt.title(plotTitle)
 
-  plt.savefig(os.path.join(outputDir, 'lengths.png', dpi=600))
+  plt.savefig(os.path.join(outputDir, 'lengths.png'), dpi=600)
 
 
 if __name__ == '__main__':
