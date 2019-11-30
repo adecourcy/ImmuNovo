@@ -265,7 +265,7 @@ def aminoAcidDistribution(peptideDict):
 def acidDistributionToString(distribution):
   distString = []
   for aa in distribution:
-    distString.append(aa + ' '.join([str(x) for x  in distribution]))
+    distString.append(aa + ': ' + ' '.join([str(x) for x  in distribution[aa]]))
   return '\n'.join(distString)
 
 
@@ -363,7 +363,6 @@ if __name__ == '__main__':
     databaseDistribution = aminoAcidDistribution(databaseDict)
     for length in immuNovoDistribution:
       f.write('Length {}\n'.format(length))
-      print(immuNovoDistribution[length])
       f.write(acidDistributionToString(immuNovoDistribution[length]))
       f.write('\n')
     f.write('\n\n')
