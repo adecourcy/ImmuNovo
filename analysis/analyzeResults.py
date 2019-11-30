@@ -342,7 +342,7 @@ if __name__ == '__main__':
               num2AA,
               arguments.output_dir,
               arguments.plt_title)
-  plotLengths(immuNovoDict, arguments.outputDir, arguments.plt_title)
+  plotLengths(immuNovoDict, arguments.output_dir, arguments.plt_title)
 
   with open(os.path.join(arguments.output_dir, 'report.txt'), 'w') as f:
     f.write(pepCountToString(immuNovoDict, databaseDict, numIdentical, num2AA))
