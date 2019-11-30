@@ -270,7 +270,7 @@ def acidDistributionToString(distribution):
 def pepCountToString(immuNovoDict, databaseDict, numMatch, num2AA):
   outString = 'Exact Matches: {}\n'.format(numMatch)
   outString += '2AA Difference: {}\n'.format(num2AA)
-  outString += 'No Match: {}\n'.format(sum([len(immuNovoDict[x] for x in immuNovoDict)]) - (num2AA + numMatch))
+  outString += 'No Match: {}\n'.format(sum([len(immuNovoDict[x]) for x in immuNovoDict]) - (num2AA + numMatch))
   outString += 'ImmuNovo Lengths\n'
   outString += ' '.join(['{}: {}'.format(x, len(immuNovoDict[x])) for x in immuNovoDict])
   outString += 'Database Lengths\n'
