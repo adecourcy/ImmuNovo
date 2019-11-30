@@ -329,8 +329,8 @@ if __name__ == '__main__':
   #                         MSGF)
   
   # This is taking a while, so in case something crashes
-  #fdrDatabase.to_csv(os.path.join(dname, 'processedDatabase.csv'))
-  fdrDatabase = pd.read_csv(os.path.join(dname, 'processedDatabase.csv'))
+  #fdrDatabase.to_csv(os.path.join(arguments.output_dir, 'processedDatabase.csv'))
+  fdrDatabase = pd.read_csv(os.path.join(arguments.output_dir, 'processedDatabase.csv'))
 
   immuNovoDict, fdrCutoff = \
     findUniquePeptides.getPeptideDict(fdrImmuNovo, arguments.fdr, False)
@@ -350,6 +350,7 @@ if __name__ == '__main__':
   plotLengths(immuNovoDict, arguments.output_dir, arguments.plt_title)
 
   with open(os.path.join(arguments.output_dir, 'report.txt'), 'w') as f:
+    f.write('FDR cutoff used: {}\n\n'.format(fdrCutoff))
     f.write(pepCountToString(immuNovoDict, databaseDict, numIdentical, num2AA))
     f.write('\n\n')
     f.write('ImmuNovo Lengths\n')
