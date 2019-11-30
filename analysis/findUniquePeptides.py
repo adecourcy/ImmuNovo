@@ -23,8 +23,7 @@ def removeModifications(peptideDF):
   #print(peptideDF)
   removal = lambda row: ''.join([x for x in row[PEPTIDE] if x.isalpha()])
   
-  peptideDF = \
-    peptideDF.apply(removal, axis=1)
+  peptideDF[PEPTIDE] = peptideDF.apply(removal, axis=1)
 
   return peptideDF, removalDict
 
@@ -60,7 +59,8 @@ def getPeptideDict(peptideDF, fdrCutoff, hardFDR=True):
       peptideDF = \
         peptideDF[peptideDF[FDR] <= fdrCutoff]
 
-  peptideDF = peptideDF.apply(lambda row: row[PEPTIDE].replace('I', 'L'), axis=1)
+  peptideDF[PEPTIDE] = \
+      peptideDF.apply(lambda row: row[PEPTIDE].replace('I', 'L'), axis=1)
   peptideDF, removalDict = removeModifications(peptideDF)
 
   spectralGroups = peptideDF.groupby(by=TITLE_SPECTRUM)
