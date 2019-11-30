@@ -316,8 +316,8 @@ if __name__ == '__main__':
   abspath = os.path.abspath(__file__)
   dname = os.path.dirname(abspath)
 
-  #decoyPeptides = runPepToScores(arguments, dname)
-  decoyPeptides = os.path.join(arguments.output_dir, 'decoyScores.csv')
+  decoyPeptides = runPepToScores(arguments, dname)
+  #decoyPeptides = os.path.join(arguments.output_dir, 'decoyScores.csv')
 
   fdrCutoffs, fdrImmuNovo = runFDR(arguments, decoyPeptides)
   fdrDatabase = \
@@ -325,6 +325,9 @@ if __name__ == '__main__':
                           fdrCutoffs,
                           SCORE_COMBINED,
                           MSGF)
+  
+  # This is taking a while, so in case something crashes
+  fdrDatabase.to_csv(os.path.join(dname, 'processedDatabase.csv'))
 
   immuNovoDict = findUniquePeptides.getPeptideDict(fdrImmuNovo, arguments.fdr)
   databaseDict = findUniquePeptides.getPeptideDict(fdrDatabase, arguments.fdr)
