@@ -36,7 +36,7 @@ def getTopPeptides(spectralGroups):
     # If equal, pick greastest PSSM Score
     df = [df[SCORE_PSSM] == df[SCORE_PSSM].max()]
     # If all equal, just pick the first one
-    topPeptides.add(df[PEPTIDE][0])
+    topPeptides.add(list(df[PEPTIDE])[0])
   return topPeptides
 
 
