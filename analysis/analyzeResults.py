@@ -131,7 +131,7 @@ def parseArguments():
 def runPepToScores(arguments):
   
   subprocess.run(['dbPepToScores.py',
-                  arguments.prec,
+                  str(arguments.prec),
                   arguments.acid_mass_file,
                   arguments.pssm_dir,
                   arguments.decoy_dir,
