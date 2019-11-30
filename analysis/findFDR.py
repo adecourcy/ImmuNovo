@@ -185,7 +185,7 @@ def dynamicFDR(maxFDR, scoreList, calculatedFDRs, increment=0.01, scoreIndex=0, 
   return thresholdList
 
 
-def findFDR(dataFrame, FDR, fdrDelta=0.005, precision=3):
+def findFDR(mergedScores, FDR, fdrDelta=0.005, precision=3):
 
   immuNovoScores = list(mergedScores[RESULT_IMMUNO])
   deltas = [1 if x == True else 0 for x in list(mergedScores[RESULTS_DELTA])]
