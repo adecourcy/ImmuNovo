@@ -20,10 +20,11 @@ from backend.constants import *
 
 def removeModifications(peptideDF):
   removalDict = {} # placeholder for future functionality
-  print(peptideDF)
+  #print(peptideDF)
+  removal = lambda row: ''.join([x for x in row[PEPTIDE] if x.isalpha()])
   
   peptideDF = \
-    peptideDF.apply(lambda row: ''.join([x for x in row[PEPTIDE] if x.isalpha()]), axis=1)
+    peptideDF.apply(removal, axis=1)
 
   return peptideDF, removalDict
 
