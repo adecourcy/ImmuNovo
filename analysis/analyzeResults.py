@@ -295,7 +295,7 @@ if __name__ == '__main__':
   abspath = os.path.abspath(__file__)
   dname = os.path.dirname(abspath)
 
-  decoyPeptides = runPepToScores(arguments)
+  decoyPeptides = runPepToScores(arguments, dname)
 
   fdrCutoffs, fdrImmuNovo = runFDR(arguments, decoyPeptides)
   fdrDatabase = \
