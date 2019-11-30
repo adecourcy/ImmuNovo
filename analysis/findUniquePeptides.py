@@ -51,13 +51,15 @@ def separateByLength(topPeptides):
 
 
 def getPeptideDict(peptideDF, fdrCutoff, hardFDR=True):
-  peptideDF = \
+  tmp = \
     peptideDF[peptideDF[FDR] <= fdrCutoff]
-  if not hardFDR and len(peptideDF) == 0:
-    while len(peptideDF) == 0:
+  if not hardFDR and len(tmp) == 0:
+    while len(tmp) == 0:
       fdrCutoff += 0.01
-      peptideDF = \
+      tmp = \
         peptideDF[peptideDF[FDR] <= fdrCutoff]
+  
+  peptideDF = tmp
 
   peptideDF[PEPTIDE] = \
       peptideDF.apply(lambda row: row[PEPTIDE].replace('I', 'L'), axis=1)
