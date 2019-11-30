@@ -259,7 +259,6 @@ def aminoAcidDistribution(peptideDict):
   distribution = {}
   for length in peptideDict:
     distribution[length] = analyzeLength(peptideDict[length], length)
-  print(distribution)
   return distribution
 
 
@@ -362,13 +361,13 @@ if __name__ == '__main__':
     f.write('ImmuNovo Lengths\n')
     immuNovoDistribution = aminoAcidDistribution(immuNovoDict)
     databaseDistribution = aminoAcidDistribution(databaseDict)
-    for length in immuNovoDict:
+    for length in immuNovoDistribution:
       f.write('Length {}\n'.format(length))
       f.write(acidDistributionToString(immuNovoDistribution[length]))
     f.write('\n\n')
 
     f.write('Database Lengths\n')
-    for length in databaseDict:
+    for length in databaseDistribution:
       f.write('Length {}\n'.format(length))
       f.write(acidDistributionToString(databaseDistribution[length]))
   
