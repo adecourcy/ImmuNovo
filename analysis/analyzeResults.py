@@ -252,7 +252,7 @@ def aminoAcidDistribution(peptideDict):
     for pep in peptides:
       for i in range(length):
         if pep[i] not in acidDistribution:
-          acidDistribution[i] = [0 for x in range(length)]
+          acidDistribution[pep[i]] = [0 for x in range(length)]
         acidDistribution[pep[i]][i] += 1
 
   distribution = {}
