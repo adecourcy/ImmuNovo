@@ -169,7 +169,7 @@ def runFDR(arguments, decoyPeptides):
   return fdrCutoffs, finalResults
 
 
-def processDatabaseData(arguments, databaseDir, fdrCutoffs, scoreType, databaseType):
+def processDatabaseData(databaseDir, fdrCutoffs, scoreType, databaseType):
   # databaseType only MSGF for now
 
   combinedResults = []
