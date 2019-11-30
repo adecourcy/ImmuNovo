@@ -254,6 +254,7 @@ def aminoAcidDistribution(peptideDict):
         if pep[i] not in acidDistribution:
           acidDistribution[pep[i]] = [0 for x in range(length)]
         acidDistribution[pep[i]][i] += 1
+    return acidDistribution
 
   distribution = {}
   for length in peptideDict:
