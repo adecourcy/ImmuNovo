@@ -77,6 +77,12 @@ def parseArguments():
                       type=int,
                       default=12,
                       help='The maximum length of a peptide in our search')
+  parser.add_argument('-mmt', '--Maximum-Mass-Tolerance',
+                      dest='mmt',
+                      type=int,
+                      default=35,
+                      help='The maximum deviance between a peptide mass and spectrum mass '
+                      'before we consider the masses to not be matched (PPM)')
   parser.add_argument('-o', '--Output-Directory',
                       dest='output_dir',
                       default=os.path.join(dname, './reports'))
