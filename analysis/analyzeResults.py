@@ -128,9 +128,9 @@ def parseArguments():
   return arguments
 
 
-def runPepToScores(arguments):
+def runPepToScores(arguments, dname):
   
-  subprocess.run(['dbPepToScores.py',
+  subprocess.run([os.path.join(dname, 'dbPepToScores.py'),
                   str(arguments.prec),
                   arguments.acid_mass_file,
                   arguments.pssm_dir,
