@@ -117,7 +117,7 @@ def parseArguments():
   checkExists(arguments.spec_dir)
   checkExists(arguments.pssm_dir)
   checkExists(arguments.acid_mass_file)
-  checkExists(arguments.decoy_file)
+  checkExists(arguments.decoy_dir)
 
   createDir(arguments.output_dir)
   
