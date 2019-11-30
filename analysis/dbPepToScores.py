@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import sys
 import os
 # cheap hack until I can figure out how to do this properly in
