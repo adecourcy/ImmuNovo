@@ -242,7 +242,7 @@ def compareResults(immuNovoDict, databaseDict):
 
 def copyPSSM(pssmDir, ouputDir):
   for f in os.listdir(pssmDir):
-    shutil.copy(f, ouputDir)
+    shutil.copy(os.path.join(pssmDir, f), ouputDir)
 
 
 def aminoAcidDistribution(peptideDict):
