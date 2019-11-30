@@ -109,7 +109,7 @@ def parseArguments():
   arguments.spec_dir = os.path.abspath(arguments.spec_dir)
   arguments.pssm_dir = os.path.abspath(arguments.pssm_dir)
   arguments.acid_mass_file = os.path.abspath(arguments.acid_mass_file)
-  arguments.decoy_file = os.path.abspath(arguments.decoy_file)
+  arguments.decoy_dir = os.path.abspath(arguments.decoy_dir)
   arguments.output_dir = os.path.abspath(arguments.output_dir)
 
   checkExists(arguments.immunovo_results_dir)
