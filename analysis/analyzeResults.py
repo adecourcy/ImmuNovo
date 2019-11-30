@@ -199,6 +199,7 @@ def processDatabaseData(databaseDir, fdrCutoffs, scoreType, databaseType):
 #                 compression)
 
   dbDF = dbDF[['Title', 'Peptide']]
+  dbDF = dbDF.rename(columns = {'Title': TITLE_SPECTRUM, 'Peptide': PEPTIDE})
   dbDF = scorePeptides.scorePeptides(dbDF,
                                     arguments.acid_mass_file,
                                     arguments.pssm_dir,
