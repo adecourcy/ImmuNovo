@@ -274,8 +274,10 @@ def pepCountToString(immuNovoDict, databaseDict, numMatch, num2AA):
   outString += 'No Match: {}\n'.format(sum([len(immuNovoDict[x]) for x in immuNovoDict]) - (num2AA + numMatch))
   outString += 'ImmuNovo Lengths\n'
   outString += ' '.join(['{}: {}'.format(x, len(immuNovoDict[x])) for x in immuNovoDict])
+  outString += '\n\n'
   outString += 'Database Lengths\n'
   outString += ' '.join(['{}: {}'.format(x, len(databaseDict[x])) for x in databaseDict])
+  outString += '\n\n'
 
   return outString
 
@@ -354,12 +356,15 @@ if __name__ == '__main__':
     f.write(pepCountToString(immuNovoDict, databaseDict, numIdentical, num2AA))
     f.write('\n\n')
     f.write('ImmuNovo Lengths\n')
+    immuNovoDistribution = aminoAcidDistribution(immuNovoDict)
+    databaseDistribution = aminoAcidDistribution(databaseDict)
     for length in immuNovoDict:
       f.write('Length {}\n'.format(length))
-      f.write(acidDistributionToString(immuNovoDict[length]))
+      f.write(acidDistributionToString(immuNovoDistribution[length]))
+    f.write('\n\n')
 
     f.write('Database Lengths\n')
     for length in databaseDict:
       f.write('Length {}\n'.format(length))
-      f.write(acidDistributionToString(databaseDict[length]))
+      f.write(acidDistributionToString(databaseDistribution[length]))
   
