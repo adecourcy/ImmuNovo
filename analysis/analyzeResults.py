@@ -363,11 +363,14 @@ if __name__ == '__main__':
     databaseDistribution = aminoAcidDistribution(databaseDict)
     for length in immuNovoDistribution:
       f.write('Length {}\n'.format(length))
+      print(immuNovoDistribution[length])
       f.write(acidDistributionToString(immuNovoDistribution[length]))
+      f.write('\n')
     f.write('\n\n')
 
     f.write('Database Lengths\n')
     for length in databaseDistribution:
       f.write('Length {}\n'.format(length))
       f.write(acidDistributionToString(databaseDistribution[length]))
+      f.write('\n')
   
