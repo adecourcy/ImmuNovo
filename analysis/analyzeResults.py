@@ -135,7 +135,8 @@ def runPepToScores(arguments, dname):
                   arguments.acid_mass_file,
                   arguments.pssm_dir,
                   arguments.decoy_dir,
-                  arguments.rev])
+                  arguments.rev,
+                  arguments.decoys])
   
   # Keep the decoy search results in case we want to re-run anything later
   os.rename('decoyScores.csv', os.path.join(arguments.output_dir, 'decoyScores.csv'))
