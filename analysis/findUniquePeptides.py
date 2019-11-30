@@ -56,7 +56,7 @@ def getPeptideDict(peptideDF, fdrCutoff):
   peptideDF = peptideDF.apply(lambda row: row[PEPTIDE].replace('I', 'L'))
   peptideDF, removalDict = removeModifications(peptideDF)
 
-  spectralGroups = peptideDF.groupby(col=TITLE_SPECTRUM)
+  spectralGroups = peptideDF.groupby(by=TITLE_SPECTRUM)
   topPeptides = getTopPeptides(spectralGroups)
 
   return separateByLength(topPeptides)
