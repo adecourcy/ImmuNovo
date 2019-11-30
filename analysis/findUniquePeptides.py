@@ -22,7 +22,7 @@ def removeModifications(peptideDF):
   removalDict = {} # placeholder for future functionality
   
   peptideDF = \
-    peptideDF.apply(lambda row: ''.join([x for x in row[PEPTIDE] if x.isalpha()]))
+    peptideDF.apply(lambda row: ''.join([x for x in row[PEPTIDE] if x.isalpha()]), axis=1)
 
   return peptideDF, removalDict
 
@@ -49,14 +49,19 @@ def separateByLength(topPeptides):
   return lengthDict
 
 
-def getPeptideDict(peptideDF, fdrCutoff):
+def getPeptideDict(peptideDF, fdrCutoff, hardFDR=True):
   peptideDF = \
     peptideDF[peptideDF[FDR] <= fdrCutoff]
+  if not hardFDR and len(peptideDF) == 0:
+    while len(peptideDF) == 0:
+      fdrCutoff += 0.01
+      peptideDF = \
+        peptideDF[peptideDF[FDR] <= fdrCutoff]
 
-  peptideDF = peptideDF.apply(lambda row: row[PEPTIDE].replace('I', 'L'))
+  peptideDF = peptideDF.apply(lambda row: row[PEPTIDE].replace('I', 'L'), axis=1)
   peptideDF, removalDict = removeModifications(peptideDF)
 
   spectralGroups = peptideDF.groupby(by=TITLE_SPECTRUM)
   topPeptides = getTopPeptides(spectralGroups)
 
-  return separateByLength(topPeptides)
+  return separateByLength(topPeptides), fdrCutoff

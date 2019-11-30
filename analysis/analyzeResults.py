@@ -332,8 +332,11 @@ if __name__ == '__main__':
   #fdrDatabase.to_csv(os.path.join(dname, 'processedDatabase.csv'))
   fdrDatabase = pd.read_csv(os.path.join(dname, 'processedDatabase.csv'))
 
-  immuNovoDict = findUniquePeptides.getPeptideDict(fdrImmuNovo, arguments.fdr)
-  databaseDict = findUniquePeptides.getPeptideDict(fdrDatabase, arguments.fdr)
+  immuNovoDict, fdrCutoff = \
+    findUniquePeptides.getPeptideDict(fdrImmuNovo, arguments.fdr, False)
+  databaseDict, fdrCutoff = \
+    findUniquePeptides.getPeptideDict(fdrDatabase, fdrCutoff)
+
 
   numIdentical, num2AA = compareResults(immuNovoDict, databaseDict)
 
