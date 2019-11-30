@@ -132,7 +132,7 @@ def runPepToScores(arguments, dname):
   
   os.system(' '.join(['python3',
                       os.path.join(dname, 'dbPepToScores.py'),
-                      str(arguments.prec),
+                      arguments.spec_dir,
                       arguments.acid_mass_file,
                       arguments.pssm_dir,
                       arguments.decoy_dir,
