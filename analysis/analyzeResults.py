@@ -257,7 +257,7 @@ def aminoAcidDistribution(peptideDict):
 
   distribution = {}
   for length in peptideDict:
-    distribution[length] = analyzeLength(peptideDict[length])
+    distribution[length] = analyzeLength(peptideDict[length], length)
   return distribution
 
 
