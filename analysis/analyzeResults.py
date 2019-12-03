@@ -278,10 +278,11 @@ def acidDistributionToString(distribution):
   return '\n'.join(distString)
 
 
-def pepCountToString(immuNovoDict, databaseDict, numMatch, num2AA):
+def pepCountToString(immuNovoDict, databaseDict, numMatch, num2AA, similarity):
   outString = 'Exact Matches: {}\n'.format(numMatch)
   outString += '2AA Difference: {}\n'.format(num2AA)
   outString += 'No Match: {}\n'.format(sum([len(immuNovoDict[x]) for x in immuNovoDict]) - (num2AA + numMatch))
+  outString += 'Remaining Similarity: {}\n'.format(similarity)
   outString += 'ImmuNovo Lengths\n'
   outString += ' '.join(['{}: {}'.format(x, len(immuNovoDict[x])) for x in immuNovoDict])
   outString += '\n\n'
@@ -365,7 +366,7 @@ if __name__ == '__main__':
 
   with open(os.path.join(arguments.output_dir, 'report.txt'), 'w') as f:
     f.write('FDR cutoff used: {}\n\n'.format(fdrCutoff))
-    f.write(pepCountToString(immuNovoDict, databaseDict, numIdentical, num2AA))
+    f.write(pepCountToString(immuNovoDict, databaseDict, numIdentical, num2AA, similarity))
     f.write('\n\n')
     f.write('ImmuNovo Lengths\n')
     immuNovoDistribution = aminoAcidDistribution(immuNovoDict)
