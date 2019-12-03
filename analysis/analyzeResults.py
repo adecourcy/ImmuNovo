@@ -19,6 +19,7 @@ more than 2AA differences found by each method
 import argparse
 import subprocess
 import shutil
+import math
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -103,15 +104,15 @@ def parseArguments():
                         default=SCORE_COMBINED,
                         help='Score type to compare (defaults to combined score)')
   parser.add_argument('-prec', '--Precision',
-      dest='prec',
-      type=int,
-      default=4,
-      help='Decimial precision of our search')
+                      dest='prec',
+                      type=int,
+                      default=4,
+                      help='Decimial precision of our search')
   parser.add_argument('-comp', '--Spectrum-Compression',
-      dest='comp',
-      type=int,
-      default=2,
-      help='The spectrum intensity log compression level')
+                      dest='comp',
+                      type=int,
+                      default=2,
+                      help='The spectrum intensity log compression level')
 
 
   arguments = parser.parse_args()
@@ -220,25 +221,33 @@ def compareResults(immuNovoDict, databaseDict):
     for aa1, aa2 in zip(pep1, pep2):
       if aa1 != aa2:
         distance += 1
-      if distance > maxDist:
-        return distance
+      # if distance > maxDist:
+      #   return distance
     return distance
 
   numIdentical = 0
   num2AA = 0
-  total = sum([len(immuNovoDict[length]) for length in immuNovoDict])
+
+  averageSimilarity = 0
+  numSimilarity = 0
 
   for length in immuNovoDict:
     for iPep in immuNovoDict[length]:
       if iPep in databaseDict[length]:
         numIdentical += 1
       else:
+        bestHamming = math.inf
         for dPep in databaseDict[length]:
-          if hammingDistance(iPep, dPep) <= 2:
+          currentHamming = hammingDistance(iPep, dPep)
+          if currentHamming <= 2:
             num2AA += 1
             break
-      
-  return numIdentical, num2AA
+          elif bestHamming > currentHamming:
+            bestHamming = currentHamming
+        numSimilarity += 1
+        averageSimilarity += (bestHamming / length)
+
+  return numIdentical, num2AA, (averageSimilarity / numSimilarity)
 
 
 def copyPSSM(pssmDir, ouputDir):
@@ -335,7 +344,7 @@ if __name__ == '__main__':
                           MSGF)
   
   # This is taking a while, so in case something crashes
-  fdrDatabase.to_csv(os.path.join(arguments.output_dir, 'processedDatabase.csv'))
+  fdrDatabase.to_csv(os.path.join(arguments.output_dir, 'processedDatabase.csv'), index=0)
   #fdrDatabase = pd.read_csv(os.path.join(arguments.output_dir, 'processedDatabase.csv'))
 
   immuNovoDict, fdrCutoff = \
@@ -343,7 +352,7 @@ if __name__ == '__main__':
   databaseDict, fdrCutoff = \
     findUniquePeptides.getPeptideDict(fdrDatabase, fdrCutoff)
 
-  numIdentical, num2AA = compareResults(immuNovoDict, databaseDict)
+  numIdentical, num2AA, similarity = compareResults(immuNovoDict, databaseDict)
 
   # Create report
   copyPSSM(arguments.pssm_dir, arguments.output_dir)
