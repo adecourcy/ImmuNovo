@@ -334,10 +334,11 @@ if __name__ == '__main__':
   abspath = os.path.abspath(__file__)
   dname = os.path.dirname(abspath)
 
-  decoyPeptides = runPepToScores(arguments, dname)
-  #decoyPeptides = os.path.join(arguments.output_dir, 'decoyScores.csv')
+  #decoyPeptides = runPepToScores(arguments, dname)
+  decoyPeptides = os.path.join(arguments.output_dir, 'decoyScores.csv')
 
   fdrCutoffs, fdrImmuNovo = runFDR(arguments, decoyPeptides)
+  fdrImmuNovo.to_csv(os.path.join(arguments.output_dir, 'processedImmunovo.csv'), index=0)
   fdrDatabase = \
       processDatabaseData(arguments.database_results_dir,
                           fdrCutoffs,
@@ -345,8 +346,8 @@ if __name__ == '__main__':
                           MSGF)
   
   # This is taking a while, so in case something crashes
-  fdrDatabase.to_csv(os.path.join(arguments.output_dir, 'processedDatabase.csv'), index=0)
-  #fdrDatabase = pd.read_csv(os.path.join(arguments.output_dir, 'processedDatabase.csv'))
+  #fdrDatabase.to_csv(os.path.join(arguments.output_dir, 'processedDatabase.csv'), index=0)
+  fdrDatabase = pd.read_csv(os.path.join(arguments.output_dir, 'processedDatabase.csv'))
 
   immuNovoDict, fdrCutoff = \
     findUniquePeptides.getPeptideDict(fdrImmuNovo, arguments.fdr, False)
@@ -364,6 +365,20 @@ if __name__ == '__main__':
               arguments.plt_title)
   plotLengths(immuNovoDict, arguments.output_dir, arguments.plt_title)
 
+  # Out Unique Peptides for 2-logo
+  with open(os.path.join(arguments.output_dir, 'denovo_peps.txt'), 'w') as f:
+    for length in immuNovoDict:
+      f.write("Length: {}\n".format(length))
+      for peptide in immuNovoDict[length]:
+        f.write(peptide + '\n')
+
+  with open(os.path.join(arguments.output_dir, 'database_peps.txt'), 'w') as f:
+    for length in databaseDict:
+      f.write("Length: {}\n".format(length))
+      for peptide in databaseDict[length]:
+        f.write(peptide + '\n')
+
+  # Output summary statistics
   with open(os.path.join(arguments.output_dir, 'report.txt'), 'w') as f:
     f.write('FDR cutoff used: {}\n\n'.format(fdrCutoff))
     f.write(pepCountToString(immuNovoDict, databaseDict, numIdentical, num2AA, similarity))
