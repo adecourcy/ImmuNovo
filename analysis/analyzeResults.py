@@ -244,8 +244,9 @@ def compareResults(immuNovoDict, databaseDict):
             break
           elif bestHamming > currentHamming:
             bestHamming = currentHamming
-        numSimilarity += 1
-        averageSimilarity += (bestHamming / length)
+        if currentHamming > 2:
+          numSimilarity += 1
+          averageSimilarity += (bestHamming / length)
 
   return numIdentical, num2AA, (averageSimilarity / numSimilarity)
 
@@ -391,6 +392,7 @@ if __name__ == '__main__':
       f.write(acidDistributionToString(immuNovoDistribution[length]))
       f.write('\n')
     f.write('\n\n')
+    
 
     f.write('Database Lengths\n')
     for length in databaseDistribution:
