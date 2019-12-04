@@ -20,6 +20,7 @@ import argparse
 import subprocess
 import shutil
 import math
+import statistics
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -189,16 +190,6 @@ def processDatabaseData(databaseDir, fdrCutoffs, scoreType, databaseType):
     combinedResults.append(pd.read_csv(os.path.join(databaseDir, fileName), sep='\t'))
   dbDF = pd.concat(combinedResults)
 
-# def scorePeptides(peptideDF,
-#                 acidMassFile,
-#                 pssmDir,
-#                 spectrumDirectory,
-#                 precision,
-#                 minPepLength,
-#                 maxPepLength,
-#                 maxMassTolerance,
-#                 compression)
-
   dbDF = dbDF[['Title', 'Peptide']]
   dbDF = dbDF.rename(columns = {'Title': TITLE_SPECTRUM, 'Peptide': PEPTIDE})
   dbDF = scorePeptides.scorePeptides(dbDF,
@@ -224,6 +215,8 @@ def compareResults(immuNovoDict, databaseDict):
       # if distance > maxDist:
       #   return distance
     return distance
+  
+  overlapPeptides = set()
 
   numIdentical = 0
   num2AA = 0
@@ -234,12 +227,14 @@ def compareResults(immuNovoDict, databaseDict):
   for length in immuNovoDict:
     for iPep in immuNovoDict[length]:
       if iPep in databaseDict[length]:
+        overlapPeptides.add(iPep)
         numIdentical += 1
       else:
         bestHamming = math.inf
         for dPep in databaseDict[length]:
           currentHamming = hammingDistance(iPep, dPep)
           if currentHamming <= 2:
+            overlapPeptides.add(iPep)
             num2AA += 1
             break
           elif bestHamming > currentHamming:
@@ -248,7 +243,7 @@ def compareResults(immuNovoDict, databaseDict):
           numSimilarity += 1
           averageSimilarity += (bestHamming / length)
 
-  return numIdentical, num2AA, (averageSimilarity / numSimilarity)
+  return numIdentical, num2AA, (averageSimilarity / numSimilarity), overlapPeptides
 
 
 def copyPSSM(pssmDir, ouputDir):
@@ -280,15 +275,26 @@ def acidDistributionToString(distribution):
 
 
 def pepCountToString(immuNovoDict, databaseDict, numMatch, num2AA, similarity):
+  immuNovoLengths = [len(immuNovoDict[x]) for x in immuNovoDict]
+  totalImmuNovo = sum(immuNovoLengths)
+  immuNovoPercentages = [round(x / totalImmuNovo, 2) for x in immuNovoLengths]
+  databaseLengths = [len(databaseDict[x]) for x in databaseDict]
+  totalDatabase = sum(databaseLengths)
+  databasePercentages = [round(x / totalDatabase, 2) for x in databaseLengths]
+
   outString = 'Exact Matches: {}\n'.format(numMatch)
   outString += '2AA Difference: {}\n'.format(num2AA)
   outString += 'No Match: {}\n'.format(sum([len(immuNovoDict[x]) for x in immuNovoDict]) - (num2AA + numMatch))
   outString += 'Remaining Similarity: {}\n'.format(similarity)
   outString += 'ImmuNovo Lengths\n'
-  outString += ' '.join(['{}: {}'.format(x, len(immuNovoDict[x])) for x in immuNovoDict])
+  outString += ' '.join(['{}: {} ({}%)'.format(x, len(immuNovoDict[x]), y) for x, y in zip(immuNovoDict, immuNovoPercentages)])
+  outString += '\n'
+  outString += "Total Peptides: {}\n".format(totalImmuNovo)
   outString += '\n\n'
   outString += 'Database Lengths\n'
-  outString += ' '.join(['{}: {}'.format(x, len(databaseDict[x])) for x in databaseDict])
+  outString += ' '.join(['{}: {} ({}%)'.format(x, len(databaseDict[x]), y) for x, y in zip(databaseDict, databasePercentages)])
+  outString += '\n'
+  outString += "Total Peptides: {}\n".format(totalDatabase)
   outString += '\n\n'
 
   return outString
@@ -329,6 +335,31 @@ def plotLengths(immuNovoDict, outputDir, plotTitle):
   plt.clf()
 
 
+def getScores(immuNovoDF, databaseDF, overlappingPeptides, fdrCutoff):
+  def getStats(df, fdrCutoff):
+    # The following filters should already be applied, just making sure
+    df = df[df[PEPTIDE] != NO_PEP]
+    df = df[df[FDR] <= fdrCutoff]
+    meanSpec = statistics.mean(list(df[SCORE_GLOBAL]))
+    meanPSSM = statistics.mean(list(df[SCORE_PSSM]))
+
+    return meanSpec, meanPSSM
+
+  separateImmuNovo = \
+      immuNovoDF[~immuNovoDF[PEPTIDE].isin(overlappingPeptides)]
+  separateDatabase = \
+      databaseDF[~databaseDF[PEPTIDE].isin(overlappingPeptides)]
+  overlappingPeptides = \
+      pd.concat(immuNovoDF[immuNovoDF[PEPTIDE].isin(overlappingPeptides)],
+                databaseDF[databaseDF[PEPTIDE].isin(overlappingPeptides)])
+  
+  iSpec, iPSSM = getStats(separateImmuNovo, fdrCutoff)
+  dSpec, dPSSM = getStats(separateDatabase, fdrCutoff)
+  oSpec, oPSSM = getStats(overlapPeptides, fdrCutoff)
+
+  return iSpec, iPSSM, dSpec, dPSSM, oSpec, oPSSM
+
+
 if __name__ == '__main__':
   arguments = parseArguments()
 
@@ -355,7 +386,8 @@ if __name__ == '__main__':
   databaseDict, fdrCutoff = \
     findUniquePeptides.getPeptideDict(fdrDatabase, fdrCutoff)
 
-  numIdentical, num2AA, similarity = compareResults(immuNovoDict, databaseDict)
+  numIdentical, num2AA, similarity, overlapPeptides = \
+                        compareResults(immuNovoDict, databaseDict)
 
   # Create report
   copyPSSM(arguments.pssm_dir, arguments.output_dir)
@@ -382,8 +414,15 @@ if __name__ == '__main__':
   # Output summary statistics
   with open(os.path.join(arguments.output_dir, 'report.txt'), 'w') as f:
     f.write('FDR cutoff used: {}\n\n'.format(fdrCutoff))
+    iSpec, iPSSM, dSpec, dPSSM, oSpec, oPSSM = \
+          getScores(fdrImmuNovo, fdrDatabase, overlapPeptides, fdrCutoff)
+    f.write('ImmuNovo Spectrum Score: {}\nImmuNovo PSSM Score: {}\n'.format(iSpec, iPSSM))
+    f.write('Database Spectrum Score: {}\nDatabase PSSM Score: {}\n'.format(dSpec, dPSSM))
+    f.write('Overlapping Spectrum Score: {}\nOverlapping PSSM Score: {}\n'.format(oSpec, oPSSM))
     f.write(pepCountToString(immuNovoDict, databaseDict, numIdentical, num2AA, similarity))
     f.write('\n\n')
+
+
     f.write('ImmuNovo Lengths\n')
     immuNovoDistribution = aminoAcidDistribution(immuNovoDict)
     databaseDistribution = aminoAcidDistribution(databaseDict)
