@@ -350,8 +350,8 @@ def getScores(immuNovoDF, databaseDF, overlappingPeptides, fdrCutoff):
   separateDatabase = \
       databaseDF[~databaseDF[PEPTIDE].isin(overlappingPeptides)]
   overlappingPeptides = \
-      pd.concat(immuNovoDF[immuNovoDF[PEPTIDE].isin(overlappingPeptides)],
-                databaseDF[databaseDF[PEPTIDE].isin(overlappingPeptides)])
+      pd.concat([immuNovoDF[immuNovoDF[PEPTIDE].isin(overlappingPeptides)],
+                 databaseDF[databaseDF[PEPTIDE].isin(overlappingPeptides)]])
   
   iSpec, iPSSM = getStats(separateImmuNovo, fdrCutoff)
   dSpec, dPSSM = getStats(separateDatabase, fdrCutoff)
