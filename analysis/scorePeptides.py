@@ -26,8 +26,8 @@ def parseArguments():
 
   parser = argparse.ArgumentParser()
   parser.add_argument('-o', '--Output-File',
-                      dest=os.path.join(dname, 'output_file'),
-                      default='scored_peptides.csv')
+                      dest='output_file',
+                      default=os.path.join(dname, 'scored_peptides'))
   parser.add_argument('peptide_file',
                         help='A csv of peptides to be scored')
   parser.add_argument('spec_dir',
