@@ -15,8 +15,7 @@ import backend.Structures.spectrum as Spectrum
 import backend.Structures.spectrumIO as SpectrumIO
 import backend.PreProcessing.spectrumConversion as SpectrumConversion
 import backend.Structures.pssm as PSSM
-#import backend.PostProcessing.processResults as processResults
-import backend.PostProcessing.processResultsOld as processResults
+import backend.PostProcessing.processResults as processResults
 from main import getAminoVariables
 from backend.constants import *
 
@@ -92,7 +91,6 @@ def globalScore(acidMassTable,
   globalScore  = processResults.calculateGlobalScore(acidMassTable,
                                                      experimentalSpectrum,
                                                      experimentalScores,
-                                                     0.5,
                                                      peptide,
                                                      protonMassModified,
                                                      H2OMassModified,
