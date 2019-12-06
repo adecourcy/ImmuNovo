@@ -92,7 +92,7 @@ def globalScore(acidMassTable,
   globalScore  = processResults.calculateGlobalScore(acidMassTable,
                                                      experimentalSpectrum,
                                                      experimentalScores,
-                                                     0.5
+                                                     0.5,
                                                      peptide,
                                                      protonMassModified,
                                                      H2OMassModified,
