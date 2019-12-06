@@ -92,6 +92,7 @@ def globalScore(acidMassTable,
   globalScore  = processResults.calculateGlobalScore(acidMassTable,
                                                      experimentalSpectrum,
                                                      experimentalScores,
+                                                     0.5
                                                      peptide,
                                                      protonMassModified,
                                                      H2OMassModified,
@@ -164,19 +165,9 @@ def scorePeptides(peptideDF,
 
       experimentalSpectrum = spectrumMasses + spectrumMassesDouble
       experimentalIntensities = spectrumIntensities + spectrumIntensitiesDouble
-      # applyGlobalScore = lambda x: globalScore(acidMassTable,
-      #                                          experimentalSpectrum,
-      #                                          experimentalIntensities,
-      #                                          protonMassAdjusted,
-      #                                          H2OMassAdjusted,
-      #                                          NH3MassAdjusted,
-      #                                          maxMassTolerance,
-      #                                          x)
-
       applyGlobalScore = lambda x: globalScore(acidMassTable,
                                                experimentalSpectrum,
                                                experimentalIntensities,
-                                               0.5,
                                                protonMassAdjusted,
                                                H2OMassAdjusted,
                                                NH3MassAdjusted,
