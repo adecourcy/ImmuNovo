@@ -138,11 +138,15 @@ def scorePeptides(peptideDF,
   protonMassAdjusted = int(PROTONMASS * (10**precision))
 
   processedPeptides = []
+  spectrumTitles = set()
 
   for spectrumFileName in os.listdir(spectrumDirectory):
     spectrumFile = os.path.join(spectrumDirectory, spectrumFileName)
     for spectrum in SpectrumIO.getSpectrums(spectrumFile):
       spectrumTitle = Spectrum.getTitle(spectrum)
+      if spectrumTitle in spectrumTitles:
+        continue # some of these files seem to have duplicates
+      spectrumTitles.add(spectrumTitle)
       # I don't remember why I was doing this
       spectrumTitle = spectrumTitle.replace(",", '').split()[0] 
       if spectrumTitle not in pepBySpectrum:
@@ -190,7 +194,7 @@ def scorePeptides(peptideDF,
       
       processedPeptides.append(spectrumPeptides)
   
-  peptideDF = pd.concat(processedPeptides)
+  peptideDF = pd.concat(processedPeptides).drop_duplicates() # just in case
   peptideDF[PEPTIDE] = \
     peptideDF.apply(lambda row: deConvertPeptideString(row[PEPTIDE],
                                                        conversionTable),
