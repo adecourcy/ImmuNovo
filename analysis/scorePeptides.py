@@ -15,7 +15,8 @@ import backend.Structures.spectrum as Spectrum
 import backend.Structures.spectrumIO as SpectrumIO
 import backend.PreProcessing.spectrumConversion as SpectrumConversion
 import backend.Structures.pssm as PSSM
-import backend.PostProcessing.processResults as processResults
+#import backend.PostProcessing.processResults as processResults
+import backend.PostProcessing.processResultsOld as processResults
 from main import getAminoVariables
 from backend.constants import *
 
@@ -143,7 +144,6 @@ def scorePeptides(peptideDF,
     spectrumFile = os.path.join(spectrumDirectory, spectrumFileName)
     for spectrum in SpectrumIO.getSpectrums(spectrumFile):
       spectrumTitle = Spectrum.getTitle(spectrum)
-      print(spectrumTitle)
       # I don't remember why I was doing this
       spectrumTitle = spectrumTitle.replace(",", '').split()[0] 
       if spectrumTitle not in pepBySpectrum:
@@ -164,9 +164,19 @@ def scorePeptides(peptideDF,
 
       experimentalSpectrum = spectrumMasses + spectrumMassesDouble
       experimentalIntensities = spectrumIntensities + spectrumIntensitiesDouble
+      # applyGlobalScore = lambda x: globalScore(acidMassTable,
+      #                                          experimentalSpectrum,
+      #                                          experimentalIntensities,
+      #                                          protonMassAdjusted,
+      #                                          H2OMassAdjusted,
+      #                                          NH3MassAdjusted,
+      #                                          maxMassTolerance,
+      #                                          x)
+
       applyGlobalScore = lambda x: globalScore(acidMassTable,
                                                experimentalSpectrum,
                                                experimentalIntensities,
+                                               0.5,
                                                protonMassAdjusted,
                                                H2OMassAdjusted,
                                                NH3MassAdjusted,
