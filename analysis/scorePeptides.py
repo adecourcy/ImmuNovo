@@ -143,6 +143,7 @@ def scorePeptides(peptideDF,
     spectrumFile = os.path.join(spectrumDirectory, spectrumFileName)
     for spectrum in SpectrumIO.getSpectrums(spectrumFile):
       spectrumTitle = Spectrum.getTitle(spectrum)
+      print(spectrumTitle)
       # I don't remember why I was doing this
       spectrumTitle = spectrumTitle.replace(",", '').split()[0] 
       if spectrumTitle not in pepBySpectrum:
