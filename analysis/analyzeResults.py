@@ -360,6 +360,41 @@ def getScores(immuNovoDF, databaseDF, overlappingPeptides, fdrCutoff):
   return iSpec, iPSSM, dSpec, dPSSM, oSpec, oPSSM
 
 
+# def getTopPeptides(spectralGroups):
+#   topPeptides = set()
+#   for elm in spectralGroups:
+#     df = elm[1]
+#     df = df[df[SCORE_COMBINED] == df[SCORE_COMBINED].max()]
+#     # If equal, pick greastest PSSM Score
+#     df = df[df[SCORE_PSSM] == df[SCORE_PSSM].max()]
+#     # If all equal, just pick the first one
+#     topPeptides.add(list(df[PEPTIDE])[0])
+#   return topPeptides
+
+def getPSSMDistribution(df, fdrCutoff):
+  pssmDistribution = {}
+  df = df[df[FDR] <= fdrCutoff]
+
+  topPeptides = []
+  for elm in df.groupby(TITLE_SPECTRUM):
+    curDF = elm[1]
+    curDF = curDF[curDF[SCORE_COMBINED] == curDF[SCORE_COMBINED].max()]
+    # If equal, pick the greatest PSSM Score
+    curDF = curDF[curDF[SCORE_PSSM] == curDF[SCORE_PSSM].max()]
+    # If all equal, just pick the first one
+    topPeptides.append(curDF)
+  df = pd.concat(topPeptides)
+
+  df = df.groupby(TITLE_PSSM)
+  totalFinds = 0
+  for elm in df:
+    totalFinds += len(elm[1])
+    pssmDistribution[elm[0]] = len(elm[1])
+  for pssm in pssmDistribution:
+    pssmDistribution[pssm] /= totalFinds
+  return pssmDistribution
+
+
 if __name__ == '__main__':
   arguments = parseArguments()
 
@@ -421,6 +456,12 @@ if __name__ == '__main__':
     f.write('Overlapping Spectrum Score: {}\nOverlapping PSSM Score: {}\n'.format(oSpec, oPSSM))
     f.write(pepCountToString(immuNovoDict, databaseDict, numIdentical, num2AA, similarity))
     f.write('\n\n')
+
+    denovoPSSM = getPSSMDistribution(fdrImmuNovo, fdrCutoff)
+    f.write('PSSM Distribution')
+    f.write('\n'.join(['{}: {}%'.format(pssm, denovoPSSM[pssm]) for pssm in denovoPSSM]))
+    f.write('\n\n')
+
 
 
     f.write('ImmuNovo Lengths\n')
