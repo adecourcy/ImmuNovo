@@ -458,8 +458,8 @@ if __name__ == '__main__':
     f.write('\n\n')
 
     denovoPSSM = getPSSMDistribution(fdrImmuNovo, fdrCutoff)
-    f.write('PSSM Distribution')
-    f.write('\n'.join(['{}: {}%'.format(pssm, denovoPSSM[pssm]) for pssm in denovoPSSM]))
+    f.write('PSSM Distribution\n')
+    f.write('\n'.join(['{}: {}%'.format(pssm, round(denovoPSSM[pssm], 2)) for pssm in denovoPSSM]))
     f.write('\n\n')
 
 
