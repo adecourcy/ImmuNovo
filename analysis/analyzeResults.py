@@ -1,4 +1,6 @@
 """
+***** Part of this code was written specifically for the Darwin server *****
+
 Run a series of programs in the analysis directory and create a results report.
 
 This program takes a decoy databases, the results from database search, and
@@ -21,6 +23,9 @@ import subprocess
 import shutil
 import math
 import statistics
+import subprocess
+import string
+
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -371,8 +376,9 @@ def getScores(immuNovoDF, databaseDF, overlappingPeptides, fdrCutoff):
 #     topPeptides.add(list(df[PEPTIDE])[0])
 #   return topPeptides
 
-def getPSSMDistribution(df, fdrCutoff):
-  pssmDistribution = {}
+
+def groupByPSSM(df, fdrCutoff):
+
   df = df[df[FDR] <= fdrCutoff]
 
   topPeptides = []
@@ -385,7 +391,12 @@ def getPSSMDistribution(df, fdrCutoff):
     topPeptides.append(curDF)
   df = pd.concat(topPeptides)
 
-  df = df.groupby(TITLE_PSSM)
+  return df.groupby(TITLE_PSSM)
+
+
+def getPSSMDistribution(df):
+  pssmDistribution = {}
+
   totalFinds = 0
   for elm in df:
     totalFinds += len(elm[1])
@@ -393,6 +404,24 @@ def getPSSMDistribution(df, fdrCutoff):
   for pssm in pssmDistribution:
     pssmDistribution[pssm] /= totalFinds
   return pssmDistribution
+
+
+def getPSSMPeptides(df):
+  def removeModifications(peptide):
+    return ''.join([x for x in peptide if x not in string.ascii_letters])
+  
+  def groupByLength(peptideList):
+    groupedPeptides = {}
+    for peptide in peptideList:
+      if len(peptide) not in groupedPeptides:
+        groupedPeptides[len(peptide)] = []
+      groupedPeptides[len(peptide)].append(peptide)
+    return groupedPeptides
+
+  # Assume all modifications are non-alpha characters
+  peptideByPSSM = {}
+
+  pass
 
 
 if __name__ == '__main__':
@@ -423,6 +452,10 @@ if __name__ == '__main__':
 
   numIdentical, num2AA, similarity, overlapPeptides = \
                         compareResults(immuNovoDict, databaseDict)
+  
+  # Create tsl images. Written for Darwin Server, specifically
+  os.system("module load ruby/2.1.0")
+
 
   # Create report
   copyPSSM(arguments.pssm_dir, arguments.output_dir)
@@ -432,19 +465,6 @@ if __name__ == '__main__':
               arguments.output_dir,
               arguments.plt_title)
   plotLengths(immuNovoDict, arguments.output_dir, arguments.plt_title)
-
-  # Out Unique Peptides for 2-logo
-  with open(os.path.join(arguments.output_dir, 'denovo_peps.txt'), 'w') as f:
-    for length in immuNovoDict:
-      f.write("Length: {}\n".format(length))
-      for peptide in immuNovoDict[length]:
-        f.write(peptide + '\n')
-
-  with open(os.path.join(arguments.output_dir, 'database_peps.txt'), 'w') as f:
-    for length in databaseDict:
-      f.write("Length: {}\n".format(length))
-      for peptide in databaseDict[length]:
-        f.write(peptide + '\n')
 
   # Output summary statistics
   with open(os.path.join(arguments.output_dir, 'report.txt'), 'w') as f:
@@ -461,8 +481,6 @@ if __name__ == '__main__':
     f.write('PSSM Distribution\n')
     f.write('\n'.join(['{}: {}%'.format(pssm, round(denovoPSSM[pssm], 2)) for pssm in denovoPSSM]))
     f.write('\n\n')
-
-
 
     f.write('ImmuNovo Lengths\n')
     immuNovoDistribution = aminoAcidDistribution(immuNovoDict)
