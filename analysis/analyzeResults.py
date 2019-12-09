@@ -1,5 +1,6 @@
 """
-***** Part of this code was written specifically for the Darwin server *****
+***** Part of this code was written specifically for the Darwin server     *****
+***** Part of this code relies on a fixed amino acid list                  *****
 
 Run a series of programs in the analysis directory and create a results report.
 
@@ -25,6 +26,7 @@ import math
 import statistics
 import subprocess
 import string
+import random
 
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -40,6 +42,9 @@ import analysis.findUniquePeptides as findUniquePeptides
 from backend.constants import *
 
 def parseArguments():
+
+  abspath = os.path.abspath(__file__)
+  dname = os.path.dirname(abspath)
 
   def checkExists(directory):
     if not os.path.exists(directory):
@@ -66,8 +71,10 @@ def parseArguments():
                       help='A file containing amino acid mass data')
   parser.add_argument('decoy_dir',
                       help='A directory containing decoy peptides for FDR calculation')
+  parser.add_argument('dataset_name',
+                      help='The name of the current dataset being processed')
   parser.add_argument('plt_title',
-                      help='A title to put on all the plots')
+                      help='A title to put on all the length distribution plots')
 
 
   parser.add_argument('-f', '--FDR',
@@ -119,6 +126,12 @@ def parseArguments():
                       type=int,
                       default=2,
                       help='The spectrum intensity log compression level')
+
+  parser.add_argument('-tsl', '--TSL_Location',
+                      dest='tsl',
+                      type=str,
+                      default=os.path.join(dname, './tsl/tsl/cgi-bin/tsl'),
+                      help='Path to the tsl binary')
 
 
   arguments = parser.parse_args()
@@ -394,11 +407,11 @@ def groupByPSSM(df, fdrCutoff):
   return df.groupby(TITLE_PSSM)
 
 
-def getPSSMDistribution(df):
+def getPSSMDistribution(groupedDF):
   pssmDistribution = {}
 
   totalFinds = 0
-  for elm in df:
+  for elm in groupedDF:
     totalFinds += len(elm[1])
     pssmDistribution[elm[0]] = len(elm[1])
   for pssm in pssmDistribution:
@@ -406,7 +419,7 @@ def getPSSMDistribution(df):
   return pssmDistribution
 
 
-def getPSSMPeptides(df):
+def getPSSMPeptides(groupedDF):
   def removeModifications(peptide):
     return ''.join([x for x in peptide if x not in string.ascii_letters])
   
@@ -417,11 +430,55 @@ def getPSSMPeptides(df):
         groupedPeptides[len(peptide)] = []
       groupedPeptides[len(peptide)].append(peptide)
     return groupedPeptides
+  
+  def processDF(df):
+    return groupByLength([removeModifications(x) for x in list(df[PEPTIDE])])
 
   # Assume all modifications are non-alpha characters
   peptideByPSSM = {}
+  for item in groupedDF:
+    peptideByPSSM[item[0]] = processDF(item[1])
+  
+  return peptideByPSSM
 
-  pass
+
+def generateDecoyPeptides(length, number):
+  # Fixed Amino Acid List for now
+  aaList = ['G', 'A', 'S', 'P',
+            'V', 'T', 'L', 
+            'N', 'D', 'Q', 'K',
+            'E', 'M', 'H', 'F',
+            'R', 'C', 'Y', 'W']
+  
+  decoys = set()
+  while len(decoys) < number:
+     decoys.add(''.join(random.choices(aaList, k=length)))
+  return decoys
+
+
+def printGraphicTSL(groupedDF, dataSetName, tslLocation, outputDirectory):
+  peptideByPSSM = getPSSMPeptides(groupedDF)
+  tmpPeptideFile = os.path.join(outputDirectory, 'tmpPep.txt')
+  tmpDecoyFile = os.path.join(outputDirectory, 'tmpDecoy.txt')
+  for pssmName in peptideByPSSM:
+    for length in peptideByPSSM[pssmName]:
+      peptideList = peptideByPSSM[pssmName][length]
+      decoys = generateDecoyPeptides(len(peptideList[0]), len(peptideList))
+      outputName = \
+          os.path.join(outputDirectory, '{}_{}_{}'.format(dataSetName,
+                                                          pssmName,
+                                                          length))
+      with open(tmpPeptideFile, 'w') as f:
+        f.write('\n'.join(peptideList))
+      with open(tmpDecoyFile, 'w') as f:
+        f.write('\n'.join(decoys))
+      subprocess.run("ruby {} -P {} -N {} -K A -O {} -R 600 -x -y -I {}".format(os.path.abspath(tslLocation),
+                                                                                os.path.abspath(tmpPeptideFile),
+                                                                                os.path.abspath(tmpDecoyFile),
+                                                                                os.path.abspath(outputName + '.png'),
+                                                                                pssmName).split())
+  os.remove(tmpPeptideFile)
+  os.remove(tmpDecoyFile)
 
 
 if __name__ == '__main__':
@@ -453,8 +510,11 @@ if __name__ == '__main__':
   numIdentical, num2AA, similarity, overlapPeptides = \
                         compareResults(immuNovoDict, databaseDict)
   
+  groupedDF = groupByPSSM(fdrImmuNovo, fdrCutoff)
+  
   # Create tsl images. Written for Darwin Server, specifically
   os.system("module load ruby/2.1.0")
+  printGraphicTSL(groupedDF, arguments.dataset_name, arguments.tsl, arguments.output_dir)
 
 
   # Create report
@@ -477,7 +537,7 @@ if __name__ == '__main__':
     f.write(pepCountToString(immuNovoDict, databaseDict, numIdentical, num2AA, similarity))
     f.write('\n\n')
 
-    denovoPSSM = getPSSMDistribution(fdrImmuNovo, fdrCutoff)
+    denovoPSSM = getPSSMDistribution(groupedDF)
     f.write('PSSM Distribution\n')
     f.write('\n'.join(['{}: {}%'.format(pssm, round(denovoPSSM[pssm], 2)) for pssm in denovoPSSM]))
     f.write('\n\n')
