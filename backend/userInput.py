@@ -56,7 +56,7 @@ def parseArguments():
   parser = argparse.ArgumentParser()
   parser = parseDefaultArguments(parser)
   parser = parseOptionalArguments(parser)
-  return parser
+  return parser.parse_args
 
 
 def parseDefaultArguments(parser):
