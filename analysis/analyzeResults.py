@@ -132,6 +132,7 @@ def parseArguments():
                       type=str,
                       default=os.path.join(dname, './tsl/tsl/cgi-bin/tsl'),
                       help='Path to the tsl binary')
+  parser.add_argument('--update', action='store_true')
 
 
   arguments = parser.parse_args()
@@ -487,21 +488,26 @@ if __name__ == '__main__':
   abspath = os.path.abspath(__file__)
   dname = os.path.dirname(abspath)
 
-  decoyPeptides = runPepToScores(arguments, dname)
+  if not arguments.update:
+    decoyPeptides = runPepToScores(arguments, dname)
   decoyPeptides = os.path.join(arguments.output_dir, 'decoyScores.csv')
 
   fdrCutoffs, fdrImmuNovo = runFDR(arguments, decoyPeptides)
   fdrImmuNovo.to_csv(os.path.join(arguments.output_dir, 'processedImmunovo.csv'), index=0)
-  fdrDatabase = \
-      processDatabaseData(arguments.database_results_dir,
-                          fdrCutoffs,
-                          SCORE_COMBINED,
-                          MSGF)
-  
-  # This is taking a while, so in case something crashes
-  fdrDatabase.to_csv(os.path.join(arguments.output_dir, 'processedDatabase.csv'), index=0)
-  #fdrDatabase = pd.read_csv(os.path.join(arguments.output_dir, 'processedDatabase.csv'))
 
+  if arguments.update:
+    fdrDatabase = pd.read_csv(os.path.join(arguments.output_dir, 'processedDatabase.csv'))
+  else: 
+    fdrDatabase = \
+        processDatabaseData(arguments.database_results_dir,
+                            fdrCutoffs,
+                            SCORE_COMBINED,
+                            MSGF)
+    
+    # This is taking a while, so in case something crashes
+    fdrDatabase.to_csv(os.path.join(arguments.output_dir, 'processedDatabase.csv'), index=0)
+
+  
   immuNovoDict, fdrCutoff = \
     findUniquePeptides.getPeptideDict(fdrImmuNovo, arguments.fdr, False)
   databaseDict, fdrCutoff = \
