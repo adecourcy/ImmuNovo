@@ -422,7 +422,7 @@ def getPSSMDistribution(groupedDF):
 
 def getPSSMPeptides(groupedDF):
   def removeModifications(peptide):
-    return ''.join([x for x in peptide if x not in string.ascii_letters])
+    return ''.join([x for x in peptide if x in string.ascii_letters])
   
   def groupByLength(peptideList):
     groupedPeptides = {}
