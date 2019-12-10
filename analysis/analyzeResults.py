@@ -1,6 +1,7 @@
 """
 ***** Part of this code was written specifically for the Darwin server     *****
 ***** Part of this code relies on a fixed amino acid list                  *****
+***** Modifications have been removed from reported peptides               *****
 
 Run a series of programs in the analysis directory and create a results report.
 
@@ -416,7 +417,7 @@ def getPSSMDistribution(groupedDF):
     totalFinds += len(elm[1])
     pssmDistribution[elm[0]] = len(elm[1])
   for pssm in pssmDistribution:
-    pssmDistribution[pssm] /= totalFinds
+    pssmDistribution[pssm] = (pssmDistribution[pssm] / totalFinds) * 10**2
   return pssmDistribution
 
 
@@ -461,9 +462,13 @@ def printGraphicTSL(groupedDF, dataSetName, tslLocation, outputDirectory):
   peptideByPSSM = getPSSMPeptides(groupedDF)
   tmpPeptideFile = os.path.join(outputDirectory, 'tmpPep.txt')
   tmpDecoyFile = os.path.join(outputDirectory, 'tmpDecoy.txt')
+  # Let's report the number of peptides for each pssm
+  pssmPeptides = {}
   for pssmName in peptideByPSSM:
+    pssmPeptides[pssmName] = {}
     for length in peptideByPSSM[pssmName]:
       peptideList = peptideByPSSM[pssmName][length]
+      pssmPeptides[pssmName][length] = peptideList
       decoys = generateDecoyPeptides(len(peptideList[0]), len(peptideList))
       outputName = \
           os.path.join(outputDirectory, '{}_{}_{}'.format(dataSetName,
@@ -477,9 +482,11 @@ def printGraphicTSL(groupedDF, dataSetName, tslLocation, outputDirectory):
                                                                                 os.path.abspath(tmpPeptideFile),
                                                                                 os.path.abspath(tmpDecoyFile),
                                                                                 os.path.abspath(outputName + '.png'),
-                                                                                pssmName).split())
+                                                                                pssmName.replace('.csv.pssm', '')).split())
   os.remove(tmpPeptideFile)
   os.remove(tmpDecoyFile)
+
+  return pssmPeptides
 
 
 if __name__ == '__main__':
@@ -522,8 +529,14 @@ if __name__ == '__main__':
   os.system("module load ruby/2.1.0")
   oldCWD = os.getcwd()
   os.chdir(os.path.dirname(arguments.tsl))
-  printGraphicTSL(groupedDF, arguments.dataset_name, arguments.tsl, arguments.output_dir)
+  pssmPeptides = printGraphicTSL(groupedDF, arguments.dataset_name,
+                                 arguments.tsl, arguments.output_dir)
   os.chdir(oldCWD)
+
+  for pssm in pssmPeptides:
+    for length in pssmPeptides[pssm]:
+      with open(os.path.join(arguments.output_dir, '{}_{}_peptides.txt'.format(pssm.replace('.csv.pssm', ''), length))) as f:
+        f.write('\n'.join(pssmPeptides[pssm][length]))
 
 
   # Create report
@@ -549,7 +562,15 @@ if __name__ == '__main__':
     denovoPSSM = getPSSMDistribution(groupedDF)
     f.write('PSSM Distribution\n')
     f.write('\n'.join(['{}: {}%'.format(pssm, round(denovoPSSM[pssm], 2)) for pssm in denovoPSSM]))
-    f.write('\n\n')
+    f.write('\n')
+
+    for pssm in pssmPeptides:
+      f.write(pssm.replace('.csv.pssm', '') + ' -- ')
+      for length in pssmPeptides[pssm]:
+        f.write('{}: {}'.format(length, len(pssmPeptides[pssm][length])))
+      f.write('\n')
+    f.write('\n')
+        
 
     f.write('ImmuNovo Lengths\n')
     immuNovoDistribution = aminoAcidDistribution(immuNovoDict)
