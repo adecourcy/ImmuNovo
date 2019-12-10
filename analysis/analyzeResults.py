@@ -461,8 +461,11 @@ def printGraphicTSL(groupedDF, dataSetName, tslLocation, outputDirectory):
   peptideByPSSM = getPSSMPeptides(groupedDF)
   tmpPeptideFile = os.path.join(outputDirectory, 'tmpPep.txt')
   tmpDecoyFile = os.path.join(outputDirectory, 'tmpDecoy.txt')
+  print("setup")
   for pssmName in peptideByPSSM:
+    print(pssmName)
     for length in peptideByPSSM[pssmName]:
+      print(length)
       peptideList = peptideByPSSM[pssmName][length]
       decoys = generateDecoyPeptides(len(peptideList[0]), len(peptideList))
       outputName = \
@@ -478,6 +481,7 @@ def printGraphicTSL(groupedDF, dataSetName, tslLocation, outputDirectory):
                                                                                 os.path.abspath(tmpDecoyFile),
                                                                                 os.path.abspath(outputName + '.png'),
                                                                                 pssmName).split())
+      print('finished graphic')
   os.remove(tmpPeptideFile)
   os.remove(tmpDecoyFile)
 
@@ -524,6 +528,7 @@ if __name__ == '__main__':
   os.system("module load ruby/2.1.0")
   print("strat graphics")
   printGraphicTSL(groupedDF, arguments.dataset_name, arguments.tsl, arguments.output_dir)
+  print('End graphics')
 
 
   # Create report
