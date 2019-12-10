@@ -512,14 +512,17 @@ if __name__ == '__main__':
     findUniquePeptides.getPeptideDict(fdrImmuNovo, arguments.fdr, False)
   databaseDict, fdrCutoff = \
     findUniquePeptides.getPeptideDict(fdrDatabase, fdrCutoff)
+  print("find Unique")
 
   numIdentical, num2AA, similarity, overlapPeptides = \
                         compareResults(immuNovoDict, databaseDict)
   
   groupedDF = groupByPSSM(fdrImmuNovo, fdrCutoff)
+  print("grouped")
   
   # Create tsl images. Written for Darwin Server, specifically
   os.system("module load ruby/2.1.0")
+  print("strat graphics")
   printGraphicTSL(groupedDF, arguments.dataset_name, arguments.tsl, arguments.output_dir)
 
 
