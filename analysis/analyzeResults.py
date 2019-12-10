@@ -130,7 +130,7 @@ def parseArguments():
   parser.add_argument('-tsl', '--TSL_Location',
                       dest='tsl',
                       type=str,
-                      default=os.path.join(dname, './tsl/tsl/cgi-bin/tsl'),
+                      default=os.path.join(dname, './tsl/cgi-bin/tsl'),
                       help='Path to the tsl binary')
   parser.add_argument('--update', action='store_true')
 
