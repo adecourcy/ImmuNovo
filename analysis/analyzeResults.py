@@ -520,7 +520,10 @@ if __name__ == '__main__':
   
   # Create tsl images. Written for Darwin Server, specifically
   os.system("module load ruby/2.1.0")
+  oldCWD = os.getcwd()
+  os.chdir(os.path.dirname(arguments.tsl))
   printGraphicTSL(groupedDF, arguments.dataset_name, arguments.tsl, arguments.output_dir)
+  os.chdir(oldCWD)
 
 
   # Create report
