@@ -459,11 +459,14 @@ def generateDecoyPeptides(length, number):
 
 def printGraphicTSL(groupedDF, dataSetName, tslLocation, outputDirectory):
   peptideByPSSM = getPSSMPeptides(groupedDF)
+  print(peptideByPSSM)
+  input()
   tmpPeptideFile = os.path.join(outputDirectory, 'tmpPep.txt')
   tmpDecoyFile = os.path.join(outputDirectory, 'tmpDecoy.txt')
   print("setup")
   for pssmName in peptideByPSSM:
     print(pssmName)
+    print(peptideByPSSM[pssmName])
     for length in peptideByPSSM[pssmName]:
       print(length)
       peptideList = peptideByPSSM[pssmName][length]
