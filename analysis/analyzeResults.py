@@ -535,7 +535,7 @@ if __name__ == '__main__':
 
   for pssm in pssmPeptides:
     for length in pssmPeptides[pssm]:
-      with open(os.path.join(arguments.output_dir, '{}_{}_peptides.txt'.format(pssm.replace('.csv.pssm', ''), length))) as f:
+      with open(os.path.join(arguments.output_dir, '{}_{}_peptides.txt'.format(pssm.replace('.csv.pssm', ''), length)), 'w') as f:
         f.write('\n'.join(pssmPeptides[pssm][length]))
 
 
