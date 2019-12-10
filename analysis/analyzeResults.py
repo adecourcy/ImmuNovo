@@ -453,7 +453,7 @@ def generateDecoyPeptides(length, number):
   
   decoys = set()
   while len(decoys) < number:
-     decoys.add(''.join(random.choices(aaList, k=length)))
+     decoys.add(''.join([random.choice(aaList) for i in range(length)]))
   return decoys
 
 
