@@ -464,6 +464,7 @@ def printGraphicTSL(groupedDF, dataSetName, tslLocation, outputDirectory):
   for pssmName in peptideByPSSM:
     for length in peptideByPSSM[pssmName]:
       peptideList = peptideByPSSM[pssmName][length]
+      pssmName = pssmName.replace('.csv.pssm', '')
       decoys = generateDecoyPeptides(len(peptideList[0]), len(peptideList))
       outputName = \
           os.path.join(outputDirectory, '{}_{}_{}'.format(dataSetName,
