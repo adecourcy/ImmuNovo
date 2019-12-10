@@ -567,7 +567,7 @@ if __name__ == '__main__':
     for pssm in pssmPeptides:
       f.write(pssm.replace('.csv.pssm', '') + ' -- ')
       for length in pssmPeptides[pssm]:
-        f.write('{}: {}'.format(length, len(pssmPeptides[pssm][length])))
+        f.write('{}: {} '.format(length, len(pssmPeptides[pssm][length])))
       f.write('\n')
     f.write('\n')
         
