@@ -78,9 +78,9 @@ def parseArguments():
   arguments.acid_mass_file = getAbsPath(arguments.acid_mass_file)
   arguments.pssm_dir = getAbsPath(arguments.pssm_dir)
 
-  arguments.spec_dir = checkExists(arguments.spec_dir)
-  arguments.acid_mass_file = checkExists(arguments.acid_mass_file)
-  arguments.pssm_dir = checkExists(arguments.pssm_dir)
+  checkExists(arguments.spec_dir)
+  checkExists(arguments.acid_mass_file)
+  checkExists(arguments.pssm_dir)
 
   return arguments
 
