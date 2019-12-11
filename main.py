@@ -97,9 +97,8 @@ def improperNumArgumentsOutput():
   print("Exiting...\n")
   exit()
 
-def clean():
-  fileList = [specFile, specDoubleFile, acidFile,
-              massFile, scoreFile, resultsFile]
+def clean(fileList):
+
   for f in fileList:
     try:
       os.remove(f)
@@ -144,7 +143,7 @@ def getAminoVariables(acidMassFile,
     print("The mass file you have provided has more than 23 amino acids defined\n")
     print("Other files may also have too many masses but haven't been checked\n"
           "by the program at this time\n")
-    clean()
+    clean(fileList)
     exit()
 
   # quick and dirty way to make sure all our amino masses match for now
@@ -160,8 +159,27 @@ def getAminoVariables(acidMassFile,
 
 if __name__ == '__main__':
 
+
+  programDir = os.path.dirname(__file__)
+
+  cPath = os.path.join(os.path.join(programDir, "scoring"))
+  specFile = os.path.join(cPath, "specFile")
+  specDoubleFile = os.path.join(cPath, "specDoubleFile")
+  acidFile = os.path.join(cPath, "acidFile")
+  massFile = os.path.join(cPath, "massFile")
+  scoreFile = os.path.join(cPath, "scoreFile")
+  resultsFile = os.path.join(cPath, "results")
+  aminoAcids = ["G", "A", "S", "P", "V",
+                "T", "L", "I", "N", "D",
+                "Q", "K", "E", "M", "H",
+                "F", "R", "C", "Y", "W",
+                "B", "J", "O"]
+
+  fileList = [specFile, specDoubleFile, acidFile,
+              massFile, scoreFile, resultsFile]
+
   try:
-    clean()
+    clean(fileList)
   except:
     pass
 
@@ -214,19 +232,6 @@ if __name__ == '__main__':
 
       for pssmTitle in allPSSM:
 
-        cPath = os.path.join("./scoring")
-        specFile = os.path.join(cPath, "specFile")
-        specDoubleFile = os.path.join(cPath, "specDoubleFile")
-        acidFile = os.path.join(cPath, "acidFile")
-        massFile = os.path.join(cPath, "massFile")
-        scoreFile = os.path.join(cPath, "scoreFile")
-        resultsFile = os.path.join(cPath, "results")
-        aminoAcids = ["G", "A", "S", "P", "V",
-                      "T", "L", "I", "N", "D",
-                      "Q", "K", "E", "M", "H",
-                      "F", "R", "C", "Y", "W",
-                      "B", "J", "O"]
-
         for acid in acidMassTable:
           if acid not in aminoAcids:
             aminoAcids.append(acid)
@@ -243,6 +248,9 @@ if __name__ == '__main__':
                     acidFile,
                     massFile,
                     scoreFile)
+
+        oldCWD = os.getcwd()
+        os.chdir(os.path.dirname(arguments.tsl))
 
         cOutput = os.system("./scoring/findPep {} {} {} {} {} \
                                      {} {} {} {} {} \
@@ -273,8 +281,10 @@ if __name__ == '__main__':
                                                       arguments.bin))
 
         if cOutput != 0:
-          clean()
+          clean(fileList)
           exit()
+      
+        os.chdir(oldCWD)
 
         experimentalSpectrum = spectrumMasses + spectrumMassesDouble
         experimentalIntensities = spectrumIntensities + spectrumIntensitiesDouble
@@ -318,6 +328,6 @@ if __name__ == '__main__':
 
             outputFile.write(outputString)
 
-        clean()
+        clean(fileList)
 
   outputFile.close()

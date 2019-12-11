@@ -1,6 +1,8 @@
 from decimal import Decimal
 
 import argparse
+import os
+import sys
 
 # Keep the legacy, dictionary-based argument parser for dependent files
 
@@ -53,9 +55,31 @@ def printOptionalArguments():
 
 
 def parseArguments():
+
+  def getAbsPath(location):
+    return os.path.abspath(location)
+
+  def checkExists(directory):
+    if not os.path.exists(directory):
+      print("Directory: {} does not exist".format(directory))
+      sys.exit()
+
+  def createDir(directory):
+    if not os.path.exists(directory):
+      os.mkdir(directory)
+
   parser = argparse.ArgumentParser()
   parser = parseDefaultArguments(parser)
   parser = parseOptionalArguments(parser)
+
+  parser.spec_dir = getAbsPath(parser.spec_dir)
+  parser.acid_mass_file = getAbsPath(parser.acid_mass_file)
+  parser.pssm_dir = getAbsPath(parser.pssm_dir)
+
+  parser.spec_dir = checkExists(parser.spec_dir)
+  parser.acid_mass_file = checkExists(parser.acid_mass_file)
+  parser.pssm_dir = checkExists(parser.pssm_dir)
+
   return parser.parse_args()
 
 
