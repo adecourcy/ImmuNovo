@@ -251,6 +251,7 @@ if __name__ == '__main__':
 
         oldCWD = os.getcwd()
         os.chdir(os.path.dirname(programDir))
+        print(os.getcwd())
 
         cOutput = os.system("./scoring/findPep {} {} {} {} {} \
                                      {} {} {} {} {} \
