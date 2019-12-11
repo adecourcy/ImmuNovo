@@ -72,6 +72,8 @@ def parseArguments():
   parser = parseDefaultArguments(parser)
   parser = parseOptionalArguments(parser)
 
+  parser.parse_args()
+
   parser.spec_dir = getAbsPath(parser.spec_dir)
   parser.acid_mass_file = getAbsPath(parser.acid_mass_file)
   parser.pssm_dir = getAbsPath(parser.pssm_dir)
@@ -80,7 +82,7 @@ def parseArguments():
   parser.acid_mass_file = checkExists(parser.acid_mass_file)
   parser.pssm_dir = checkExists(parser.pssm_dir)
 
-  return parser.parse_args()
+  return parser
 
 
 def parseDefaultArguments(parser):
