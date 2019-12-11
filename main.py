@@ -160,7 +160,7 @@ def getAminoVariables(acidMassFile,
 if __name__ == '__main__':
 
 
-  programDir = os.path.dirname(__file__)
+  programDir = os.path.dirname(os.path.abspath(__file__))
   print(programDir)
   input()
 
