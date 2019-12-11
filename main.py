@@ -250,7 +250,7 @@ if __name__ == '__main__':
                     scoreFile)
 
         oldCWD = os.getcwd()
-        os.chdir(os.path.dirname(arguments.tsl))
+        os.chdir(os.path.dirname(programDir))
 
         cOutput = os.system("./scoring/findPep {} {} {} {} {} \
                                      {} {} {} {} {} \
