@@ -162,6 +162,7 @@ if __name__ == '__main__':
 
   programDir = os.path.dirname(__file__)
   print(programDir)
+  input()
 
   cPath = os.path.join(os.path.join(programDir, "scoring"))
   specFile = os.path.join(cPath, "specFile")
