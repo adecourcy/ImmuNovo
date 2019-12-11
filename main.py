@@ -162,7 +162,6 @@ if __name__ == '__main__':
 
   programDir = os.path.dirname(os.path.abspath(__file__))
   print(programDir)
-  input()
 
   cPath = os.path.join(os.path.join(programDir, "scoring"))
   specFile = os.path.join(cPath, "specFile")
@@ -203,7 +202,8 @@ if __name__ == '__main__':
     spectrumFile = os.path.join(arguments.spec_dir, spectrumFileName)
 
     try:
-      outputFile = open(spectrumFileName + arguments.os, 'w')
+      outputFile = \
+          open(os.path.join(programDir, spectrumFileName + arguments.os), 'w')
     except:
       print(str.format("Error opening {} to write output, skpping {} spectrum file",
                         spectrumFileName + arguments.os,
