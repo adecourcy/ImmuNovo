@@ -133,7 +133,7 @@ def parseArguments():
                       type=str,
                       default=os.path.join(dname, './tsl/cgi-bin/tsl'),
                       help='Path to the tsl binary')
-  parser.add_argument('--fdr_only', action='store_true')
+  parser.add_argument('--immunovo_only', action='store_true')
   parser.add_argument('--update', action='store_true')
 
 
