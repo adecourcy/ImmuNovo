@@ -107,7 +107,7 @@ def parseArguments():
                         help='The database search program used (only MSGF)')
   parser.add_argument('-d', '--max-decoys',
                         dest='decoys',
-                        default=10,
+                        default=str(50),
                         help='The number of decoy peptides to be considered in calculating FDR')
   parser.add_argument('-rev', '--reversed_decoys',
                         dest='rev',
