@@ -109,10 +109,6 @@ def parseArguments():
                         dest='decoys',
                         default=str(50),
                         help='The number of decoy peptides to be considered in calculating FDR')
-  parser.add_argument('-rev', '--reversed_decoys',
-                        dest='rev',
-                        default='t',
-                        help='Are the decoy peptides in the database reversed? ("t" or "f")')
   parser.add_argument('-st', '--Score-Type',
                         dest='scoreType',
                         default=SCORE_COMBINED,
@@ -135,6 +131,7 @@ def parseArguments():
                       help='Path to the tsl binary')
   parser.add_argument('--immunovo_only', action='store_true')
   parser.add_argument('--update', action='store_true')
+  parser.add_argument('--reverse', action='store_false')
 
 
   arguments = parser.parse_args()
@@ -163,6 +160,11 @@ def parseArguments():
 
 
 def runPepToScores(arguments, dname):
+
+  if arguments.reverse:
+    rev = 't'
+  else:
+    rev = 'f'
   
   os.system(' '.join(['python3',
                       os.path.join(dname, 'dbPepToScores.py'),
@@ -170,7 +172,7 @@ def runPepToScores(arguments, dname):
                       arguments.acid_mass_file,
                       arguments.pssm_dir,
                       arguments.decoy_dir,
-                      arguments.rev,
+                      rev,
                       arguments.decoys]))
 
   # subprocess.run([os.path.join(dname, 'dbPepToScores.py'),
