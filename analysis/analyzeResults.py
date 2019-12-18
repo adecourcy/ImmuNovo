@@ -519,25 +519,25 @@ if __name__ == '__main__':
   os.chdir(oldCWD)
 
   ##### Done With ImmuNovo Only analysis #####
-  if not arguments.immunovo_only:
+  # if not arguments.immunovo_only:
 
-    if arguments.update:
-      fdrDatabase = pd.read_csv(os.path.join(arguments.output_dir, 'processedDatabase.csv'))
-    else: 
-      fdrDatabase = \
-          processDatabaseData(arguments.database_results_dir,
-                              fdrCutoffs,
-                              SCORE_COMBINED,
-                              MSGF)
+  #   if arguments.update:
+  #     fdrDatabase = pd.read_csv(os.path.join(arguments.output_dir, 'processedDatabase.csv'))
+  #   else: 
+  #     fdrDatabase = \
+  #         processDatabaseData(arguments.database_results_dir,
+  #                             fdrCutoffs,
+  #                             SCORE_COMBINED,
+  #                             MSGF)
       
-      # This is taking a while, so in case something crashes
-      fdrDatabase.to_csv(os.path.join(arguments.output_dir, 'processedDatabase.csv'), index=0)
+  #     # This is taking a while, so in case something crashes
+  #     fdrDatabase.to_csv(os.path.join(arguments.output_dir, 'processedDatabase.csv'), index=0)
 
-    databaseDict, fdrCutoff = \
-      findUniquePeptides.getPeptideDict(fdrDatabase, fdrCutoff)
+  #   databaseDict, fdrCutoff = \
+  #     findUniquePeptides.getPeptideDict(fdrDatabase, fdrCutoff)
 
-    numIdentical, num2AA, similarity, overlapPeptides = \
-                          compareResults(immuNovoDict, databaseDict)
+  #   numIdentical, num2AA, similarity, overlapPeptides = \
+  #                         compareResults(immuNovoDict, databaseDict)
 
   #### Start creating report ####
 
@@ -546,37 +546,37 @@ if __name__ == '__main__':
       with open(os.path.join(arguments.output_dir, '{}_{}_peptides.txt'.format(pssm.replace('.csv.pssm', ''), length)), 'w') as f:
         f.write('\n'.join(pssmPeptides[pssm][length]))
 
-  if not arguments.immunovo_only:
-    copyPSSM(arguments.pssm_dir, arguments.output_dir)
-    plotMatches(immuNovoDict,
-                numIdentical,
-                num2AA,
-                arguments.output_dir,
-                arguments.plt_title)
-    plotLengths(immuNovoDict, arguments.output_dir, arguments.plt_title)
+  # if not arguments.immunovo_only:
+  #   copyPSSM(arguments.pssm_dir, arguments.output_dir)
+  #   plotMatches(immuNovoDict,
+  #               numIdentical,
+  #               num2AA,
+  #               arguments.output_dir,
+  #               arguments.plt_title)
+  #   plotLengths(immuNovoDict, arguments.output_dir, arguments.plt_title)
 
   # Output summary statistics
   with open(os.path.join(arguments.output_dir, 'report.txt'), 'w') as f:
     f.write('FDR cutoff used: {}\n\n'.format(fdrCutoff))
 
-    if not arguments.immunovo_only:
-      iSpec, iPSSM, dSpec, dPSSM, oSpec, oPSSM = \
-            getScores(fdrImmuNovo, fdrDatabase, overlapPeptides, fdrCutoff)
-      f.write('ImmuNovo Spectrum Score: {}\nImmuNovo PSSM Score: {}\n'.format(iSpec, iPSSM))
-      f.write('Database Spectrum Score: {}\nDatabase PSSM Score: {}\n'.format(dSpec, dPSSM))
-      f.write('Overlapping Spectrum Score: {}\nOverlapping PSSM Score: {}\n'.format(oSpec, oPSSM))
-      f.write(pepCountToString(immuNovoDict, databaseDict, numIdentical, num2AA, similarity))
-      f.write('\n\n')
-    else:
-      iSpec, iPSSM, dSpec, dPSSM, oSpec, oPSSM = \
-            getScores(fdrImmuNovo, fdrImmuNovo, set(), fdrCutoff)
-      immuNovoLengths = [len(immuNovoDict[x]) for x in immuNovoDict]
-      totalImmuNovo = sum(immuNovoLengths)
-      immuNovoPercentages = [round((x / totalImmuNovo) * 10**2, 2) for x in immuNovoLengths]
-      f.write(' '.join(['{}: {} ({}%)'.format(x, len(immuNovoDict[x]), y) for x, y in zip(immuNovoDict, immuNovoPercentages)]))
-      f.write('\n')
-      f.write('ImmuNovo Spectrum Score: {}\nImmuNovo PSSM Score: {}\n'.format(iSpec, iPSSM))
-      f.write('\n\n')
+    # if not arguments.immunovo_only:
+    #   iSpec, iPSSM, dSpec, dPSSM, oSpec, oPSSM = \
+    #         getScores(fdrImmuNovo, fdrDatabase, overlapPeptides, fdrCutoff)
+    #   f.write('ImmuNovo Spectrum Score: {}\nImmuNovo PSSM Score: {}\n'.format(iSpec, iPSSM))
+    #   f.write('Database Spectrum Score: {}\nDatabase PSSM Score: {}\n'.format(dSpec, dPSSM))
+    #   f.write('Overlapping Spectrum Score: {}\nOverlapping PSSM Score: {}\n'.format(oSpec, oPSSM))
+    #   f.write(pepCountToString(immuNovoDict, databaseDict, numIdentical, num2AA, similarity))
+    #   f.write('\n\n')
+    # else:
+    iSpec, iPSSM, dSpec, dPSSM, oSpec, oPSSM = \
+          getScores(fdrImmuNovo, fdrImmuNovo, set(), fdrCutoff)
+    immuNovoLengths = [len(immuNovoDict[x]) for x in immuNovoDict]
+    totalImmuNovo = sum(immuNovoLengths)
+    immuNovoPercentages = [round((x / totalImmuNovo) * 10**2, 2) for x in immuNovoLengths]
+    f.write(' '.join(['{}: {} ({}%)'.format(x, len(immuNovoDict[x]), y) for x, y in zip(immuNovoDict, immuNovoPercentages)]))
+    f.write('\n')
+    f.write('ImmuNovo Spectrum Score: {}\nImmuNovo PSSM Score: {}\n'.format(iSpec, iPSSM))
+    f.write('\n\n')
 
     denovoPSSM = getPSSMDistribution(groupedDF)
     f.write('PSSM Distribution\n')
@@ -600,11 +600,11 @@ if __name__ == '__main__':
     f.write('\n\n')
     
 
-    if not arguments.immunovo_only:
-      f.write('Database Lengths\n')
-      databaseDistribution = aminoAcidDistribution(databaseDict)
-      for length in databaseDistribution:
-        f.write('Length {}\n'.format(length))
-        f.write(acidDistributionToString(databaseDistribution[length]))
-        f.write('\n')
+    # if not arguments.immunovo_only:
+    #   f.write('Database Lengths\n')
+    #   databaseDistribution = aminoAcidDistribution(databaseDict)
+    #   for length in databaseDistribution:
+    #     f.write('Length {}\n'.format(length))
+    #     f.write(acidDistributionToString(databaseDistribution[length]))
+    #     f.write('\n')
   
