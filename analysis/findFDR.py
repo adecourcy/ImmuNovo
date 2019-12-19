@@ -101,7 +101,6 @@ def getScores(resultsDF, decoyDF, scoreType, deltaThreshold=0):
   thresholdCalc = \
     lambda row: True if row[RESULT_IMMUNO] - row[RESULTS_DECOY] >= deltaThreshold \
                      else False
-  print(merged)
 
   merged[RESULTS_DELTA] = \
       merged.apply(thresholdCalc, axis=1)

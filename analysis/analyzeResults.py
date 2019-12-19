@@ -498,8 +498,8 @@ if __name__ == '__main__':
   abspath = os.path.abspath(__file__)
   dname = os.path.dirname(abspath)
 
-  if not arguments.update:
-    decoyPeptides = runPepToScores(arguments, dname)
+  #if not arguments.update:
+  #  decoyPeptides = runPepToScores(arguments, dname)
   decoyPeptides = os.path.join(arguments.output_dir, 'decoyScores.csv')
 
   fdrCutoffs, fdrImmuNovo = runFDR(arguments, decoyPeptides)
