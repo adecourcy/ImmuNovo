@@ -13,19 +13,30 @@ def _getDirection(title, allPSSM):
   return allPSSM[title][2]
 
 def setDirection(forward, allPSSM):
-  newPSSM = {}
+  # newPSSM = {}
+  # for title in allPSSM:
+  #   if _getDirection(title, allPSSM) == forward:
+  #     newPSSM[title] = copy.deepcopy(allPSSM[title])
+  #   allLengths = {}
+  #   for length in allPSSM[title][1]:
+  #     matrix = getMatrixOfLength(title, length, allPSSM)
+  #     for acid in matrix:
+  #       matrix[acid].reverse()
+  #     allLengths[length] = matrix
+  #   newPSSM[title] = (allPSSM[0], allLengths, forward)
+  
+  def _reverseList(newMatrix, acidProbabilities, acid):
+    newMatrix[acid] = acidProbabilities
+    newMatrix[acid].reverse()
+    return newMatrix
+
   for title in allPSSM:
     if _getDirection(title, allPSSM) == forward:
-      newPSSM[title] = copy.deepcopy(allPSSM[title])
-    allLengths = {}
-    for length in allPSSM[title][1]:
-      matrix = getMatrixOfLength(title, length, allPSSM)
-      for acid in matrix:
-        matrix[acid].reverse()
-      allLengths[length] = matrix
-    newPSSM[title] = (allPSSM[0], allLengths, forward)
+      return allPSSM
+    else:
+      break
 
-  return newPSSM
+  return _adjustPSSM(allPSSM, _reverseList)
 
 
 def _adjustPSSM(allPSSM, adjustFunc):
@@ -44,7 +55,7 @@ def _adjustPSSM(allPSSM, adjustFunc):
 
       newPSSM[length] = newMatrix
 
-    adjustedAllPSSM[title] = (allPSSM[title][0], newPSSM)
+    adjustedAllPSSM[title] = (allPSSM[title][0], newPSSM, allPSSM[title][2])
 
   return adjustedAllPSSM
 
