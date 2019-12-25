@@ -1,5 +1,6 @@
 from decimal import Decimal
 from os import listdir, path
+import sys
 
 def getAllPSSM(directory, minPepLength, maxPepLength, acids, bEnd):
   allPSSM = {}
@@ -20,11 +21,12 @@ def getAllPSSM(directory, minPepLength, maxPepLength, acids, bEnd):
                        acids)
 
     if missing == [] or _promptUser(missing, file) == 'uniform':
-      allPSSM[file] = ([], pssm)
+      allPSSM[file] = ([], pssm, bEnd)
     else:
-      allPSSM[file] = (missing, pssm)
+      allPSSM[file] = (missing, pssm, bEnd)
 
-  allPSSM['uniform'] = ([], _adjustPSSM({}, minPepLength, maxPepLength, acids))
+  allPSSM['uniform'] = \
+        ([], _adjustPSSM({}, minPepLength, maxPepLength, acids), bEnd)
 
   return allPSSM
 
@@ -53,9 +55,9 @@ def _parsePSSM(file, bEnd):
     else:
       lineList = line.split()
       acid = lineList[0]
+      scores = lineList[1:]
       if not bEnd:
-        scores = lineList[1:]
-      scores.reverse()
+        scores.reverse()
 
       if len(scores) != length:
         print(str.format("Table length for '{}' in file {} should be {} but is {}",
@@ -63,7 +65,7 @@ def _parsePSSM(file, bEnd):
                          file,
                          length,
                          len(scores)))
-        exit()
+        sys.exit()
 
       pssm[length][acid] = [Decimal(x) for x in scores]
 

@@ -1,11 +1,32 @@
+import copy
+
 def getMatrixOfLength(title, length, allPSSM):
-  return allPSSM[title][1][length]
+  return copy.deepcopy(allPSSM[title][1][length])
 
 def getAcidProbabilities(matrix, acid):
-  return matrix[acid]
+  return copy.deepcopy(matrix[acid])
 
 def getIgnoredLengths(title, allPSSM):
-  return allPSSM[title][0]
+  return copy.deepcopy(allPSSM[title][0])
+
+def _getDirection(title, allPSSM):
+  return allPSSM[title][2]
+
+def setDirection(forward, allPSSM):
+  newPSSM = {}
+  for title in allPSSM:
+    if _getDirection(title, allPSSM) == forward:
+      newPSSM[title] = copy.deepcopy(allPSSM[title])
+    allLengths = {}
+    for length in allPSSM[title][1]:
+      matrix = getMatrixOfLength(title, length, allPSSM)
+      for acid in matrix:
+        matrix[acid].reverse()
+      allLengths[length] = matrix
+    newPSSM[title] = (allPSSM[0], allLengths, forward)
+
+  return newPSSM
+
 
 def _adjustPSSM(allPSSM, adjustFunc):
 
