@@ -118,7 +118,8 @@ def getAminoVariables(acidMassFile,
                       precision,
                       pssmDir,
                       minPepLength,
-                      maxPepLength):
+                      maxPepLength,
+                      bEnd):
 
   acidMassTable = \
       AcidMassTable.adjustForPrecision(
@@ -132,7 +133,8 @@ def getAminoVariables(acidMassFile,
           PSSMIO.getAllPSSM(pssmDir,
                             minPepLength,
                             maxPepLength,
-                            aminoAcids),
+                            aminoAcids,
+                            bEnd),
           precision)
 
   conversionTable = \
@@ -190,7 +192,8 @@ if __name__ == '__main__':
                                                 arguments.prec,
                                                 arguments.pssm_dir,
                                                 arguments.minP,
-                                                arguments.maxP)
+                                                arguments.maxP,
+                                                arguments.bEnd)
 
 
   H2OMassAdjusted = int(H2OMASS * (10**arguments.prec))

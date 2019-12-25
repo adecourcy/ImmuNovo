@@ -4,55 +4,6 @@ import argparse
 import os
 import sys
 
-# Keep the legacy, dictionary-based argument parser for dependent files
-
-def tryFiles(files):
-  cannotOpen = []
-  for file in files:
-    try:
-      f = open(file, 'r')
-    except:
-      cannotOpen.append(file)
-
-  if cannotOpen != []:
-    print("Cannot open the following files.\n"
-           "Please check the names and try again:")
-    for file in cannotOpen:
-      print(file)
-    exit()
-
-def printOptionalArguments():
-  padding = '{:<20}{}'
-  print("\nAll optional arguments must be passed as ARG=VALUE, in any order")
-  print("Optional arguments:")
-  print(str.format(padding, 'minP',
-        'The minimum peptide length'))
-  print(str.format(padding, 'maxP',
-        'The maximum peptide length'))
-  print(str.format(padding, 'PREC',
-        'Decimal precision'))
-  print(str.format(padding, 'OUT',
-        'File output suffix'))
-  print(str.format(padding, 'MMT',
-        'The mass tolerance limit (maximum mass tolerance)'))
-  print(str.format(padding, 'AMT',
-        'The average (ideal) mass tolerance limit'))
-  print('\nDon\'t touch these unless you know what you\'re doing:')
-
-  print(str.format(padding, 'IMC',
-        'Number of consectutive miscleavages before a peptide is discarded'))
-  print(str.format(padding, 'TMC',
-        'Number of total miscleavages before a peptide is discarded'))
-  print(str.format(padding, 'BIN',
-        'The maximum "bin" size of a spectrum mass'))
-  print(str.format(padding, 'BPEN',
-        'The score reduction if a b-ion, but not a y-ion, is matched'))
-  print(str.format(padding, 'COMP',
-        'The spectrum intensity log compression level'))
-  print(str.format(padding, 'TOLP',
-        'The maximum mass tolerance penalty'))
-
-
 
 def parseArguments():
 
@@ -165,8 +116,62 @@ def parseOptionalArguments(parser):
       type=bool,
       default=False,
       help='Run the program in debug mode')
+  
+
+  parser.add_argument('--bEnd', action='store_true')
       
   return parser
+
+
+# Keep the legacy, dictionary-based argument parser for dependent files
+
+def tryFiles(files):
+  cannotOpen = []
+  for file in files:
+    try:
+      f = open(file, 'r')
+    except:
+      cannotOpen.append(file)
+
+  if cannotOpen != []:
+    print("Cannot open the following files.\n"
+           "Please check the names and try again:")
+    for file in cannotOpen:
+      print(file)
+    exit()
+
+def printOptionalArguments():
+  padding = '{:<20}{}'
+  print("\nAll optional arguments must be passed as ARG=VALUE, in any order")
+  print("Optional arguments:")
+  print(str.format(padding, 'minP',
+        'The minimum peptide length'))
+  print(str.format(padding, 'maxP',
+        'The maximum peptide length'))
+  print(str.format(padding, 'PREC',
+        'Decimal precision'))
+  print(str.format(padding, 'OUT',
+        'File output suffix'))
+  print(str.format(padding, 'MMT',
+        'The mass tolerance limit (maximum mass tolerance)'))
+  print(str.format(padding, 'AMT',
+        'The average (ideal) mass tolerance limit'))
+  print('\nDon\'t touch these unless you know what you\'re doing:')
+
+  print(str.format(padding, 'IMC',
+        'Number of consectutive miscleavages before a peptide is discarded'))
+  print(str.format(padding, 'TMC',
+        'Number of total miscleavages before a peptide is discarded'))
+  print(str.format(padding, 'BIN',
+        'The maximum "bin" size of a spectrum mass'))
+  print(str.format(padding, 'BPEN',
+        'The score reduction if a b-ion, but not a y-ion, is matched'))
+  print(str.format(padding, 'COMP',
+        'The spectrum intensity log compression level'))
+  print(str.format(padding, 'TOLP',
+        'The maximum mass tolerance penalty'))
+
+
 
 def parseParameterInput(args):
 

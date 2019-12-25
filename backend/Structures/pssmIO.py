@@ -1,13 +1,13 @@
 from decimal import Decimal
 from os import listdir, path
 
-def getAllPSSM(directory, minPepLength, maxPepLength, acids):
+def getAllPSSM(directory, minPepLength, maxPepLength, acids, bEnd):
   allPSSM = {}
   missing = {}
 
   for file in listdir(directory):
     missing = {}
-    pssm = _parsePSSM(path.join(directory, file))
+    pssm = _parsePSSM(path.join(directory, file), bEnd)
 
     missing = _assessPSSM(missing,
                           pssm,
@@ -29,7 +29,7 @@ def getAllPSSM(directory, minPepLength, maxPepLength, acids):
   return allPSSM
 
 
-def _parsePSSM(file):
+def _parsePSSM(file, bEnd):
   # A pssm will be a dictionary of dictionaries of lists. Explained thusly:
   #
   # pssm[length] will return a pssm for all amino acids of length 'length'
@@ -53,8 +53,8 @@ def _parsePSSM(file):
     else:
       lineList = line.split()
       acid = lineList[0]
-      # We're just always assuming a y-end peptide for now
-      scores = lineList[1:]
+      if not bEnd:
+        scores = lineList[1:]
       scores.reverse()
 
       if len(scores) != length:
