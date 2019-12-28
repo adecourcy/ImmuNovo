@@ -17,7 +17,7 @@ def parseArguments():
 
   def createDir(directory):
     if not os.path.exists(directory):
-      os.mkdir(directory)
+      os.makedirs(directory)
 
   parser = argparse.ArgumentParser()
   parser = parseDefaultArguments(parser)
@@ -28,6 +28,7 @@ def parseArguments():
   arguments.spec_dir = getAbsPath(arguments.spec_dir)
   arguments.acid_mass_file = getAbsPath(arguments.acid_mass_file)
   arguments.pssm_dir = getAbsPath(arguments.pssm_dir)
+  arguments.od = createDir(arguments.od)
 
   checkExists(arguments.spec_dir)
   checkExists(arguments.acid_mass_file)
@@ -68,6 +69,10 @@ def parseOptionalArguments(parser):
       dest='os',
       default='.out.csv',
       help='Suffix of the output file')
+  parser.add_argument('-od', '--Output-File-Directory',
+      dest='od',
+      default=os.path.split(os.path.abspath(os.path.curdir))[0],
+      help='File output directory')
   parser.add_argument('-mmt', '--Maximum-Mass-Tolerance',
       dest='mmt',
       type=int,
