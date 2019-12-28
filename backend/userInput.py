@@ -117,7 +117,6 @@ def parseOptionalArguments(parser):
       default=False,
       help='Run the program in debug mode')
   
-
   parser.add_argument('--bEnd', action='store_true')
       
   return parser

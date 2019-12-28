@@ -82,16 +82,9 @@ def processResults(resultsFile: str,
     unadjustedScore = Decimal(results.readline()) / decPrec
     massScore = Decimal(results.readline()) / decPrec
     aminoScore = (Decimal(results.readline()) / decPrec) / len(peptideString)
-    globalScore  = calculateGlobalScore(acidMassTable,
-                                        experimentalSpectrum,
-                                        experimentalScores,
-                                        peptideString[::-1],
-                                        protonMassModified,
-                                        H2OMassModified,
-                                        NH3MassModified,
-                                        maxMassTolerance)
+    globalScore  = 0
 
-    combinedScore = aminoScore * Decimal(globalScore)
+    combinedScore = 0
       
     nodes.append(Node(deConvertPeptideString(peptideString[::-1], acidConversion),
                       mass,

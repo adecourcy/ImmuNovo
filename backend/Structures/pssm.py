@@ -12,7 +12,7 @@ def getIgnoredLengths(title, allPSSM):
 def _getDirection(title, allPSSM):
   return allPSSM[title][2]
 
-def setDirection(forward, allPSSM):
+def setForward(allPSSM, forward=True):
   # newPSSM = {}
   # for title in allPSSM:
   #   if _getDirection(title, allPSSM) == forward:
