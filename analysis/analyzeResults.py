@@ -62,16 +62,10 @@ def parseArguments():
   parser = argparse.ArgumentParser()
   parser.add_argument('immunovo_results_dir',
                       help='A directory containing results of the ImmuNovo Program')
-  parser.add_argument('database_results_dir',
-                      help='A directory containing results of database search')
   parser.add_argument('spec_dir',
                       help='A directory containing the spectrum files that were searched')
   parser.add_argument('pssm_dir',
                       help='A directory containing pssm files searched')
-  parser.add_argument('acid_mass_file',
-                      help='A file containing amino acid mass data')
-  parser.add_argument('decoy_dir',
-                      help='A directory containing decoy peptides for FDR calculation')
   parser.add_argument('dataset_name',
                       help='The name of the current dataset being processed')
   parser.add_argument('plt_title',
@@ -82,29 +76,11 @@ def parseArguments():
                       dest='fdr',
                       default = 0.01,
                       help='The target FDR', type=float)
-  parser.add_argument('-minP', '--Minimum-Peptide-Length',
-                      dest='minP',
-                      type=int,
-                      default=9,
-                      help='The minimum length of a peptide in our search')
-  parser.add_argument('-maxP', '--Maximum-Peptide-Length',
-                      dest='maxP',
-                      type=int,
-                      default=12,
-                      help='The maximum length of a peptide in our search')
-  parser.add_argument('-mmt', '--Maximum-Mass-Tolerance',
-                      dest='mmt',
-                      type=int,
-                      default=35,
-                      help='The maximum deviance between a peptide mass and spectrum mass '
-                      'before we consider the masses to not be matched (PPM)')
-  parser.add_argument('-o', '--Output-Directory',
-                      dest='output_dir',
-                      default=os.path.join(dname, './reports'))
+
   parser.add_argument('-db', '--database-search-program',
                         dest='database',
                         default=MSGF,
-                        help='The database search program used (only MSGF)')
+                        help='The database search program used (currently only MSGF)')
   parser.add_argument('-d', '--max-decoys',
                         dest='decoys',
                         default=str(50),
@@ -113,16 +89,6 @@ def parseArguments():
                         dest='scoreType',
                         default=SCORE_COMBINED,
                         help='Score type to compare (defaults to combined score)')
-  parser.add_argument('-prec', '--Precision',
-                      dest='prec',
-                      type=int,
-                      default=4,
-                      help='Decimial precision of our search')
-  parser.add_argument('-comp', '--Spectrum-Compression',
-                      dest='comp',
-                      type=int,
-                      default=2,
-                      help='The spectrum intensity log compression level')
 
   parser.add_argument('-tsl', '--TSL_Location',
                       dest='tsl',
@@ -132,6 +98,13 @@ def parseArguments():
   parser.add_argument('--immunovo_only', action='store_true')
   parser.add_argument('--update', action='store_true')
   parser.add_argument('--reverse', action='store_false')
+
+
+  #####
+  #
+  # Add optional arguments here
+  #
+  #####
 
 
   arguments = parser.parse_args()

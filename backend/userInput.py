@@ -41,8 +41,6 @@ def parseDefaultArguments(parser):
 
   parser.add_argument('spec_dir',
       help='A directory containing 1 or more spectrum files')
-  parser.add_argument('acid_mass_file',
-      help='A file containing amino acid mass data')
   parser.add_argument('pssm_dir',
       help='A directory containing a positional scoring matrix')
   return parser
@@ -50,6 +48,18 @@ def parseDefaultArguments(parser):
 
 def parseOptionalArguments(parser):
   
+  parser.add_argument('acid_mass_file',
+      dest='acid_mass_file',
+      default=os.path.join(os.path.split(os.path.abspath(os.path.curdir))[0], 'aminoMassesWithModifications'),
+      help='A file containing amino acid mass data')
+  parser.add_argument('decoy_dir',
+      dest='decoy_dir',
+      default=os.path.join(os.path.split(os.path.abspath(os.path.curdir))[0], 'userData', 'decoyDatabase'),
+      help='A directory containing decoy peptides for FDR calculation')
+  parser.add_argument('database_results_dir',
+      dest='database_results_dir',
+      default='',
+      help='A directory containing results of database search')
   parser.add_argument('-minP', '--Minimum-Peptide-Length',
       dest='minP',
       type=int,
@@ -70,7 +80,7 @@ def parseOptionalArguments(parser):
       default='.out.csv',
       help='Suffix of the output file')
   parser.add_argument('-od', '--Output-File-Directory',
-      dest='od',
+      dest='output_dir',
       default=os.path.split(os.path.abspath(os.path.curdir))[0],
       help='File output directory')
   parser.add_argument('-mmt', '--Maximum-Mass-Tolerance',

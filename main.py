@@ -205,7 +205,7 @@ if __name__ == '__main__':
 
     try:
       outputFile = \
-          open(os.path.join(arguments.od, spectrumFileName + arguments.os), 'w')
+          open(os.path.join(arguments.output_dir, spectrumFileName + arguments.os), 'w')
     except:
       print(str.format("Error opening {} to write output, skpping {} spectrum file",
                         spectrumFileName + arguments.os,
