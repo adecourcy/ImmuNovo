@@ -25,6 +25,9 @@ def parseArguments():
 
   arguments = parser.parse_args()
 
+  if arguments.dataset_name == '':
+    arguments.dataset_name = arguments.spec_dir
+
   arguments.spec_dir = getAbsPath(arguments.spec_dir)
   arguments.acid_mass_file = getAbsPath(arguments.acid_mass_file)
   arguments.pssm_dir = getAbsPath(arguments.pssm_dir)
@@ -126,13 +129,45 @@ def parseOptionalArguments(parser):
       type=float,
       default=0.5,
       help='The maximum mass tolerance penalty')
+  parser.add_argument('dataset_name',
+      dest='dataset_name',
+      default='',
+      help='The name of the current dataset being processed')
   parser.add_argument('-db', '--debug',
       dest='db',
       type=bool,
       default=False,
       help='Run the program in debug mode')
   
-  parser.add_argument('--bEnd', action='store_true')
+  parser.add_argument('-f', '--FDR',
+                      dest='fdr',
+                      default = 0.01,
+                      help='The target FDR', type=float)
+  parser.add_argument('-db', '--database-search-program',
+                        dest='database',
+                        default=MSGF,
+                        help='The database search program used (currently only MSGF)')
+  parser.add_argument('-d', '--max-decoys',
+                        dest='decoys',
+                        default=str(50),
+                        help='The number of decoy peptides to be considered in calculating FDR')
+  parser.add_argument('-st', '--Score-Type',
+                        dest='scoreType',
+                        default=SCORE_COMBINED,
+                        help='Score type to compare (defaults to combined score)')
+
+  parser.add_argument('-tsl', '--TSL_Location',
+                      dest='tsl',
+                      type=str,
+                      default=os.path.join(dname, './tsl/cgi-bin/tsl'),
+                      help='Path to the tsl binary')
+  
+  parser.add_argument('--bEnd',
+                      action='store_true',
+                      help='Construct Peptides from the bEnd (not currently implemented)')
+  parser.add_argument('--reverse',
+                      action='store_false',
+                      help='Reveres the peptides in the decoy database')
       
   return parser
 

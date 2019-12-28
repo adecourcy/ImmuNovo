@@ -66,38 +66,8 @@ def parseArguments():
                       help='A directory containing the spectrum files that were searched')
   parser.add_argument('pssm_dir',
                       help='A directory containing pssm files searched')
-  parser.add_argument('dataset_name',
-                      help='The name of the current dataset being processed')
-  parser.add_argument('plt_title',
-                      help='A title to put on all the length distribution plots')
 
-
-  parser.add_argument('-f', '--FDR',
-                      dest='fdr',
-                      default = 0.01,
-                      help='The target FDR', type=float)
-
-  parser.add_argument('-db', '--database-search-program',
-                        dest='database',
-                        default=MSGF,
-                        help='The database search program used (currently only MSGF)')
-  parser.add_argument('-d', '--max-decoys',
-                        dest='decoys',
-                        default=str(50),
-                        help='The number of decoy peptides to be considered in calculating FDR')
-  parser.add_argument('-st', '--Score-Type',
-                        dest='scoreType',
-                        default=SCORE_COMBINED,
-                        help='Score type to compare (defaults to combined score)')
-
-  parser.add_argument('-tsl', '--TSL_Location',
-                      dest='tsl',
-                      type=str,
-                      default=os.path.join(dname, './tsl/cgi-bin/tsl'),
-                      help='Path to the tsl binary')
-  parser.add_argument('--immunovo_only', action='store_true')
   parser.add_argument('--update', action='store_true')
-  parser.add_argument('--reverse', action='store_false')
 
 
   #####
