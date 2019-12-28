@@ -31,3 +31,25 @@ def convertAcidModifications(acidMasses, allPSSM, conversionTable):
   newAcidMasses = acidMassTable.convertAcids(acidMasses, conversionTable)
 
   return newAcidMasses, newPSSM
+
+
+def convertPeptideString(peptideString, acidConversion):
+  allConversions = []
+  convertedPeptide = peptideString[:]
+  for key in acidConversion:
+    allConversions.append(key)
+  allConversions.sort(key=lambda x: len(x), reverse=True)
+  for conversion in allConversions:
+    convertedPeptide = convertedPeptide.replace(conversion, acidConversion[conversion])
+  return convertPeptideString
+
+
+def deConvertPeptideString(peptideString, acidConversion):
+
+  reverseConversionTable = {acidConversion[x]: x for x in acidConversion}
+
+  convertedPeptide = ''
+  for acid in peptideString:
+    convertedPeptide += reverseConversionTable[acid]
+  
+  return convertedPeptide

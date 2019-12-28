@@ -46,7 +46,7 @@ def _parseSpectrumFile(spectrumFile):
     elif 'CHARGE=' in nextLine:
       spectrum['charge'] = int(nextLine.split('=')[1][0])
     elif 'TITLE=' in nextLine:
-      spectrum['title'] = nextLine.split('=')[1].strip()
+      spectrum['title'] = nextLine.split('=')[1].strip().replace(",", '').split()[0]
     elif nextLine[0].isdigit():
       mass, intensity = nextLine.split()
       spectrum['masses'].append(Decimal(mass))

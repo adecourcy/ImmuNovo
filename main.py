@@ -305,7 +305,6 @@ if __name__ == '__main__':
 
 
         spectrumTitle = Spectrum.getTitle(spectrum)
-        spectrumTitle = spectrumTitle.replace(",", '').split()[0]
         if len(results) == 0:
           outputString = spectrumFileName + "," + spectrumTitle + \
                          ',' + pssmTitle + ",{}".format(NO_PEP) + "\n"

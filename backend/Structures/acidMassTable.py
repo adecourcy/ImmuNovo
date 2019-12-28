@@ -22,3 +22,11 @@ def convertAcids(masses, acidConversion):
     newMasses[acidConversion[acid]] = int(masses[acid])
 
   return newMasses
+
+
+def peptideMass(peptide,
+                acidMassTable):
+  mass = 0
+  for acid in peptide:
+    mass += getMass(acidMassTable, acid)
+  return mass

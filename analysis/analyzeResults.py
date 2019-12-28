@@ -20,6 +20,12 @@ A plot of the number of exact matches, matches with <=2AA differences, and
 more than 2AA differences found by each method
 """
 
+# read Denovo Results, remove duplicates
+# read database Results, remove duplicates
+# read decoy peptides, remove duplicates
+
+
+
 import argparse
 import subprocess
 import shutil

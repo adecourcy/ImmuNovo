@@ -44,6 +44,11 @@ class Node:
       else:
         return self.combinedScore < other.combinedScore
 
+
+def convertPeptideString(peptideString, acidConversion):
+  convertedPeptide = peptideString[:]
+  pass
+
 def deConvertPeptideString(peptideString, acidConversion):
 
   reverseConversionTable = {acidConversion[x]: x for x in acidConversion}
