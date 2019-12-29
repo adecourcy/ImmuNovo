@@ -51,15 +51,15 @@ def parseDefaultArguments(parser):
 
 def parseOptionalArguments(parser):
   
-  parser.add_argument('acid_mass_file',
+  parser.add_argument('-amf', '--acid-mass-file',
       dest='acid_mass_file',
       default=os.path.join(os.path.split(os.path.abspath(os.path.curdir))[0], 'aminoMassesWithModifications'),
       help='A file containing amino acid mass data')
-  parser.add_argument('decoy_dir',
+  parser.add_argument('-dd', '--decoy-dir',
       dest='decoy_dir',
       default=os.path.join(os.path.split(os.path.abspath(os.path.curdir))[0], 'userData', 'decoyDatabase'),
       help='A directory containing decoy peptides for FDR calculation')
-  parser.add_argument('database_results_dir',
+  parser.add_argument('-drd', '--database-results-dir',
       dest='database_results_dir',
       default='',
       help='A directory containing results of database search')
@@ -129,7 +129,7 @@ def parseOptionalArguments(parser):
       type=float,
       default=0.5,
       help='The maximum mass tolerance penalty')
-  parser.add_argument('dataset_name',
+  parser.add_argument('-dn', '--dataset-name',
       dest='dataset_name',
       default='',
       help='The name of the current dataset being processed')
@@ -147,7 +147,7 @@ def parseOptionalArguments(parser):
                         dest='database',
                         default=MSGF,
                         help='The database search program used (currently only MSGF)')
-  parser.add_argument('-d', '--max-decoys',
+  parser.add_argument('-md', '--max-decoys',
                         dest='decoys',
                         default=str(50),
                         help='The number of decoy peptides to be considered in calculating FDR')
