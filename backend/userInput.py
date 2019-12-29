@@ -4,6 +4,8 @@ import argparse
 import os
 import sys
 
+from backend.constants import *
+
 
 def parseArguments():
 
@@ -159,7 +161,7 @@ def parseOptionalArguments(parser):
   parser.add_argument('-tsl', '--TSL_Location',
                       dest='tsl',
                       type=str,
-                      default=os.path.join(dname, './tsl/cgi-bin/tsl'),
+                      default=os.path.join(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'analysis'), './tsl/cgi-bin/tsl'),
                       help='Path to the tsl binary')
   
   parser.add_argument('--bEnd',
