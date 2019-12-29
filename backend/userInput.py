@@ -135,8 +135,8 @@ def parseOptionalArguments(parser):
       dest='dataset_name',
       default='',
       help='The name of the current dataset being processed')
-  parser.add_argument('-db', '--debug',
-      dest='db',
+  parser.add_argument('-dbg', '--debug',
+      dest='dbg',
       type=bool,
       default=False,
       help='Run the program in debug mode')
