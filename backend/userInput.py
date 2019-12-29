@@ -52,6 +52,28 @@ def parseDefaultArguments(parser):
 
 
 def parseOptionalArguments(parser):
+
+
+  parser.add_argument('-drd', '--database-results-dir',
+      dest='database_results_dir',
+      default='',
+      help='A directory containing results of database search')
+  parser.add_argument('-os', '--Output-File-Suffix',
+      dest='os',
+      default='.out.csv',
+      help='Suffix of the output file')
+  parser.add_argument('-od', '--Output-File-Directory',
+      dest='output_dir',
+      default=os.path.split(os.path.abspath(os.path.curdir))[0],
+      help='File output directory')
+  parser.add_argument('-dn', '--dataset-name',
+      dest='dataset_name',
+      default='',
+      help='The name of the current dataset being processed')
+  parser.add_argument('-f', '--FDR',
+      dest='fdr',
+      default = 0.01,
+      help='The target FDR', type=float)
   
   parser.add_argument('-amf', '--acid-mass-file',
       dest='acid_mass_file',
@@ -61,10 +83,6 @@ def parseOptionalArguments(parser):
       dest='decoy_dir',
       default=os.path.join(os.path.split(os.path.abspath(os.path.curdir))[0], 'userData', 'decoyDatabase'),
       help='A directory containing decoy peptides for FDR calculation')
-  parser.add_argument('-drd', '--database-results-dir',
-      dest='database_results_dir',
-      default='',
-      help='A directory containing results of database search')
   parser.add_argument('-minP', '--Minimum-Peptide-Length',
       dest='minP',
       type=int,
@@ -80,14 +98,6 @@ def parseOptionalArguments(parser):
       type=int,
       default=4,
       help='Decimial precision of our search')
-  parser.add_argument('-os', '--Output-File-Suffix',
-      dest='os',
-      default='.out.csv',
-      help='Suffix of the output file')
-  parser.add_argument('-od', '--Output-File-Directory',
-      dest='output_dir',
-      default=os.path.split(os.path.abspath(os.path.curdir))[0],
-      help='File output directory')
   parser.add_argument('-mmt', '--Maximum-Mass-Tolerance',
       dest='mmt',
       type=int,
@@ -131,20 +141,12 @@ def parseOptionalArguments(parser):
       type=float,
       default=0.5,
       help='The maximum mass tolerance penalty')
-  parser.add_argument('-dn', '--dataset-name',
-      dest='dataset_name',
-      default='',
-      help='The name of the current dataset being processed')
   parser.add_argument('-dbg', '--debug',
       dest='dbg',
       type=bool,
       default=False,
       help='Run the program in debug mode')
   
-  parser.add_argument('-f', '--FDR',
-                      dest='fdr',
-                      default = 0.01,
-                      help='The target FDR', type=float)
   parser.add_argument('-db', '--database-search-program',
                         dest='database',
                         default=MSGF,
