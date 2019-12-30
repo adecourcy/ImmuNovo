@@ -137,6 +137,46 @@ def peptidesForSpectrum(spectrumData, peptideDict, massTolerance, maxDecoys):
   df = pd.DataFrame({TITLE_SPECTRUM: spectrumTitles, DECOYS: decoyPeptides})
   return df
 
+def getPeptideDict(decoyPeptideDirectory,
+                   precision,
+                   minP,
+                   maxP):
+
+  pepDict = {}
+
+  for fileName in os.listdir(decoyPeptideDirectory):
+    currentFile = os.path.join(decoyPeptideDirectory, fileName)
+    pepDict = fileToDict(currentFile, precision, minP, maxP, pepDict)
+  
+  return pepDict
+
+
+def fileToDict(pepFile,
+               precision,
+               minP,
+               maxP,
+               pepDict):
+
+  for pepLine in pepFile:
+    if pepLine == "":
+      break
+    if PEPTIDE in pepLine:
+      continue
+    length, peptide, mass = pepLine.strip().split(',')
+    mass = (10 ** precision) * mass
+
+    # if 'U' in peptide or 'X' in peptide:
+    #   continue
+    if length < minP or length > maxP:
+      continue
+
+    if mass in pepDict:
+      pepDict[mass].append(peptide)
+    else:
+      pepDict[mass] = [peptide]
+
+  return pepDict
+
 def selectDecoyPeptides(decoyPeptideDirectory,
                         spectrumFileDirectory,
                         acidMassTable,
@@ -149,13 +189,15 @@ def selectDecoyPeptides(decoyPeptideDirectory,
   
   spectrumData = extractSpectrumInformation(spectrumFileDirectory, precision)
   
-  decoyPeptides = getAllDecoyPeptides(decoyPeptideDirectory)
-  input("Begin Filtering")
-  decoyPeptides = filterByLength(decoyPeptides, minPeptideLength, maxPeptideLength)
-  input("Done Filtering")
+  #decoyPeptides = getAllDecoyPeptides(decoyPeptideDirectory)
+  #decoyPeptides = filterByLength(decoyPeptides, minPeptideLength, maxPeptideLength)
   #decoyPeptides = removeUnknownPeptides(decoyPeptides, acidMassTable)
 
-  peptideDict = separateByMass(decoyPeptides, precision)
+  #peptideDict = separateByMass(decoyPeptides, precision)
+  peptideDict = getPeptideDict(decoyPeptideDirectory,
+                               precision,
+                               minPeptideLength,
+                               maxPeptideLength)
 
   decoyDataframe = \
       peptidesForSpectrum(spectrumData, peptideDict, massTolerance, maxDecoys)
