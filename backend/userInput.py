@@ -33,7 +33,8 @@ def parseArguments(programDirectory):
   arguments.spec_dir = getAbsPath(arguments.spec_dir)
   arguments.acid_mass_file = getAbsPath(arguments.acid_mass_file)
   arguments.pssm_dir = getAbsPath(arguments.pssm_dir)
-  arguments.output_dir = createDir(arguments.output_dir)
+  
+  createDir(arguments.output_dir)
 
   checkExists(arguments.spec_dir)
   checkExists(arguments.acid_mass_file)
@@ -52,7 +53,6 @@ def parseDefaultArguments(parser):
 
 
 def parseOptionalArguments(parser, programDirectory):
-  print(programDirectory)
 
   parser.add_argument('-drd', '--database-results-dir',
       dest='database_results_dir',
