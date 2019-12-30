@@ -149,7 +149,7 @@ def selectDecoyPeptides(decoyPeptideDirectory,
   
   spectrumData = extractSpectrumInformation(spectrumFileDirectory, precision)
   
-  decoyPeptides = getAllDecoyPeptides(decoyPeptideDirectory, acidConversion)
+  decoyPeptides = getAllDecoyPeptides(decoyPeptideDirectory, conversionTable)
   #decoyPeptides[PEPTIDE] = \
   #    decoyPeptides.apply(lambda x: AcidConversion.convertPeptideString(x[PEPTIDE], conversionTable), axis=1)
   decoyPeptides = filterByLength(decoyPeptides, minPeptideLength, maxPeptideLength)
