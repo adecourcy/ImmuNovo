@@ -150,7 +150,6 @@ def getPeptideDict(decoyPeptideDirectory,
   
   return pepDict
 
-
 def fileToDict(peptideFileName,
                precision,
                minP,
@@ -192,18 +191,13 @@ def selectDecoyPeptides(decoyPeptideDirectory,
                         precision=4):
   
   spectrumData = extractSpectrumInformation(spectrumFileDirectory, precision)
-  
-  #decoyPeptides = getAllDecoyPeptides(decoyPeptideDirectory)
-  #decoyPeptides = filterByLength(decoyPeptides, minPeptideLength, maxPeptideLength)
-  #decoyPeptides = removeUnknownPeptides(decoyPeptides, acidMassTable)
 
-  #peptideDict = separateByMass(decoyPeptides, precision)
-  print("Begin filtering")
   peptideDict = getPeptideDict(decoyPeptideDirectory,
                                precision,
                                minPeptideLength,
                                maxPeptideLength)
-  print("end filtering")
+  
+  print(peptideDict)
 
   decoyDataframe = \
       peptidesForSpectrum(spectrumData, peptideDict, massTolerance, maxDecoys)
