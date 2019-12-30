@@ -36,13 +36,12 @@ def convertAcidModifications(acidMasses, allPSSM, conversionTable):
 def convertPeptideString(peptideString, acidConversion):
   allConversions = []
   for key in acidConversion:
-    allConversions.append(key)
+    if key != acidConversion[key]:
+      allConversions.append(key)
   allConversions.sort(key=lambda x: len(x), reverse=True)
-  for entry in peptideString:
-    if entry not in allConversions:
-      for conversion in allConversions:
-        peptideString = peptideString.replace(conversion, acidConversion[conversion])
-      return peptideString
+
+  for conversion in allConversions:
+    peptideString = peptideString.replace(conversion, acidConversion[conversion])
 
   return peptideString
 
