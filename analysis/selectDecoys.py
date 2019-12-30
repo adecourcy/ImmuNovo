@@ -136,12 +136,12 @@ def peptidesForSpectrum(spectrumData, peptideDict, massTolerance, maxDecoys):
 def selectDecoyPeptides(decoyPeptideDirectory,
                         spectrumFileDirectory,
                         acidMassTable,
-                        massTolerance,
-                        minPeptideLength,
-                        maxPeptideLength,
-                        maxDecoys,
                         conversionTable,
-                        precision):
+                        massTolerance=35,
+                        minPeptideLength=9,
+                        maxPeptideLength=12,
+                        maxDecoys=10,
+                        precision=4):
   
   spectrumData = extractSpectrumInformation(spectrumFileDirectory)
   
@@ -164,12 +164,14 @@ def selectDecoyPeptides(decoyPeptideDirectory,
 
 if __name__ == "__main__":
 
+  acidMassTable = \
+      AcidMassTable.adjustForPrecision(
+          AcidMassTableIO.getAminoMasses(sys.argv[4]),
+          4)
+  conversionTable = \
+      AcidConversion.createAcidConversionTable([acid for acid in acidMassTable])
+
   selectDecoyPeptides(sys.argv[1],
                       sys.argv[2],
                       sys.argv[3],
-                      sys.argv[4],
-                      sys.argv[5],
-                      sys.argv[6],
-                      sys.argv[7],
-                      sys.argv[8],
-                      sys.argv[9])
+                      conversionTable)
