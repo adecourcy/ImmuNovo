@@ -49,7 +49,6 @@ def getAllDecoyPeptides(decoyPeptideDirectory):
       allData += f.read().strip().split('\n')
   return pd.DataFrame({PEPTIDE: allData})
 
-
 def filterByLength(df, minLength, maxLength):
   # Input: Dataframe with column of peptides
   # Output: Dataframe with column of peptides
@@ -57,24 +56,21 @@ def filterByLength(df, minLength, maxLength):
   df = df[df.apply(lambda x: len(x[PEPTIDE]) >= minLength, axis=1)]
   return df
 
-
 def validPeptide(peptide, validAcids):
   for acid in peptide:
     if acid not in validAcids:
       return False
   return True
 
-
 def removeUnknownPeptides(df, acidMasstable):
   validAcids = AcidMassTable.getAcids(acidMasstable)
   return df[df.apply(lambda x: validPeptide(x[PEPTIDE], validAcids), axis=1)]
 
-
 def calculateMasses(df, acidMassTable):
   # Input: Dataframe with column of peptides
   # Output: Dataframe with column of peptides and masses
-  return df.apply(lambda x: AcidMassTable.peptideMass(x[PEPTIDE]), axis=1)
-
+  df[MASS] = df.apply(lambda x: AcidMassTable.peptideMass(x[PEPTIDE]), axis=1)
+  return df
 
 def separateByMass(df, precision):
   # Input: Dataframe with masses, peptides
@@ -92,7 +88,6 @@ def massToleranceMaxDiff(calculatedMass, massTolerance):
 
   return (minExp, maxExp)
 
-
 def getDecoys(mass, peptideDict, massTolerance, maxDecoys):
   possibles = []
 
@@ -107,7 +102,6 @@ def getDecoys(mass, peptideDict, massTolerance, maxDecoys):
 
   else:
     return random.sample(possibles, maxDecoys)
-
 
 def extractSpectrumInformation(spectrumFileDirectory):
   # Return a dataframe with spectrum title and mass columns
@@ -126,20 +120,18 @@ def extractSpectrumInformation(spectrumFileDirectory):
 
   return pd.concat(allInfo)
 
-
-def peptidesForSpectrum(df, peptideDict, massTolerance, maxDecoys):
+def peptidesForSpectrum(spectrumData, peptideDict, massTolerance, maxDecoys):
   # Input: Dataframe with Spectrum, masses
   # Output: Dataframe with Spectrum, decoy peptides
   spectrumTitles = []
   decoyPeptides = []
-  for spec, mass in zip(df[TITLE_SPECTRUM], df[MASS]):
+  for spec, mass in zip(spectrumData[TITLE_SPECTRUM], spectrumData[MASS]):
     newDecoyPeptides = getDecoys(mass, peptideDict, massTolerance, maxDecoys)
     for i in range(len(newDecoyPeptides)):
       spectrumTitles.append(spec)
     decoyPeptides += newDecoyPeptides
   df = pd.DataFrame({TITLE_SPECTRUM: spectrumTitles, DECOYS: decoyPeptides})
   return df
-
 
 def selectDecoyPeptides(decoyPeptideDirectory,
                         spectrumFileDirectory,
@@ -149,5 +141,35 @@ def selectDecoyPeptides(decoyPeptideDirectory,
                         maxPeptideLength,
                         maxDecoys,
                         conversionTable,
-                        precision,):
-  pass
+                        precision):
+  
+  spectrumData = extractSpectrumInformation(spectrumFileDirectory)
+  
+  decoyPeptides = getAllDecoyPeptides(decoyPeptideDirectory)
+  decoyPeptides[PEPTIDE] = \
+      decoyPeptides.apply(lambda x: AcidConversion.convertPeptideString(x[PEPTIDE]), axis=1)
+  decoyPeptides = filterByLength(decoyPeptides, minPeptideLength, maxPeptideLength)
+  decoyPeptides = removeUnknownPeptides(decoyPeptides, acidMassTable)
+  decoyPeptides = calculateMasses(decoyPeptides, acidMassTable)
+
+  peptideDict = separateByMass(decoyPeptides, precision)
+
+  decoyDataframe = \
+      peptidesForSpectrum(spectrumData, peptideDict, massTolerance, maxDecoys)
+  decoyDataframe[PEPTIDE] = \
+    decoyDataframe.apply(lambda x: AcidConversion.convertPeptideString(x[PEPTIDE], conversionTable), axis=1)
+  
+  return decoyDataframe
+
+
+if __name__ == "__main__":
+
+  selectDecoyPeptides(sys.argv[1],
+                      sys.argv[2],
+                      sys.argv[3],
+                      sys.argv[4],
+                      sys.argv[5],
+                      sys.argv[6],
+                      sys.argv[7],
+                      sys.argv[8],
+                      sys.argv[9])
