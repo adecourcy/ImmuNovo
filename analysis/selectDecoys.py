@@ -158,13 +158,14 @@ def fileToDict(pepFile,
                pepDict):
 
   for pepLine in pepFile:
+    print(pepLine)
     if pepLine == "":
       break
     if PEPTIDE in pepLine:
       continue
-    print(pepLine)
     length, peptide, mass = pepLine.strip().split(',')
-    mass = (10 ** precision) * mass
+    mass = int(round((10 ** precision) * float(mass)))
+    length = int(length)
 
     # if 'U' in peptide or 'X' in peptide:
     #   continue
