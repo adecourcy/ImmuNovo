@@ -333,4 +333,4 @@ if __name__ == '__main__':
 
         clean(fileList)
 
-  outputFile.close()
+    outputFile.close()
