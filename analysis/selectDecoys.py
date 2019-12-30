@@ -168,8 +168,8 @@ def fileToDict(peptideFileName,
     mass = int(round((10 ** precision) * float(mass)))
     length = int(length)
 
-    # if 'U' in peptide or 'X' in peptide:
-    #   continue
+    if 'U' in peptide or 'X' in peptide:
+      continue
     if length < minP or length > maxP:
       continue
 
@@ -196,11 +196,11 @@ def selectDecoyPeptides(decoyPeptideDirectory,
                                precision,
                                minPeptideLength,
                                maxPeptideLength)
-  
-  print(peptideDict)
 
   decoyDataframe = \
       peptidesForSpectrum(spectrumData, peptideDict, massTolerance, maxDecoys)
+  
+  print(decoyDataframe)
   
   return decoyDataframe
 
