@@ -185,7 +185,7 @@ if __name__ == '__main__':
   except:
     pass
 
-  arguments = parseArguments()
+  arguments = parseArguments(os.path.dirname(os.path.abspath(os.path.realpath(__file__))))
   allPSSM, acidMassTable, conversionTable = \
                               getAminoVariables(arguments.acid_mass_file,
                                                 arguments.prec,

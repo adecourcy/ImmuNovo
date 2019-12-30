@@ -7,7 +7,7 @@ import sys
 from backend.constants import *
 
 
-def parseArguments():
+def parseArguments(programDirectory):
 
   def getAbsPath(location):
     return os.path.abspath(location)
@@ -23,7 +23,7 @@ def parseArguments():
 
   parser = argparse.ArgumentParser()
   parser = parseDefaultArguments(parser)
-  parser = parseOptionalArguments(parser)
+  parser = parseOptionalArguments(parser, programDirectory)
 
   arguments = parser.parse_args()
 
@@ -51,7 +51,7 @@ def parseDefaultArguments(parser):
   return parser
 
 
-def parseOptionalArguments(parser):
+def parseOptionalArguments(parser, programDirectory):
 
 
   parser.add_argument('-drd', '--database-results-dir',
@@ -64,7 +64,7 @@ def parseOptionalArguments(parser):
       help='Suffix of the output file')
   parser.add_argument('-od', '--Output-File-Directory',
       dest='output_dir',
-      default=os.path.dirname(os.path.realpath(__file__)),
+      default=programDirectory,
       help='File output directory')
   parser.add_argument('-dn', '--dataset-name',
       dest='dataset_name',
@@ -77,11 +77,11 @@ def parseOptionalArguments(parser):
   
   parser.add_argument('-amf', '--acid-mass-file',
       dest='acid_mass_file',
-      default=os.path.join(os.path.dirname(os.path.realpath(__file__)), 'userData', 'aminoMassesWithModifications'),
+      default=os.path.realpath(os.path.join(programDirectory, 'userData', 'aminoMassesWithModifications')),
       help='A file containing amino acid mass data')
   parser.add_argument('-dd', '--decoy-dir',
       dest='decoy_dir',
-      default=os.path.join(os.path.dirname(os.path.realpath(__file__)), 'userData', 'decoyDatabase'),
+      default=os.path.realpath(os.path.join(programDirectory, 'userData', 'decoyDatabase')),
       help='A directory containing decoy peptides for FDR calculation')
   parser.add_argument('-minP', '--Minimum-Peptide-Length',
       dest='minP',
@@ -163,7 +163,7 @@ def parseOptionalArguments(parser):
   parser.add_argument('-tsl', '--TSL_Location',
                       dest='tsl',
                       type=str,
-                      default=os.path.join(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'analysis'), './tsl/cgi-bin/tsl'),
+                      default=os.path.realpath(os.path.join(os.path.join(programDirectory, 'analysis'), './tsl/cgi-bin/tsl')),
                       help='Path to the tsl binary')
   
   parser.add_argument('--bEnd',
