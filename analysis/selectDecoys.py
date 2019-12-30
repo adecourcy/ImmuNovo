@@ -131,6 +131,7 @@ def peptidesForSpectrum(spectrumData, peptideDict, massTolerance, maxDecoys):
   decoyPeptides = []
   for spec, mass in zip(spectrumData[TITLE_SPECTRUM], spectrumData[PRECURSOR_MASS]):
     newDecoyPeptides = getDecoys(mass, peptideDict, massTolerance, maxDecoys)
+    print(newDecoyPeptides)
     for i in range(len(newDecoyPeptides)):
       spectrumTitles.append(spec)
     decoyPeptides += newDecoyPeptides
