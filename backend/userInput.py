@@ -9,7 +9,8 @@ from backend.constants import *
 
 def parseArguments():
 
-  print(os.path.split(os.path.abspath(os.path.curdir(__file__)))[0])
+  #print(os.path.split(os.path.abspath(os.path.curdir(__file__)))[0])
+  print(os.path.curdir(__file__))
   input()
 
   def getAbsPath(location):
