@@ -39,6 +39,7 @@ def convertPeptideString(peptideString, acidConversion):
     if key != acidConversion[key]:
       allConversions.append(key)
   allConversions.sort(key=lambda x: len(x), reverse=True)
+  print(allConversions)
 
   for conversion in allConversions:
     peptideString = peptideString.replace(conversion, acidConversion[conversion])
