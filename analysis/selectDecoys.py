@@ -159,7 +159,7 @@ def fileToDict(peptideFileName,
   
   with open(peptideFileName, 'r') as f:
     pepFile = f.read()
-  pepFile = decoys.split('\n')
+  pepFile = pepFile.split('\n')
 
 
   for pepLine in pepFile[1:]:
