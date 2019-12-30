@@ -9,10 +9,6 @@ from backend.constants import *
 
 def parseArguments():
 
-  #print(os.path.split(os.path.abspath(os.path.curdir(__file__)))[0])
-  print(os.path.curdir(__file__))
-  input()
-
   def getAbsPath(location):
     return os.path.abspath(location)
 
@@ -68,7 +64,7 @@ def parseOptionalArguments(parser):
       help='Suffix of the output file')
   parser.add_argument('-od', '--Output-File-Directory',
       dest='output_dir',
-      default=os.path.split(os.path.abspath(os.path.curdir(__file__)))[0],
+      default=os.path.dirname(os.path.realpath(__file__)),
       help='File output directory')
   parser.add_argument('-dn', '--dataset-name',
       dest='dataset_name',
