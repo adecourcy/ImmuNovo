@@ -150,7 +150,9 @@ def selectDecoyPeptides(decoyPeptideDirectory,
   spectrumData = extractSpectrumInformation(spectrumFileDirectory, precision)
   
   decoyPeptides = getAllDecoyPeptides(decoyPeptideDirectory)
+  input("Begin Filtering")
   decoyPeptides = filterByLength(decoyPeptides, minPeptideLength, maxPeptideLength)
+  input("Done Filtering")
   #decoyPeptides = removeUnknownPeptides(decoyPeptides, acidMassTable)
 
   peptideDict = separateByMass(decoyPeptides, precision)
