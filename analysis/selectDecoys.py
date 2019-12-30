@@ -163,7 +163,6 @@ def fileToDict(peptideFileName,
 
 
   for pepLine in pepFile[1:]:
-    print(pepLine)
     if pepLine == "":
       break
     length, peptide, mass = pepLine.strip().split(',')
