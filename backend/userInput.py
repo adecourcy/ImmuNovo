@@ -77,11 +77,11 @@ def parseOptionalArguments(parser):
   
   parser.add_argument('-amf', '--acid-mass-file',
       dest='acid_mass_file',
-      default=os.path.join(os.path.split(os.path.abspath(os.path.curdir))[0], 'aminoMassesWithModifications'),
+      default=os.path.join(os.path.dirname(os.path.realpath(__file__)), 'userData', 'aminoMassesWithModifications'),
       help='A file containing amino acid mass data')
   parser.add_argument('-dd', '--decoy-dir',
       dest='decoy_dir',
-      default=os.path.join(os.path.split(os.path.abspath(os.path.curdir))[0], 'userData', 'decoyDatabase'),
+      default=os.path.join(os.path.dirname(os.path.realpath(__file__)), 'userData', 'decoyDatabase'),
       help='A directory containing decoy peptides for FDR calculation')
   parser.add_argument('-minP', '--Minimum-Peptide-Length',
       dest='minP',
