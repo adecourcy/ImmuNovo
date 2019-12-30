@@ -21,6 +21,7 @@ from backend.userInput import *
 
 MASS = 'MASS'
 DECOYS = 'DECOYS'
+PEPTIDE_CONVERTED = 'PEPTIDE_CONVERTED'
 
 
 # Read decoy file*
@@ -39,15 +40,18 @@ DECOYS = 'DECOYS'
 # return results
 
 
-def getAllDecoyPeptides(decoyPeptideDirectory):
+def getAllDecoyPeptides(decoyPeptideDirectory, acidConversion):
   # Input: decoy database directory
   # Output: dataframe
   allData = []
+  convertedPeptides = []
   for fileName in os.listdir(decoyPeptideDirectory):
     currentFile = os.path.join(decoyPeptideDirectory, fileName)
     with open(currentFile, 'r') as f:
       allData += f.read().strip().split('\n')
-  return pd.DataFrame({PEPTIDE: allData})
+  for pep in allData:
+    convertedPeptides.append(AcidConversion.convertPeptideString(pep, acidConversion))
+  return pd.DataFrame({PEPTIDE: allData, PEPTIDE_CONVERTED: convertedPeptides})
 
 def filterByLength(df, minLength, maxLength):
   # Input: Dataframe with column of peptides
@@ -145,9 +149,9 @@ def selectDecoyPeptides(decoyPeptideDirectory,
   
   spectrumData = extractSpectrumInformation(spectrumFileDirectory, precision)
   
-  decoyPeptides = getAllDecoyPeptides(decoyPeptideDirectory)
-  decoyPeptides[PEPTIDE] = \
-      decoyPeptides.apply(lambda x: AcidConversion.convertPeptideString(x[PEPTIDE], conversionTable), axis=1)
+  decoyPeptides = getAllDecoyPeptides(decoyPeptideDirectory, acidConversion)
+  #decoyPeptides[PEPTIDE] = \
+  #    decoyPeptides.apply(lambda x: AcidConversion.convertPeptideString(x[PEPTIDE], conversionTable), axis=1)
   decoyPeptides = filterByLength(decoyPeptides, minPeptideLength, maxPeptideLength)
   decoyPeptides = removeUnknownPeptides(decoyPeptides, acidMassTable)
   decoyPeptides = calculateMasses(decoyPeptides, acidMassTable)
