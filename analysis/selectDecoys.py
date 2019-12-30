@@ -56,8 +56,8 @@ def getAllDecoyPeptides(decoyPeptideDirectory):
 def filterByLength(df, minLength, maxLength):
   # Input: Dataframe with column of peptides
   # Output: Dataframe with column of peptides
-  df = df[df.apply(lambda x: len(x[PEPTIDE]) <= maxLength, axis=1)]
-  df = df[df.apply(lambda x: len(x[PEPTIDE]) >= minLength, axis=1)]
+  df = df[df.apply(lambda x: x[LENGTH] <= maxLength, axis=1)]
+  df = df[df.apply(lambda x: x[LENGTH] >= minLength, axis=1)]
   return df
 
 def validPeptide(peptide, validAcids):
