@@ -166,7 +166,7 @@ if __name__ == "__main__":
 
   acidMassTable = \
       AcidMassTable.adjustForPrecision(
-          AcidMassTableIO.getAminoMasses(sys.argv[4]),
+          AcidMassTableIO.getAminoMasses(sys.argv[3]),
           4)
   conversionTable = \
       AcidConversion.createAcidConversionTable([acid for acid in acidMassTable])
