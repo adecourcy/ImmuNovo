@@ -159,25 +159,26 @@ def fileToDict(pepFile,
 
   for pepLine in pepFile:
     print(pepLine)
-    if pepLine == "":
-      break
-    if PEPTIDE in pepLine:
-      continue
-    length, peptide, mass = pepLine.strip().split(',')
-    mass = int(round((10 ** precision) * float(mass)))
-    length = int(length)
 
-    # if 'U' in peptide or 'X' in peptide:
-    #   continue
-    if length < minP or length > maxP:
-      continue
+  #   if pepLine == "":
+  #     break
+  #   if PEPTIDE in pepLine:
+  #     continue
+  #   length, peptide, mass = pepLine.strip().split(',')
+  #   mass = int(round((10 ** precision) * float(mass)))
+  #   length = int(length)
 
-    if mass in pepDict:
-      pepDict[mass].append(peptide)
-    else:
-      pepDict[mass] = [peptide]
+  #   # if 'U' in peptide or 'X' in peptide:
+  #   #   continue
+  #   if length < minP or length > maxP:
+  #     continue
 
-  return pepDict
+  #   if mass in pepDict:
+  #     pepDict[mass].append(peptide)
+  #   else:
+  #     pepDict[mass] = [peptide]
+
+  # return pepDict
 
 def selectDecoyPeptides(decoyPeptideDirectory,
                         spectrumFileDirectory,
