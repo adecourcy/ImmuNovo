@@ -103,14 +103,14 @@ def getDecoys(mass, peptideDict, massTolerance, maxDecoys):
   else:
     return random.sample(possibles, maxDecoys)
 
-def extractSpectrumInformation(spectrumFileDirectory):
+def extractSpectrumInformation(spectrumFileDirectory, precision):
   # Return a dataframe with spectrum title and mass columns
   allInfo = []
   def extractFileInformation(spectrumFile):
     precursorMasses = []
     titles = []
     for spectrum in SpectrumIO.getSpectrums(spectrumFile):
-      precursorMasses.append(Spectrum.getPrecursorMass(spectrum))
+      precursorMasses.append(int(round((10 ** precision) * float(Spectrum.getPrecursorMass(spectrum)))))
       titles.append(Spectrum.getTitle(spectrum))
     return pd.DataFrame({TITLE_SPECTRUM: titles,
                          PRECURSOR_MASS: precursorMasses})
@@ -143,7 +143,7 @@ def selectDecoyPeptides(decoyPeptideDirectory,
                         maxDecoys=10,
                         precision=4):
   
-  spectrumData = extractSpectrumInformation(spectrumFileDirectory)
+  spectrumData = extractSpectrumInformation(spectrumFileDirectory, precision)
   
   decoyPeptides = getAllDecoyPeptides(decoyPeptideDirectory)
   decoyPeptides[PEPTIDE] = \
