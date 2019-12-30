@@ -162,6 +162,7 @@ def fileToDict(pepFile,
       break
     if PEPTIDE in pepLine:
       continue
+    print(pepLine)
     length, peptide, mass = pepLine.strip().split(',')
     mass = (10 ** precision) * mass
 
