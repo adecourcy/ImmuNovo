@@ -52,7 +52,7 @@ def parseDefaultArguments(parser):
 
 
 def parseOptionalArguments(parser, programDirectory):
-
+  print(programDirectory)
 
   parser.add_argument('-drd', '--database-results-dir',
       dest='database_results_dir',
