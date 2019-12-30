@@ -29,6 +29,8 @@ def parseArguments():
 
   if arguments.dataset_name == '':
     arguments.dataset_name = arguments.spec_dir
+  
+  print(arguments.output_dir)
 
   arguments.spec_dir = getAbsPath(arguments.spec_dir)
   arguments.acid_mass_file = getAbsPath(arguments.acid_mass_file)
