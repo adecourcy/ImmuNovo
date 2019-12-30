@@ -64,7 +64,7 @@ def parseOptionalArguments(parser):
       help='Suffix of the output file')
   parser.add_argument('-od', '--Output-File-Directory',
       dest='output_dir',
-      default=os.path.split(os.path.abspath(os.path.curdir))[0],
+      default=os.path.split(os.path.abspath(os.path.curdir(__file__)))[0],
       help='File output directory')
   parser.add_argument('-dn', '--dataset-name',
       dest='dataset_name',
