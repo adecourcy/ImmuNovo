@@ -194,10 +194,12 @@ def selectDecoyPeptides(decoyPeptideDirectory,
   #decoyPeptides = removeUnknownPeptides(decoyPeptides, acidMassTable)
 
   #peptideDict = separateByMass(decoyPeptides, precision)
+  print("Begin filtering")
   peptideDict = getPeptideDict(decoyPeptideDirectory,
                                precision,
                                minPeptideLength,
                                maxPeptideLength)
+  print("end filtering")
 
   decoyDataframe = \
       peptidesForSpectrum(spectrumData, peptideDict, massTolerance, maxDecoys)
