@@ -212,13 +212,10 @@ if __name__ == '__main__':
                         spectrumFileName))
       continue
 
-    outputFile.write("Filename,{},{},{},{},{},{},"
+    outputFile.write("Filename,{},{},{},,"
                      "Precursor Mass,Precursor Error\n".format(TITLE_SPECTRUM,
                                                                TITLE_PSSM,
-                                                               PEPTIDE,
-                                                               SCORE_GLOBAL,
-                                                               SCORE_PSSM,
-                                                               SCORE_COMBINED))
+                                                               PEPTIDE))
 
     for spectrum in SpectrumIO.getSpectrums(spectrumFile):
       spectrumMasses, spectrumMassesDouble, \
@@ -318,14 +315,11 @@ if __name__ == '__main__':
               continue
 
             outputString = \
-              str.format('{},{},{},{},{},{},{},{},{}',
+              str.format('{},{},{},{},{},{}',
                          spectrumFileName,
                          spectrumTitle,
                          pssmTitle,
                          node.peptideString,
-                         node.globalScore,
-                         node.aminoScore,
-                         node.combinedScore,
                          Spectrum.getPrecursorMass(spectrum),
                          node.precursorError)
 
