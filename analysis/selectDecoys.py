@@ -147,7 +147,7 @@ def selectDecoyPeptides(decoyPeptideDirectory,
   
   decoyPeptides = getAllDecoyPeptides(decoyPeptideDirectory)
   decoyPeptides[PEPTIDE] = \
-      decoyPeptides.apply(lambda x: AcidConversion.convertPeptideString(x[PEPTIDE]), axis=1)
+      decoyPeptides.apply(lambda x: AcidConversion.convertPeptideString(x[PEPTIDE], conversionTable), axis=1)
   decoyPeptides = filterByLength(decoyPeptides, minPeptideLength, maxPeptideLength)
   decoyPeptides = removeUnknownPeptides(decoyPeptides, acidMassTable)
   decoyPeptides = calculateMasses(decoyPeptides, acidMassTable)
@@ -157,7 +157,7 @@ def selectDecoyPeptides(decoyPeptideDirectory,
   decoyDataframe = \
       peptidesForSpectrum(spectrumData, peptideDict, massTolerance, maxDecoys)
   decoyDataframe[PEPTIDE] = \
-    decoyDataframe.apply(lambda x: AcidConversion.convertPeptideString(x[PEPTIDE], conversionTable), axis=1)
+    decoyDataframe.apply(lambda x: AcidConversion.deconvertPeptideString(x[PEPTIDE], conversionTable), axis=1)
   
   return decoyDataframe
 
