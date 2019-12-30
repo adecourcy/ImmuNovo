@@ -49,7 +49,8 @@ def getAllDecoyPeptides(decoyPeptideDirectory, acidConversion):
     currentFile = os.path.join(decoyPeptideDirectory, fileName)
     with open(currentFile, 'r') as f:
       allData += f.read().strip().split('\n')
-  for pep in allData:
+  for pep, index in zip(allData, range(allData)):
+    print(index)
     convertedPeptides.append(AcidConversion.convertPeptideString(pep, acidConversion))
   return pd.DataFrame({PEPTIDE: allData, PEPTIDE_CONVERTED: convertedPeptides})
 
