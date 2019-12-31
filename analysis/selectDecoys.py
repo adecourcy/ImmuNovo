@@ -92,21 +92,6 @@ def massToleranceMaxDiff(calculatedMass, massTolerance):
 
   return (minExp, maxExp)
 
-def getDecoys(mass, peptideDict, massTolerance, maxDecoys):
-  possibles = []
-
-  minDiff, maxDiff = massToleranceMaxDiff(mass, massTolerance)
-
-  for mass in range(minDiff, maxDiff+1):
-    if mass in peptideDict:
-      possibles += peptideDict[mass]
-
-  if len(possibles) <= maxDecoys:
-    return possibles
-
-  else:
-    return random.sample(possibles, maxDecoys)
-
 def extractSpectrumInformation(spectrumFileDirectory, precision):
   # Return a dataframe with spectrum title and mass columns
   allInfo = []
@@ -124,6 +109,22 @@ def extractSpectrumInformation(spectrumFileDirectory, precision):
 
   return pd.concat(allInfo)
 
+def getDecoys(mass, peptideDict, massTolerance, maxDecoys):
+  possibles = []
+
+  minDiff, maxDiff = massToleranceMaxDiff(mass, massTolerance)
+
+  for mass in range(minDiff, maxDiff+1):
+    print(mass)
+    if mass in peptideDict:
+      possibles += peptideDict[mass]
+
+  if len(possibles) <= maxDecoys:
+    return possibles
+
+  else:
+    return random.sample(possibles, maxDecoys)
+
 def peptidesForSpectrum(spectrumData, peptideDict, massTolerance, maxDecoys):
   # Input: Dataframe with Spectrum, masses
   # Output: Dataframe with Spectrum, decoy peptides
@@ -131,7 +132,6 @@ def peptidesForSpectrum(spectrumData, peptideDict, massTolerance, maxDecoys):
   decoyPeptides = []
   for spec, mass in zip(spectrumData[TITLE_SPECTRUM], spectrumData[PRECURSOR_MASS]):
     newDecoyPeptides = getDecoys(mass, peptideDict, massTolerance, maxDecoys)
-    print(newDecoyPeptides)
     for i in range(len(newDecoyPeptides)):
       spectrumTitles.append(spec)
     decoyPeptides += newDecoyPeptides
@@ -200,9 +200,7 @@ def selectDecoyPeptides(decoyPeptideDirectory,
 
   decoyDataframe = \
       peptidesForSpectrum(spectrumData, peptideDict, massTolerance, maxDecoys)
-  
-  print(decoyDataframe)
-  
+    
   return decoyDataframe
 
 
