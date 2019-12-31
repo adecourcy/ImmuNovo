@@ -111,23 +111,10 @@ def massToleranceMaxDiff(calculatedMass, massTolerance):
 
   return (minExp, maxExp)
 
-
-# float massToleranceCalculation(long calculatedMass,
-#                                long experimentalMass)
-# {
-#   cM = ((mt * eM) / 1,000,000) + eM
-#   cM = ((mt * eM) / 1,000,000) + eM
-#   return ((((double) (calculatedMass - experimentalMass)) *
-#               1000000.0) /
-#               ((double) experimentalMass));
-# }
-
 def getDecoys(mass, peptideDict, massTolerance, maxDecoys):
   possibles = []
 
   minDiff, maxDiff = massToleranceMaxDiff(mass, massTolerance)
-  print(minDiff)
-  print(maxDiff)
 
   for mass in range(minDiff, maxDiff+1):
     if mass in peptideDict:
@@ -214,6 +201,7 @@ def selectDecoyPeptides(decoyPeptideDirectory,
 
   decoyDataframe = \
       peptidesForSpectrum(spectrumData, peptideDict, massTolerance, maxDecoys)
+  print(decoyDataframe)
     
   return decoyDataframe
 
