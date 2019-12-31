@@ -111,11 +111,11 @@ def extractSpectrumInformation(spectrumFileDirectory, precision):
 
 def getDecoys(mass, peptideDict, massTolerance, maxDecoys):
   possibles = []
+  print(mass)
 
   minDiff, maxDiff = massToleranceMaxDiff(mass, massTolerance)
 
   for mass in range(minDiff, maxDiff+1):
-    print(mass)
     if mass in peptideDict:
       possibles += peptideDict[mass]
 
@@ -131,7 +131,6 @@ def peptidesForSpectrum(spectrumData, peptideDict, massTolerance, maxDecoys):
   spectrumTitles = []
   decoyPeptides = []
   for spec, mass in zip(spectrumData[TITLE_SPECTRUM], spectrumData[PRECURSOR_MASS]):
-    print(mass)
     newDecoyPeptides = getDecoys(mass, peptideDict, massTolerance, maxDecoys)
     for i in range(len(newDecoyPeptides)):
       spectrumTitles.append(spec)
