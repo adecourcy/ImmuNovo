@@ -85,13 +85,6 @@ def separateByMass(df, precision):
     dataDict[mass] = list(elm[1][PEPTIDE])
   return dataDict
 
-def massToleranceMaxDiff(calculatedMass, massTolerance):
-
-  minExp = int(round(calculatedMass / (massTolerance + 1)))
-  maxExp = int(round(calculatedMass / (1 - massTolerance)))
-
-  return (minExp, maxExp)
-
 def extractSpectrumInformation(spectrumFileDirectory, precision):
   # Return a dataframe with spectrum title and mass columns
   allInfo = []
@@ -109,11 +102,19 @@ def extractSpectrumInformation(spectrumFileDirectory, precision):
 
   return pd.concat(allInfo)
 
+def massToleranceMaxDiff(calculatedMass, massTolerance):
+
+  minExp = int(round(calculatedMass / (massTolerance + 1)))
+  maxExp = int(round(calculatedMass / (1 - massTolerance)))
+
+  return (minExp, maxExp)
+
 def getDecoys(mass, peptideDict, massTolerance, maxDecoys):
   possibles = []
-  print(mass)
 
   minDiff, maxDiff = massToleranceMaxDiff(mass, massTolerance)
+  print(minDiff)
+  print(maxDiff)
 
   for mass in range(minDiff, maxDiff+1):
     if mass in peptideDict:
