@@ -41,49 +41,49 @@ PEPTIDE_CONVERTED = 'PEPTIDE_CONVERTED'
 # return results
 
 
-def getAllDecoyPeptides(decoyPeptideDirectory):
-  # Expects files to include masses, peptide, and peptide length with headers
-  # as stated in the constants
+# def getAllDecoyPeptides(decoyPeptideDirectory):
+#   # Expects files to include masses, peptide, and peptide length with headers
+#   # as stated in the constants
 
-  # Input: decoy database directory
-  # Output: dataframe
-  allData = []
-  for fileName in os.listdir(decoyPeptideDirectory):
-    currentFile = os.path.join(decoyPeptideDirectory, fileName)
-    allData.append(pd.read_csv(currentFile))
-  return pd.concat(allData)
+#   # Input: decoy database directory
+#   # Output: dataframe
+#   allData = []
+#   for fileName in os.listdir(decoyPeptideDirectory):
+#     currentFile = os.path.join(decoyPeptideDirectory, fileName)
+#     allData.append(pd.read_csv(currentFile))
+#   return pd.concat(allData)
 
-def filterByLength(df, minLength, maxLength):
-  # Input: Dataframe with column of peptides
-  # Output: Dataframe with column of peptides
-  df = df[df.apply(lambda x: x[LENGTH] <= maxLength, axis=1)]
-  df = df[df.apply(lambda x: x[LENGTH] >= minLength, axis=1)]
-  return df
+# def filterByLength(df, minLength, maxLength):
+#   # Input: Dataframe with column of peptides
+#   # Output: Dataframe with column of peptides
+#   df = df[df.apply(lambda x: x[LENGTH] <= maxLength, axis=1)]
+#   df = df[df.apply(lambda x: x[LENGTH] >= minLength, axis=1)]
+#   return df
 
-def validPeptide(peptide, validAcids):
-  for acid in peptide:
-    if acid not in validAcids:
-      return False
-  return True
+# def validPeptide(peptide, validAcids):
+#   for acid in peptide:
+#     if acid not in validAcids:
+#       return False
+#   return True
 
-def removeUnknownPeptides(df, acidMasstable):
-  validAcids = AcidMassTable.getAcids(acidMasstable)
-  return df[df.apply(lambda x: validPeptide(x[PEPTIDE], validAcids), axis=1)]
+# def removeUnknownPeptides(df, acidMasstable):
+#   validAcids = AcidMassTable.getAcids(acidMasstable)
+#   return df[df.apply(lambda x: validPeptide(x[PEPTIDE], validAcids), axis=1)]
 
-def calculateMasses(df, acidMassTable):
-  # Input: Dataframe with column of peptides
-  # Output: Dataframe with column of peptides and masses
-  df[MASS] = df.apply(lambda x: AcidMassTable.peptideMass(x[PEPTIDE]), axis=1)
-  return df
+# def calculateMasses(df, acidMassTable):
+#   # Input: Dataframe with column of peptides
+#   # Output: Dataframe with column of peptides and masses
+#   df[MASS] = df.apply(lambda x: AcidMassTable.peptideMass(x[PEPTIDE]), axis=1)
+#   return df
 
-def separateByMass(df, precision):
-  # Input: Dataframe with masses, peptides
-  # Output: Dictionary with key masses (int, adjusted for precision), list peptides
-  dataDict = {}
-  df[MASS] = df.apply(lambda x: int(round(x[MASS] * (10**precision))), axis=1)
-  for elm in df.groupby(MASS):
-    dataDict[mass] = list(elm[1][PEPTIDE])
-  return dataDict
+# def separateByMass(df, precision):
+#   # Input: Dataframe with masses, peptides
+#   # Output: Dictionary with key masses (int, adjusted for precision), list peptides
+#   dataDict = {}
+#   df[MASS] = df.apply(lambda x: int(round(x[MASS] * (10**precision))), axis=1)
+#   for elm in df.groupby(MASS):
+#     dataDict[mass] = list(elm[1][PEPTIDE])
+#   return dataDict
 
 def extractSpectrumInformation(spectrumFileDirectory, precision):
   # Return a dataframe with spectrum title and mass columns
@@ -142,13 +142,14 @@ def peptidesForSpectrum(spectrumData, peptideDict, massTolerance, maxDecoys):
 def getPeptideDict(decoyPeptideDirectory,
                    precision,
                    minP,
-                   maxP):
+                   maxP,
+                   reverse):
 
   pepDict = {}
 
   for fileName in os.listdir(decoyPeptideDirectory):
     currentFile = os.path.join(decoyPeptideDirectory, fileName)
-    pepDict = fileToDict(currentFile, precision, minP, maxP, pepDict)
+    pepDict = fileToDict(currentFile, precision, minP, maxP, pepDict, reverse)
   
   return pepDict
 
@@ -156,7 +157,8 @@ def fileToDict(peptideFileName,
                precision,
                minP,
                maxP,
-               pepDict):
+               pepDict,
+               reverse):
   
   with open(peptideFileName, 'r') as f:
     pepFile = f.read()
@@ -169,6 +171,9 @@ def fileToDict(peptideFileName,
     length, peptide, mass = pepLine.strip().split(',')
     mass = int(round((10 ** precision) * float(mass)))
     length = int(length)
+
+    if reverse:
+      peptide = peptide[::-1]
 
     if 'U' in peptide or 'X' in peptide:
       continue
@@ -190,18 +195,19 @@ def selectDecoyPeptides(decoyPeptideDirectory,
                         minPeptideLength=9,
                         maxPeptideLength=12,
                         maxDecoys=10,
-                        precision=4):
+                        precision=4,
+                        reverse=False):
   
   spectrumData = extractSpectrumInformation(spectrumFileDirectory, precision)
 
   peptideDict = getPeptideDict(decoyPeptideDirectory,
                                precision,
                                minPeptideLength,
-                               maxPeptideLength)
+                               maxPeptideLength,
+                               reverse)
 
   decoyDataframe = \
       peptidesForSpectrum(spectrumData, peptideDict, massTolerance, maxDecoys)
-  print(decoyDataframe)
     
   return decoyDataframe
 
