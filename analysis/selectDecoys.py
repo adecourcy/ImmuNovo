@@ -105,9 +105,9 @@ def extractSpectrumInformation(spectrumFileDirectory, precision):
 def massToleranceMaxDiff(calculatedMass, massTolerance):
 
   minExp = \
-    int(round(calculateMasses - ((massTolerance * calculateMasses) / 1000000)))
+    round(calculateMasses - ((massTolerance * calculateMasses) / 1000000))
   maxExp = \
-    int(round(calculateMasses + ((massTolerance * calculateMasses) / 1000000)))
+    round(calculateMasses + ((massTolerance * calculateMasses) / 1000000))
 
   return (minExp, maxExp)
 
