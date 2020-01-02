@@ -63,43 +63,32 @@ def parseArguments():
   return arguments
 
 
-def getResultsScores(dataFrame, scoreType):
-  df_filtered = \
-      dataFrame[dataFrame[PEPTIDE] != NO_PEP][[scoreType, TITLE_SPECTRUM]]
-
-  df_grouped = \
-      df_filtered.groupby(TITLE_SPECTRUM)[scoreType].transform(max) == \
-          df_filtered[scoreType]
-
-  return df_filtered[df_grouped][[scoreType, TITLE_SPECTRUM]]
-
-
-def getDecoyScores(dataFrame, scoreType):
+def getBestScoringEntries(dataFrame, scoreType):
   df_filtered = \
       dataFrame[[scoreType, TITLE_SPECTRUM]]
 
+  # Create a dataframe of bools which indicate whether each entry is the max
+  # score for that spectrum
   df_grouped = \
       df_filtered.groupby(TITLE_SPECTRUM)[scoreType].transform(max) == \
           df_filtered[scoreType]
 
+  # return only the maximum scoring entry for each spectrum
   return df_filtered[df_grouped][[scoreType, TITLE_SPECTRUM]]
 
+def hitOrMissDataframe(resultsDF, decoyDF, scoreType):
 
-def getScores(resultsDF, decoyDF, scoreType, deltaThreshold=0):
-  results = getResultsScores(resultsDF, scoreType)
-  decoy = getDecoyScores(decoyDF, scoreType)
-
-  resultsFiltered = \
-      results[results[TITLE_SPECTRUM].isin(decoy[TITLE_SPECTRUM])]
-  decoyFiltered = \
-      decoy[decoy[TITLE_SPECTRUM].isin(resultsFiltered[TITLE_SPECTRUM])]
+  resultsDF = \
+      resultsDF[resultsDF[TITLE_SPECTRUM].isin(decoyDF[TITLE_SPECTRUM])]
+  decoyDF = \
+      decoyDF[decoyDF[TITLE_SPECTRUM].isin(resultsDF[TITLE_SPECTRUM])]
 
   merged = \
-    pd.merge(resultsFiltered.rename(columns={scoreType: RESULT_IMMUNO}),
-              decoyFiltered.rename(columns={scoreType: RESULTS_DECOY}))
+    pd.merge(resultsDF.rename(columns={scoreType: RESULT_IMMUNO}),
+              decoyDF.rename(columns={scoreType: RESULTS_DECOY}))
   
   thresholdCalc = \
-    lambda row: True if row[RESULT_IMMUNO] - row[RESULTS_DECOY] >= deltaThreshold \
+    lambda row: True if row[RESULT_IMMUNO] - row[RESULTS_DECOY] >= 0 \
                      else False
 
   merged[RESULTS_DELTA] = \
@@ -107,10 +96,14 @@ def getScores(resultsDF, decoyDF, scoreType, deltaThreshold=0):
 
   return merged
 
-
 def dynamicFDR(maxFDR, scoreList, calculatedFDRs, increment=0.01, scoreIndex=0, fdrIndex=1):
   # Given a sets of scores vs FDR calculations, use dynamic programming to find
   # an optimal, monotonically decreasing step function to match scores vs FDRs
+
+  # Assumes scoreList and calculatedFDRs are ordered by greatest to least based
+  # on scoreList entries
+
+  # Return (score, fdr) sorted lowest to highest by fdr
 
   def getMinScoreIndex(calcs):
     minScore = math.inf
@@ -123,6 +116,7 @@ def dynamicFDR(maxFDR, scoreList, calculatedFDRs, increment=0.01, scoreIndex=0, 
   
 
   def createThresholdList(theoreticalFDRs):
+    # Create a matrix of optimal threshold scores for each FDR
     thresholds = {}
     for tFDR in theoreticalFDRs:
       thresholds[tFDR] = 0
@@ -132,14 +126,13 @@ def dynamicFDR(maxFDR, scoreList, calculatedFDRs, increment=0.01, scoreIndex=0, 
     return thresholdList
 
   maxFDR = round(maxFDR, 2)
+  # Rounded version of the actual, calculated FDRs
   calculatedFDRs = [round(x, 2) for x in calculatedFDRs]
+  # List going from the min to max FDR by "increment"
   theoreticalFDRs = [round((x * increment), 2) for x in range(1, round((maxFDR+increment)/increment))]
-  # print(calculatedFDRs)
-  # input()
-  # print(theoreticalFDRs)
-  # input()
 
-  # (pathIndex, calculation)
+  # Dinstance between the calculate FDR, and each potential FDR label
+  # for the first entry. Used to start off the dynamic programming
   prevCalc = [abs(calculatedFDRs[0] - x) for x in theoreticalFDRs]
 
   # We don't need to track paths, only score to FDR thresholds
@@ -147,20 +140,13 @@ def dynamicFDR(maxFDR, scoreList, calculatedFDRs, increment=0.01, scoreIndex=0, 
 
   for cIndex in range(1, len(calculatedFDRs)):
     currentCalc = []
-    cFDR = calculatedFDRs[cIndex]
+    cFDR = calculatedFDRs[cIndex] #### !!!!! Is this right? Should be cIndex-1? !!!!! 
     prevScore = scoreList[cIndex - 1]
-    #print(prevScore)
     newThresholdList = {}
-    # print(prevCalc)
-    # input()
     for tIndex in range(len(theoreticalFDRs)):
       minPrevScore, minPrevIndex = getMinScoreIndex(prevCalc[:tIndex+1])
       tFDR = theoreticalFDRs[tIndex]
       prevFDR = theoreticalFDRs[minPrevIndex]
-      # print(minPrevScore)
-      # print(minPrevIndex)
-      # print(prevFDR)
-      # input()
 
       currentCalc.append(abs(cFDR - tFDR) + minPrevScore)
       newThresholdList[tFDR] = deepcopy(prevThresholdList[prevFDR])
@@ -184,8 +170,7 @@ def dynamicFDR(maxFDR, scoreList, calculatedFDRs, increment=0.01, scoreIndex=0, 
 
   return thresholdList
 
-
-def findFDR(mergedScores, FDR, fdrDelta=0.005, precision=3):
+def findFDR(mergedScores, precision=3):
 
   immuNovoScores = list(mergedScores[RESULT_IMMUNO])
   deltas = [1 if x == True else 0 for x in list(mergedScores[RESULTS_DELTA])]
@@ -208,21 +193,35 @@ def findFDR(mergedScores, FDR, fdrDelta=0.005, precision=3):
 
   return dynamicFDR(maxFDR, immuNovoScores, fdrList)
 
-
 def addFDR(dataFrame, fdrCutoffs, scoreType, increment=0.01):
   # fdrCutoffs = (scores, fdr)
 
   def findCutoff(score, fdrCutoffs, increment):
     for elm in fdrCutoffs:
       if score > elm[0]:
-        return round(elm[1] + increment, 2)
+        return round(elm[1], 2)
+        # pretty sure this was a bug
+        # return round(elm[1] + increment, 2)
 
+  # sort (score, fdr) from highest to lowest by score
   fdrCutoffs.sort(key=lambda x: x[0], reverse=True)
   
   dataFrame[FDR] = \
     dataFrame.apply(lambda row: findCutoff(row[scoreType], fdrCutoffs, increment), axis=1)
   
   return dataFrame
+
+def addFDRToDataframe(targetDF, decoyDF, scoreType, precision=3, increment=0.01):
+
+  hitOrMissDF = hitOrMissDataframe(targetDF, decoyDF, scoreType)
+  fdrCutoffs = findFDR(hitOrMissDF, precision)
+  fdrDF = addFDR(targetDF, fdrCutoffs, scoreType, increment)
+
+  return fdrDF
+  
+
+
+
 
 
 def plotResults(mergedScores,

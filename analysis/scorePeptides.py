@@ -10,66 +10,33 @@ import argparse
 import pandas as pd
 import numpy as np
 
+from copy import deepcopy
+
 import backend.userInput as userInput
 import backend.Structures.spectrum as Spectrum
 import backend.Structures.spectrumIO as SpectrumIO
 import backend.PreProcessing.spectrumConversion as SpectrumConversion
 import backend.Structures.pssm as PSSM
 import backend.PostProcessing.processResults as processResults
+import backend.PostProcessing.processResultsOld as processResultsOld
+import backend.PreProcessing.acidConversion as AcidConversion
 from main import getAminoVariables
 from backend.constants import *
 
 
-def parseArguments():
-  abspath = os.path.abspath(__file__)
-  dname = os.path.dirname(abspath)
+def getUniquePeptides(peptideList):
+  uniquePeptides = {}
+  for pep in peptideList:
+    uniquePeptides[pep] = 0
+  return uniquePeptides
 
-  parser = argparse.ArgumentParser()
-  parser.add_argument('-o', '--Output-File',
-                      dest='output_file',
-                      default=os.path.join(dname, 'scored_peptides'))
-  parser.add_argument('peptide_file',
-                        help='A csv of peptides to be scored')
-  parser.add_argument('spec_dir',
-                        help='A directory of spectra to use in scoring')
-  parser.add_argument('pssm_dir',
-                        help='A directory of PSSM files for scoring')
-  parser.add_argument('acid_mass_file',
-      help='A file containing mass spectrometry data')
-  parser = userInput.parseOptionalArguments(parser)
-
-  arguments = parser.parse_args()
-  arguments.peptide_file = os.path.abspath(arguments.peptide_file)
-  arguments.spec_dir = os.path.abspath(arguments.spec_dir)
-  arguments.pssm_dir = os.path.abspath(arguments.pssm_dir)
-
-  if not arguments.output_file.endswith('.csv'):
-    arguments.output_file += '.csv'
-  
-  return arguments
-
-
-def deConvertPeptideString(peptideString, acidConversion):
-
-  reverseConversionTable = {acidConversion[x]: x for x in acidConversion}
-
-  convertedPeptide = ''
-  for acid in peptideString:
-    convertedPeptide += reverseConversionTable[acid]
-  
-  return convertedPeptide
-
-
-def convertPeptidString(peptideString, acidConversion):
-  acidConversion = [(x, acidConversion[x]) for x in acidConversion]
-  acidConversion.sort(key=lambda x: len(x[0]), reverse=True)
-  for item in acidConversion:
-    peptideString = peptideString.replace(item[0], item[1])
-
-  return peptideString
-
+def scorePeptides(uniquePeptideScoreDict, conversionDict, scoreFunc):
+  for peptide in uniquePeptideScoreDict:
+    uniquePeptideScoreDict[peptide] = scoreFunc(conversionDict[peptide])
+  return uniquePeptideScoreDict
 
 def pssmScore(peptideString, allPSSM, title):
+  # Assumes converted Peptide String
   matrix = PSSM.getMatrixOfLength(title, len(peptideString), allPSSM)
   score = 0
   for i in range(len(peptideString)):
@@ -77,15 +44,53 @@ def pssmScore(peptideString, allPSSM, title):
   score /= len(peptideString)
   return score
 
+def pssmScoreForPeptides(uniquePeptideScoreDict, conversionDict, allPSSM, title):
+  scoringFunction = \
+      lambda peptideString: pssmScore(peptideString, allPSSM, title)
+  return scorePeptides(uniquePeptideScoreDict, conversionDict, scoringFunction)
 
-def globalScore(acidMassTable,
-                experimentalSpectrum,
-                experimentalScores,
-                protonMassModified,
-                H2OMassModified,
-                NH3MassModified,
-                maxMassTolerance,
-                peptide):
+def allPeptideAllPssmScores(uniquePeptideScoreDict, conversionDict, allPSSM):
+  pssmScores = []
+
+  for title in allPSSM:
+    pssmScores.append((title, pssmScoreForPeptides(deepcopy(uniquePeptideScoreDict),
+                                                   conversionDict,
+                                                   allPSSM,
+                                                   title)))
+  
+  return pssmScores
+
+def getMaximalPssmScoreForPeptide(pssmScores, peptide):
+  # Output from allPeptideAllPssmScores
+  maxScore = -1
+  for entry in pssmScores:
+    currentScore = entry[1][peptide]
+    if currentScore > maxScore:
+      maxScore = currentScore
+      maxTitle = entry[0]
+  return (maxTitle, maxScore)
+
+def getMaximalPssmScores(uniquePeptideScoreDict, conversionDict, allPSSM):
+
+  pssmPeptideScoreDict = deepcopy(uniquePeptideScoreDict)
+
+  pssmScores = \
+      allPeptideAllPssmScores(uniquePeptideScoreDict, conversionDict, allPSSM)
+  
+  for peptide in pssmPeptideScoreDict:
+    pssmPeptideScoreDict[peptide] = \
+        getMaximalPssmScoreForPeptide(pssmScores, peptide)
+  
+  return pssmPeptideScoreDict
+
+def spectrumScore(acidMassTable,
+                  experimentalSpectrum,
+                  experimentalScores,
+                  protonMassModified,
+                  H2OMassModified,
+                  NH3MassModified,
+                  maxMassTolerance,
+                  peptide):
 
 
   globalScore  = processResults.calculateGlobalScore(acidMassTable,
@@ -99,19 +104,75 @@ def globalScore(acidMassTable,
 
   return globalScore
 
+def spectrumScoreOld(acidMassTable,
+                     experimentalSpectrum,
+                     experimentalScores,
+                     protonMassModified,
+                     H2OMassModified,
+                     NH3MassModified,
+                     maxMassTolerance,
+                     peptide):
 
-def scorePeptides(peptideDF,
-                  acidMassFile,
-                  pssmDir,
-                  spectrumDirectory,
-                  precision,
-                  minPepLength,
-                  maxPepLength,
-                  maxMassTolerance,
-                  compression):
 
-  peptideDF = peptideDF[peptideDF[PEPTIDE] != NO_PEP]
-  pepBySpectrum = {}
+  globalScore = processResultsOld.calculateGlobalScore(acidMassTable,
+                                                       experimentalSpectrum,
+                                                       experimentalScores,
+                                                       0.5,
+                                                       peptide,
+                                                       protonMassModified,
+                                                       H2OMassModified,
+                                                       NH3MassModified,
+                                                       maxMassTolerance)
+
+  return globalScore
+
+def allPeptideSpectrumScores(acidMassTable,
+                             experimentalSpectrum,
+                             experimentalScores,
+                             protonMassModified,
+                             H2OMassModified,
+                             NH3MassModified,
+                             maxMassTolerance,
+                             uniquePeptideScoreDict,
+                             conversionDict):
+
+  scoreFunction = lambda peptide: spectrumScore(acidMassTable,
+                                                experimentalSpectrum,
+                                                experimentalScores,
+                                                protonMassModified,
+                                                H2OMassModified,
+                                                NH3MassModified,
+                                                maxMassTolerance,
+                                                peptide)
+  
+  return scorePeptides(deepcopy(uniquePeptideScoreDict), conversionDict, scoreFunction)
+
+def allPeptideSpectrumScoresOld(acidMassTable,
+                                experimentalSpectrum,
+                                experimentalScores,
+                                protonMassModified,
+                                H2OMassModified,
+                                NH3MassModified,
+                                maxMassTolerance,
+                                uniquePeptideScoreDict,
+                                conversionDict):
+
+  scoreFunction = lambda peptide: spectrumScoreOld(acidMassTable,
+                                                   experimentalSpectrum,
+                                                   experimentalScores,
+                                                   protonMassModified,
+                                                   H2OMassModified,
+                                                   NH3MassModified,
+                                                   maxMassTolerance,
+                                                   peptide)
+  
+  return scorePeptides(deepcopy(uniquePeptideScoreDict), conversionDict, scoreFunction)
+
+def spectrumVariableSetup(acidMassFile,
+                          pssmDir,
+                          minPepLength,
+                          maxPepLength,
+                          precision):
 
   allPSSM, acidMassTable, conversionTable = \
                               getAminoVariables(acidMassFile,
@@ -119,39 +180,61 @@ def scorePeptides(peptideDF,
                                                 pssmDir,
                                                 minPepLength,
                                                 maxPepLength)
-  peptideDF[PEPTIDE] = \
-    peptideDF.apply(lambda row: convertPeptidString(row[PEPTIDE],
-                    conversionTable),
-                    axis=1)
-  peptideDF['pepFilter'] = \
-    peptideDF.apply(lambda row: False if len(row[PEPTIDE]) < minPepLength or \
-                                         len(row[PEPTIDE]) > maxPepLength else True,
-                    axis=1)
-  peptideDF = peptideDF[peptideDF['pepFilter'] == True]
-  peptideDF = peptideDF.drop(columns=['pepFilter'])
-
-  for item in peptideDF.groupby(by=TITLE_SPECTRUM):
-    pepBySpectrum[item[0]] = item[1]
-
   H2OMassAdjusted = int(H2OMASS * (10**precision))
   NH3MassAdjusted = int(NH3MASS * (10**precision))
   protonMassAdjusted = int(PROTONMASS * (10**precision))
 
-  processedPeptides = []
+  return allPSSM, acidMassFile, conversionTable, \
+         H2OMASS, NH3MASS, protonMassAdjusted
+
+def peptideSpectrumDict(peptideDF):
+  specToPeptideDict = {}
+  spectrumList = list(peptideDF[TITLE_SPECTRUM])
+  peptideList = list(peptideDF[PEPTIDE])
+
+  for spectrum, peptide in zip(spectrumList, peptideList):
+    if spectrum not in specToPeptideDict:
+      specToPeptideDict[spectrum] = []
+    specToPeptideDict[spectrum].append(peptide)
+  
+  for spectrum in specToPeptideDict:
+    specToPeptideDict[spectrum] = getUniquePeptides(specToPeptideDict[spectrum])
+  
+  return specToPeptideDict
+
+###############################################################################
+
+def scorePeptidesSpectrumOverlap(peptideDF,
+                                 conversionDict,
+                                 allPSSM,
+                                 acidMassTable,
+                                 conversionTable,
+                                 H2OMassAdjusted,
+                                 NH3MassAdjusted,
+                                 protonMassAdjusted,
+                                 spectrumDirectory,
+                                 scoringFunction,
+                                 precision=4,
+                                 minPepLength=9,
+                                 maxPepLength=12,
+                                 maxMassTolerance=35,
+                                 compression=2):
+
+  specToPeptideDict = peptideSpectrumDict(peptideDF)
+
   spectrumTitles = set()
 
   for spectrumFileName in os.listdir(spectrumDirectory):
     spectrumFile = os.path.join(spectrumDirectory, spectrumFileName)
     for spectrum in SpectrumIO.getSpectrums(spectrumFile):
       spectrumTitle = Spectrum.getTitle(spectrum)
+
       if spectrumTitle in spectrumTitles:
         continue # some of these files seem to have duplicates
       spectrumTitles.add(spectrumTitle)
-      # I don't remember why I was doing this
-      spectrumTitle = spectrumTitle.replace(",", '').split()[0] 
-      if spectrumTitle not in pepBySpectrum:
+      if spectrumTitle not in specToPeptideDict:
         continue
-      spectrumPeptides = pepBySpectrum[spectrumTitle]
+      spectrumPeptides = specToPeptideDict[spectrumTitle]
 
       spectrumMasses, spectrumMassesDouble, \
       spectrumIntensities, spectrumIntensitiesDouble = \
@@ -167,59 +250,90 @@ def scorePeptides(peptideDF,
 
       experimentalSpectrum = spectrumMasses + spectrumMassesDouble
       experimentalIntensities = spectrumIntensities + spectrumIntensitiesDouble
-      applyGlobalScore = lambda x: globalScore(acidMassTable,
-                                               experimentalSpectrum,
-                                               experimentalIntensities,
-                                               protonMassAdjusted,
-                                               H2OMassAdjusted,
-                                               NH3MassAdjusted,
-                                               maxMassTolerance,
-                                               x)
 
-      spectrumPeptides[SCORE_GLOBAL] = \
-          spectrumPeptides.apply(lambda row: applyGlobalScore(row[PEPTIDE]), axis=1)
-
-      pssmTitles = [title for title in allPSSM]
-      spectrumPeptides = \
-        (spectrumPeptides.loc[spectrumPeptides.index.repeat(len(pssmTitles))]
-                         # place holder column names
-                         .assign(pt = np.tile(pssmTitles, len(spectrumPeptides)))
-                         .assign(ps = lambda x: [pssmScore(peptideString, allPSSM, title) for peptideString, title in zip(x[PEPTIDE], np.tile(pssmTitles, len(spectrumPeptides)))])
-                         )
-      spectrumPeptides = \
-        spectrumPeptides.rename(columns = {'pt': TITLE_PSSM, 'ps': SCORE_PSSM})
-      spectrumPeptides[SCORE_PSSM] /= 10**precision
-      spectrumPeptides[SCORE_COMBINED] = \
-            spectrumPeptides[SCORE_GLOBAL] * spectrumPeptides[SCORE_PSSM]
-      
-      processedPeptides.append(spectrumPeptides)
+      # Scoring function passed in, should be one of ours
+      specToPeptideDict[spectrumTitle] = \
+          scoringFunction(conversionTable,
+                          experimentalSpectrum,
+                          experimentalIntensities,
+                          protonMassAdjusted,
+                          H2OMassAdjusted,
+                          NH3MassAdjusted,
+                          maxMassTolerance,
+                          specToPeptideDict[spectrumTitle],
+                          conversionDict)
   
-  peptideDF = pd.concat(processedPeptides).drop_duplicates() # just in case
-  peptideDF[PEPTIDE] = \
-    peptideDF.apply(lambda row: deConvertPeptideString(row[PEPTIDE],
-                                                       conversionTable),
-                    axis=1)
+  peptideDF[SCORE_GLOBAL] = \
+    peptideDF.apply(lambda x: specToPeptideDict[x[TITLE_SPECTRUM]][x[PEPTIDE]], axis=1)
 
+  return peptideDF, allPSSM
+
+def scorePeptidesPssm(peptideDF, conversionDict, allPSSM):
+  uniquePeptideDict = \
+      getUniquePeptides(list(peptideDF[PEPTIDE]))
+  scoredPeptideDict = \
+      getMaximalPssmScores(uniquePeptideDict, conversionDict, allPSSM)
+
+  peptideDF[TITLE_PSSM] = \
+    peptideDF.apply(lambda x: scoredPeptideDict[x[PEPTIDE]][0])
+  peptideDF[SCORE_PSSM] = \
+    peptideDF.apply(lambda x: scoredPeptideDict[x[PEPTIDE]][1])
+  
   return peptideDF
 
 
-if __name__ == '__main__':
-  """
-  pass a CSV with headers for spectra and peptides, headers should conform to
-  the constants file standards
+def getPeptideScores(peptideDF,
+                     peptideConversionDict,
+                     acidMassTable,
+                     conversionTable,
+                     H2OMassAdjusted,
+                     NH3MassAdjusted,
+                     protonMassAdjusted,
+                     spectrumDirectory,
+                     scoringFunction,
+                     precision=4,
+                     minPepLength=9,
+                     maxPepLength=12,
+                     maxMassTolerance=35,
+                     compression=2):
 
-  Pass directory of spectra files, and a directory of PSSMs
-  """
-  arguments = parseArguments()
+  if scoringFunction == CALCULATION_NN:
+    pass
+  elif scoringFunction == CALCULATION_OVERLAP_NEW:
+    peptideDF, allPSSM = scorePeptidesSpectrumOverlap(peptideDF,
+                                                      peptideConversionDict,
+                                                      allPSSM,
+                                                      acidMassTable,
+                                                      conversionTable,
+                                                      H2OMassAdjusted,
+                                                      NH3MassAdjusted,
+                                                      protonMassAdjusted,
+                                                      spectrumDirectory,
+                                                      allPeptideSpectrumScores,
+                                                      precision,
+                                                      minPepLength,
+                                                      maxPepLength,
+                                                      maxMassTolerance,
+                                                      compression)
+  elif scoringFunction == CALCULATION_OVERLAP_OLD:
+    peptideDF, allPSSM = scorePeptidesSpectrumOverlap(peptideDF,
+                                                      peptideConversionDict,
+                                                      allPSSM,
+                                                      acidMassTable,
+                                                      conversionTable,
+                                                      H2OMassAdjusted,
+                                                      NH3MassAdjusted,
+                                                      protonMassAdjusted,
+                                                      spectrumDirectory,
+                                                      allPeptideSpectrumScoresOld,
+                                                      precision,
+                                                      minPepLength,
+                                                      maxPepLength,
+                                                      maxMassTolerance,
+                                                      compression)
 
-  peptideDF = scorePeptides(pd.read_csv(arguments.peptide_file),
-                            arguments.acid_mass_file,
-                            arguments.pssm_dir,
-                            arguments.spec_dir,
-                            arguments.prec,
-                            arguments.minP,
-                            arguments.maxP,
-                            arguments.mmt,
-                            arguments.comp)
+  peptideDF = scorePeptidesPssm(peptideDF, peptideConversionDict, allPSSM)
 
-  peptideDF.to_csv(arguments.output_file, index=False)
+  peptideDF[SCORE_COMBINED] = peptideDF[SCORE_GLOBAL] * peptideDF[SCORE_PSSM]
+  
+  return peptideDF
