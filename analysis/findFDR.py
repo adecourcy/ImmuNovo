@@ -218,9 +218,44 @@ def addFDRToDataframe(targetDF, decoyDF, scoreType, precision=3, increment=0.01)
   fdrDF = addFDR(targetDF, fdrCutoffs, scoreType, increment)
 
   return fdrDF
+
+
+def findFDROld(targetScores, decoyScores):
+
+  def nextDecoyIndex(currentDecoyIndex, decoyScores, targetScore):
+    if currentDecoyIndex == -1:
+      return -1
+    while decoyScores[currentDecoyIndex] > targetScore:
+      currentDecoyIndex += 1
+      if currentDecoyIndex >= len(decoyScores):
+        return -1
+    return currentDecoyIndex
+
+  targetScores.sort(reverse=True)
+  decoyScores.sort(reverse=True)
+  fdrList = []
+
+  targetIndex = 0
+  decoyIndex = 0
+
+  while targetIndex < len(targetScores):
+    decoyIndex = \
+        nextDecoyIndex(decoyIndex, decoyScores, targetScores[targetIndex])
+    if decoyIndex == -1:
+      fdrList.append(0.0)
+    else:
+      fdrList.append(len(decoyScores[decoyIndex:]) / \
+            (len(decoyScores[decoyIndex:]) + len(targetScores[targetIndex:])))
+    targetIndex += 1
   
+  return dynamicFDR(max(fdrList), targetScores, fdrList)
 
 
+def addFDRToDataframeOld(targetDF, decoyDF, scoreType, precision=3, increment=0.01):
+  
+  fdrCutoffs = findFDROld(list(targetDF[scoreType]), list(decoyDF[scoreType]))
+  return addFDR(targetDF, fdrCutoffs, scoreType, increment)
+  
 
 
 

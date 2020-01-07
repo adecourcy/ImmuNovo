@@ -47,6 +47,7 @@ import analysis.findFDR as FindFDR
 import analysis.scorePeptides as ScorePeptides
 import analysis.selectDecoys as SelectDecoys
 import analysis.findUniquePeptides as FindUniquePeptides
+import backend.userInput as UserInput
 from main import getAminoVariables
 from backend.constants import *
 
@@ -57,6 +58,8 @@ SOURCE_DECOY = 'SOURCE_DECOY'
 SOURCE_DATABASE = 'SOURCE_DATABASE'
 
 def parseArguments():
+
+# denovoResultsDirectory    -- required (add to analyzeResults)
 
   abspath = os.path.abspath(__file__)
   dname = os.path.dirname(abspath)
@@ -70,51 +73,18 @@ def parseArguments():
     if not os.path.exists(directory):
       os.mkdir(directory)
 
-  abspath = os.path.abspath(__file__)
-  dname = os.path.dirname(abspath)
-  
   parser = argparse.ArgumentParser()
+
   parser.add_argument('immunovo_results_dir',
+                      dest='immunovo_results_dir',
                       help='A directory containing results of the ImmuNovo Program')
-  parser.add_argument('spec_dir',
-                      help='A directory containing the spectrum files that were searched')
-  parser.add_argument('pssm_dir',
-                      help='A directory containing pssm files searched')
+  
+  arguments = UserInput.parseArguments(os.getcwd())
 
-  parser.add_argument('--update', action='store_true')
-
-
-  #####
-  #
-  # Add optional arguments here
-  #
-  #####
-
-
-  arguments = parser.parse_args()
-  arguments.immunovo_results_dir = os.path.abspath(arguments.immunovo_results_dir)
-  arguments.database_results_dir = os.path.abspath(arguments.database_results_dir)
-  arguments.spec_dir = os.path.abspath(arguments.spec_dir)
-  arguments.pssm_dir = os.path.abspath(arguments.pssm_dir)
-  arguments.acid_mass_file = os.path.abspath(arguments.acid_mass_file)
-  arguments.decoy_dir = os.path.abspath(arguments.decoy_dir)
-  arguments.output_dir = os.path.abspath(arguments.output_dir)
-
+  arguments.immunovo_results_dir = \
+        os.path.abspath(arguments.immunovo_results_dir)
   checkExists(arguments.immunovo_results_dir)
-  checkExists(arguments.database_results_dir)
-  checkExists(arguments.spec_dir)
-  checkExists(arguments.pssm_dir)
-  checkExists(arguments.acid_mass_file)
-  checkExists(arguments.decoy_dir)
-
-  createDir(arguments.output_dir)
-  
-  if not (0 < arguments.fdr < 1):
-    print(str.format('{} is not a valid FDR. Should be between (0, 1)', arguments.fdr))
-    sys.exit()
-  
   return arguments
-
 
 
 
@@ -354,7 +324,7 @@ def mergeDataFrames(denovoDF, decoyDF, databaseDF, qValue):
   denovoDF[SOURCE] = [SOURCE_DENOVO for i in range(len(denovoDF))]
   decoyDF[SOURCE] = [SOURCE_DECOY for i in range(len(decoyDF))]
   combinedDF = pd.concat(denovoDF, decoyDF)
-  if not qValue:
+  if not qValue or databaseDF != '':
     databaseDF[SOURCE] = [SOURCE_DATABASE for i in range(databaseDF)]
     combinedDF = pd.concat(combinedDF, databaseDF)
   return combinedDF
@@ -415,6 +385,7 @@ def dataframeSetup(denovoResultsDirectory,
                    spectrumFileDirectory,
                    acidMassTable,
                    acidConversionTable,
+                   fdrOnly,
                    massTolerance=35,
                    minPeptideLength=9,
                    maxPeptideLength=12,
@@ -425,21 +396,24 @@ def dataframeSetup(denovoResultsDirectory,
   
   denovoDF = resultsFilter(importDenovoData(denovoResultsDirectory))
 
-  databaseDF = resultsFilter(importDatabaseData(databaseResultsDirectory,
-                                                databaseType,
-                                                minPeptideLength,
-                                                maxPeptideLength))
+  if fdrOnly:
+    databaseDF = ''
+  else:
+    databaseDF = resultsFilter(importDatabaseData(databaseResultsDirectory,
+                                                  databaseType,
+                                                  minPeptideLength,
+                                                  maxPeptideLength))
 
-  decoyDF = resultsFilter(SelectDecoys(decoyPeptideDirectory,
-                                       spectrumFileDirectory,
-                                       acidMassTable,
-                                       acidConversionTable,
-                                       massTolerance,
-                                       minPeptideLength,
-                                       maxPeptideLength,
-                                       maxDecoys,
-                                       precision,
-                                       reverse))
+  decoyDF = resultsFilter(SelectDecoys.selectDecoyPeptides(decoyPeptideDirectory,
+                                                          spectrumFileDirectory,
+                                                          acidMassTable,
+                                                          acidConversionTable,
+                                                          massTolerance,
+                                                          minPeptideLength,
+                                                          maxPeptideLength,
+                                                          maxDecoys,
+                                                          precision,
+                                                          reverse))
 
   return denovoDF, decoyDF, databaseDF
 
@@ -463,6 +437,26 @@ def spectrumVariableSetup(acidMassFile,
          H2OMASS, NH3MASS, protonMassAdjusted
 
 
+def addFDR(fdrTargetDF,
+           fdrDecoyDF,
+           scoreComparisionType,
+           precision,
+           increment,
+           fdrCalculationType):
+
+  if fdrCalculationType == FDR_TDA:
+    return FindFDR.addFDRToDataframe(fdrTargetDF,
+                                     fdrDecoyDF,
+                                     scoreComparisionType,
+                                     precision,
+                                     increment)
+  elif fdrCalculationType == FDR_DISTRIBUTION:
+    return FindFDR.addFDRToDataframeOld(fdrTargetDF,
+                                        fdrDecoyDF,
+                                        scoreComparisionType,
+                                        precision,
+                                        increment)
+
 
 def getAnalysis(denovoResultsDirectory,
                 databaseResultsDirectory,
@@ -477,6 +471,7 @@ def getAnalysis(denovoResultsDirectory,
                 outputDirectory,
                 dataSetName,
                 tslLocation,
+                fdrCalculationType,
                 increment=0.01,
                 massTolerance=35,
                 minPeptideLength=9,
@@ -514,8 +509,9 @@ def getAnalysis(denovoResultsDirectory,
       createConversionDict(list(mergedDF[PEPTIDE]), acidConversionTable)
   
   denovoDF = addPeptideLength(denovoDF, peptideConversionDict)
-  databaseDF = addPeptideLength(denovoDF, peptideConversionDict)
-  databaseDF = addPeptideLength(denovoDF, peptideConversionDict)
+  decoyDF = addPeptideLength(decoyDF, peptideConversionDict)
+  if databaseDF != '':
+    databaseDF = addPeptideLength(databaseDF, peptideConversionDict)
   mergedDF = addPeptideLength(denovoDF, peptideConversionDict)
 
   mergedDF = ScorePeptides.getPeptideScores(mergedDF,
@@ -533,7 +529,7 @@ def getAnalysis(denovoResultsDirectory,
                                             massTolerance,
                                             compression)
   
-  if qValue:
+  if not qValue or databaseDF != '':
     denovoDF, decoyDF, databaseDF = separateDataFrames(mergedDF, qValue)
   else:
     denovoDF, decoyDF = separateDataFrames(mergedDF, qValue)
@@ -542,27 +538,31 @@ def getAnalysis(denovoResultsDirectory,
   fdrDenovoDF = filterTopPeptides(denovoDF, scoreComparisionType)
   fdrDecoyDF = filterTopPeptides(decoyDF, scoreComparisionType)
 
-  if not qValue:
-    fdrDatabaseDF = filterTopPeptides(databaseDF, scoreComparisionType)
-  else:
-    fdrDatabaseDF = databaseDF
+  if databaseDF != '':
+    if not qValue:
+      fdrDatabaseDF = filterTopPeptides(databaseDF, scoreComparisionType)
+    else:
+      fdrDatabaseDF = databaseDF
   
-  denovoDF = FindFDR.addFDRToDataframe(denovoDF,
-                                       fdrDecoyDF,
-                                       scoreComparisionType,
-                                       precision,
-                                       increment)
+  fdrDenovoDF = addFDR(fdrDenovoDF,
+                       fdrDecoyDF,
+                       scoreComparisionType,
+                       precision,
+                       increment,
+                       fdrCalculationType)
 
-  if not qValue:
-    fdrDatabaseDF = FindFDR.addFDRToDataframe(fdrDatabaseDF,
-                                              fdrDecoyDF,
-                                              scoreComparisionType,
-                                              precision,
-                                              increment)
+  if not qValue or databaseDF != '':
+    fdrDatabaseDF = addFDR(fdrDatabaseDF,
+                           fdrDecoyDF,
+                           scoreComparisionType,
+                           precision,
+                           increment,
+                           fdrCalculationType)
   
 
   fdrDenovoDF, fdrCutoff = closestFDR(fdrDenovoDF, fdrCutoff, increment)
-  fdrDatabaseDF = fdrDatabaseDF[fdrDatabaseDF[FDR] >= fdrCutoff]
+  if databaseDF != '':
+    fdrDatabaseDF = fdrDatabaseDF[fdrDatabaseDF[FDR] >= fdrCutoff]
 
   ############# Do Analysis ####################
 
@@ -571,20 +571,24 @@ def getAnalysis(denovoResultsDirectory,
 
   with open(outputFileName, 'w') as f:
     uniquePeptidesDenovo = uniquePeptides(fdrDenovoDF)
-    uniquePeptidesDatabase = uniquePeptides(fdrDatabaseDF)
+    if databaseDF != '':
+      uniquePeptidesDatabase = uniquePeptides(fdrDatabaseDF)
     f.write('FDR used: {}\n'.format(fdrCutoff))
     f.write('\n')
     f.write('Denovo Spectrum Matches: {}\n'.format(getSpectrumHits(denovoDF)))
-    f.write('Database Spectrum Matches: {}\n'.format(getSpectrumHits(databaseDF)))
+    if databaseDF != '':
+      f.write('Database Spectrum Matches: {}\n'.format(getSpectrumHits(databaseDF)))
     f.write('\n')
     f.write('Denovo Unique Peptides Found: {}\n'.format(uniquePeptidesDenovo))
     f.write('Database Unique Peptides Found: {}\n'.format(uniquePeptidesDatabase))
-    f.write('Overlap: {}\n'.format(getOverlap(fdrDatabaseDF, fdrDatabaseDF)))
+    if databaseDF != '':
+      f.write('Overlap: {}\n'.format(getOverlap(fdrDenovoDF, fdrDatabaseDF)))
     f.write('\n')
 
     f.write('Length Distribution:\n')
     lengthCountDenovo = getLengthCountDict(fdrDenovoDF)
-    lengthCountDatabase = getLengthCountDict(fdrDatabaseDF)
+    if databaseDF != '':
+      lengthCountDatabase = getLengthCountDict(fdrDatabaseDF)
     lengthDistributionDenovo = \
       getLengthDistribution(lengthCountDenovo, uniquePeptidesDenovo)
     lengthDistributionDatabase = \
@@ -612,123 +616,30 @@ def getAnalysis(denovoResultsDirectory,
                   outputDirectory)
 
 
+if __name__ == '__main__':
 
+  arguments = parseArguments()
 
-
-
-# if __name__ == '__main__':
-#   arguments = parseArguments()
-
-#   abspath = os.path.abspath(__file__)
-#   dname = os.path.dirname(abspath)
-
-#   if not arguments.update:
-#     decoyPeptides = runPepToScores(arguments, dname)
-#   decoyPeptides = os.path.join(arguments.output_dir, 'decoyScores.csv')
-
-#   fdrCutoffs, fdrImmuNovo = runFDR(arguments, decoyPeptides)
-#   fdrImmuNovo.to_csv(os.path.join(arguments.output_dir, 'processedImmunovo.csv'), index=0)
-
-#   immuNovoDict, fdrCutoff = \
-#     findUniquePeptides.getPeptideDict(fdrImmuNovo, arguments.fdr, False)
-
-#   groupedDF = groupByPSSM(fdrImmuNovo, fdrCutoff)
-
-#   # Create tsl images. Written for Darwin Server, specifically
-#   os.system("module load ruby/2.1.0")
-#   oldCWD = os.getcwd()
-#   os.chdir(os.path.dirname(arguments.tsl))
-#   pssmPeptides = printGraphicTSL(groupedDF, arguments.dataset_name,
-#                                  arguments.tsl, arguments.output_dir)
-#   os.chdir(oldCWD)
-
-#   ##### Done With ImmuNovo Only analysis #####
-#   if not arguments.immunovo_only:
-
-#     if arguments.update:
-#       fdrDatabase = pd.read_csv(os.path.join(arguments.output_dir, 'processedDatabase.csv'))
-#     else: 
-#       fdrDatabase = \
-#           processDatabaseData(arguments.database_results_dir,
-#                               fdrCutoffs,
-#                               SCORE_COMBINED,
-#                               MSGF)
-      
-#       # This is taking a while, so in case something crashes
-#       fdrDatabase.to_csv(os.path.join(arguments.output_dir, 'processedDatabase.csv'), index=0)
-
-#     databaseDict, fdrCutoff = \
-#       findUniquePeptides.getPeptideDict(fdrDatabase, fdrCutoff)
-
-#     numIdentical, num2AA, similarity, overlapPeptides = \
-#                           compareResults(immuNovoDict, databaseDict)
-
-#   #### Start creating report ####
-
-#   for pssm in pssmPeptides:
-#     for length in pssmPeptides[pssm]:
-#       with open(os.path.join(arguments.output_dir, '{}_{}_peptides.txt'.format(pssm.replace('.csv.pssm', ''), length)), 'w') as f:
-#         f.write('\n'.join(pssmPeptides[pssm][length]))
-
-#   if not arguments.immunovo_only:
-#     copyPSSM(arguments.pssm_dir, arguments.output_dir)
-#     plotMatches(immuNovoDict,
-#                 numIdentical,
-#                 num2AA,
-#                 arguments.output_dir,
-#                 arguments.plt_title)
-#     plotLengths(immuNovoDict, arguments.output_dir, arguments.plt_title)
-
-#   # Output summary statistics
-#   with open(os.path.join(arguments.output_dir, 'report.txt'), 'w') as f:
-#     f.write('FDR cutoff used: {}\n\n'.format(fdrCutoff))
-
-#     if not arguments.immunovo_only:
-#       iSpec, iPSSM, dSpec, dPSSM, oSpec, oPSSM = \
-#             getScores(fdrImmuNovo, fdrDatabase, overlapPeptides, fdrCutoff)
-#       f.write('ImmuNovo Spectrum Score: {}\nImmuNovo PSSM Score: {}\n'.format(iSpec, iPSSM))
-#       f.write('Database Spectrum Score: {}\nDatabase PSSM Score: {}\n'.format(dSpec, dPSSM))
-#       f.write('Overlapping Spectrum Score: {}\nOverlapping PSSM Score: {}\n'.format(oSpec, oPSSM))
-#       f.write(pepCountToString(immuNovoDict, databaseDict, numIdentical, num2AA, similarity))
-#       f.write('\n\n')
-#     else:
-#       iSpec, iPSSM, dSpec, dPSSM, oSpec, oPSSM = \
-#             getScores(fdrImmuNovo, fdrImmuNovo, set(), fdrCutoff)
-#       immuNovoLengths = [len(immuNovoDict[x]) for x in immuNovoDict]
-#       totalImmuNovo = sum(immuNovoLengths)
-#       immuNovoPercentages = [round((x / totalImmuNovo) * 10**2, 2) for x in immuNovoLengths]
-#       f.write(' '.join(['{}: {} ({}%)'.format(x, len(immuNovoDict[x]), y) for x, y in zip(immuNovoDict, immuNovoPercentages)]))
-#       f.write('\n')
-#       f.write('ImmuNovo Spectrum Score: {}\nImmuNovo PSSM Score: {}\n'.format(iSpec, iPSSM))
-#       f.write('\n\n')
-
-#     denovoPSSM = getPSSMDistribution(groupedDF)
-#     f.write('PSSM Distribution\n')
-#     f.write('\n'.join(['{}: {}%'.format(pssm, round(denovoPSSM[pssm], 2)) for pssm in denovoPSSM]))
-#     f.write('\n')
-
-#     for pssm in pssmPeptides:
-#       f.write(pssm.replace('.csv.pssm', '') + ' -- ')
-#       for length in pssmPeptides[pssm]:
-#         f.write('{}: {} '.format(length, len(pssmPeptides[pssm][length])))
-#       f.write('\n')
-#     f.write('\n')
-        
-
-#     f.write('ImmuNovo Lengths\n')
-#     immuNovoDistribution = aminoAcidDistribution(immuNovoDict)
-#     for length in immuNovoDistribution:
-#       f.write('Length {}\n'.format(length))
-#       f.write(acidDistributionToString(immuNovoDistribution[length]))
-#       f.write('\n')
-#     f.write('\n\n')
-    
-
-#     if not arguments.immunovo_only:
-#       f.write('Database Lengths\n')
-#       databaseDistribution = aminoAcidDistribution(databaseDict)
-#       for length in databaseDistribution:
-#         f.write('Length {}\n'.format(length))
-#         f.write(acidDistributionToString(databaseDistribution[length]))
-#         f.write('\n')
-  
+  getAnalysis(arguments.immunovo_results_dir,
+              arguments.database_results_dir,
+              arguments.decoy_dir,
+              arguments.spec_dir,
+              arguments.qValue,
+              arguments.fdr,
+              arguments.spectrumComparison,
+              arguments.scoreType,
+              arguments.pssm_dir,
+              arguments.acid_mass_file,
+              arguments.output_dir,
+              arguments.dataset_name,
+              arguments.tsl,
+              arguments.fdrCalculation,
+              arguments.increment,
+              arguments.mmt,
+              arguments.minP,
+              arguments.maxP,
+              arguments.decoys,
+              arguments.prec,
+              arguments.comp,
+              arguments.reverse,
+              arguments.database)

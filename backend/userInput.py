@@ -7,7 +7,7 @@ import sys
 from backend.constants import *
 
 
-def parseArguments(programDirectory):
+def parseArguments(programDirectory, parser=None):
 
   def getAbsPath(location):
     return os.path.abspath(location)
@@ -21,7 +21,8 @@ def parseArguments(programDirectory):
     if not os.path.exists(directory):
       os.makedirs(directory)
 
-  parser = argparse.ArgumentParser()
+  if parser == None:
+    parser = argparse.ArgumentParser()
   parser = parseDefaultArguments(parser)
   parser = parseOptionalArguments(parser, programDirectory)
 
@@ -39,6 +40,16 @@ def parseArguments(programDirectory):
   checkExists(arguments.spec_dir)
   checkExists(arguments.acid_mass_file)
   checkExists(arguments.pssm_dir)
+
+  if arguments.spectrumComparison == 0:
+    arguments.spectrumComparison = CALCULATION_OVERLAP_NEW
+  elif arguments.spectrumComparison == 1:
+    arguments.spectrumComparison = CALCULATION_OVERLAP_OLD
+
+  if arguments.fdrCalculation == 0:
+    arguments.fdrCalculation = FDR_TDA
+  elif arguments.fdrCalculation == 1:
+    arguments.fdrCalculation = FDR_DISTRIBUTION
 
   return arguments
 
@@ -74,6 +85,10 @@ def parseOptionalArguments(parser, programDirectory):
       dest='fdr',
       default = 0.01,
       help='The target FDR', type=float)
+  parser.add_argument('-i', '--increment',
+      dest='increment',
+      default=0.01,
+      help='If the target FDR is not found, increment FDR by this amount until a valid FDR is found')
   
   parser.add_argument('-amf', '--acid-mass-file',
       dest='acid_mass_file',
@@ -147,18 +162,10 @@ def parseOptionalArguments(parser, programDirectory):
       default=False,
       help='Run the program in debug mode')
   
-  parser.add_argument('-db', '--database-search-program',
-                        dest='database',
-                        default=MSGF,
-                        help='The database search program used (currently only MSGF)')
   parser.add_argument('-md', '--max-decoys',
                         dest='decoys',
-                        default=str(50),
+                        default=10,
                         help='The number of decoy peptides to be considered in calculating FDR')
-  parser.add_argument('-st', '--Score-Type',
-                        dest='scoreType',
-                        default=SCORE_COMBINED,
-                        help='Score type to compare (defaults to combined score)')
 
   parser.add_argument('-tsl', '--TSL_Location',
                       dest='tsl',
@@ -166,12 +173,40 @@ def parseOptionalArguments(parser, programDirectory):
                       default=os.path.realpath(os.path.join(os.path.join(programDirectory, 'analysis'), './tsl/cgi-bin/tsl')),
                       help='Path to the tsl binary')
   
+  # Change to integer selection
+  parser.add_argument('-db', '--database-search-program',
+                        dest='database',
+                        default=MSGF,
+                        help='The database search program used (currently only MSGF)')
+  parser.add_argument('-st', '--Score-Type',
+                        dest='scoreType',
+                        default=SCORE_COMBINED,
+                        help='Score type to compare (defaults to combined score)')
+  parser.add_argument('-sc', '--Spectrum-Comparsion',
+                        dest='spectrumComparison',
+                        choices=[0,1],
+                        default=0,
+                        help='The spectrum comparison function to be used:\n' \
+                             '0 for the new comparison function\n' \
+                             '1 for the old comparison function')
+  parser.add_argument('-fc', '--FDR-Calculation',
+                        choices=[0,1],
+                        dest='fdrCalculation',
+                        default=0,
+                        help='The fdr calculation to be used:\n' \
+                              '0 for TDA\n' \
+                              '1 for distribution comparison')
+
+
   parser.add_argument('--bEnd',
                       action='store_true',
                       help='Construct Peptides from the bEnd (not currently implemented)')
   parser.add_argument('--reverse',
                       action='store_false',
                       help='Reveres the peptides in the decoy database')
+  parser.add_argument('--qValue',
+                       action='store_true',
+                       help='Use the qValue for MSGF FDR calculation')
       
   return parser
 

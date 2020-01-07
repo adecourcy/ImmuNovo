@@ -11,6 +11,7 @@ import backend.Structures.spectrum as Spectrum
 import backend.PreProcessing.acidConversion as AcidConversion
 import backend.PreProcessing.spectrumConversion as SpectrumConversion
 import backend.PostProcessing.processResults as ProcessResults
+import analysis.analyzeResults as AnalyzeResults
 from backend.constants import *
 from backend.userInput import *
 
@@ -328,3 +329,27 @@ if __name__ == '__main__':
         clean(fileList)
 
     outputFile.close()
+  
+  AnalyzeResults.getAnalysis(arguments.output_dir,
+                             arguments.database_results_dir,
+                             arguments.decoy_dir,
+                             arguments.spec_dir,
+                             arguments.qValue,
+                             arguments.fdr,
+                             arguments.spectrumComparison,
+                             arguments.scoreType,
+                             arguments.pssm_dir,
+                             arguments.acid_mass_file,
+                             os.path.join(arguments.output_dir, 'reports'),
+                             arguments.dataset_name,
+                             arguments.tsl,
+                             arguments.fdrCalculation,
+                             arguments.increment,
+                             arguments.mmt,
+                             arguments.minP,
+                             arguments.maxP,
+                             arguments.decoys,
+                             arguments.prec,
+                             arguments.comp,
+                             arguments.reverse,
+                             arguments.database)
