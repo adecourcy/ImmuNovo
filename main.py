@@ -287,7 +287,7 @@ if __name__ == '__main__':
   
   analyzeOutputDir = os.path.join(arguments.output_dir, 'reports')
   os.makedirs(analyzeOutputDir)
-  AnalyzeResults.getAnalysis(arguments.output_dir,
+  AnalyzeResults.getAnalysis(os.path.join(arguments.output_dir, outputFile),
                              arguments.database_results_dir,
                              arguments.decoy_dir,
                              arguments.spec_dir,

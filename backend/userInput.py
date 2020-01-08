@@ -68,7 +68,7 @@ def parseOptionalArguments(parser, programDirectory):
   parser.add_argument('-drd', '--database-results-dir',
       dest='database_results_dir',
       default='',
-      help='A directory containing results of database search')
+      help='A directory or file containing results of database search')
   parser.add_argument('-os', '--Output-File-Suffix',
       dest='os',
       default='.out.csv',

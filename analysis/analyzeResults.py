@@ -67,7 +67,7 @@ def parseArguments():
 
   def checkExists(directory):
     if not os.path.exists(directory):
-      print("Directory: {} does not exist".format(directory))
+      print("{} does not exist".format(directory))
       sys.exit()
   
   def createDir(directory):
@@ -76,9 +76,9 @@ def parseArguments():
 
   parser = argparse.ArgumentParser()
 
-  parser.add_argument('immunovo_results_dir',
-                      dest='immunovo_results_dir',
-                      help='A directory containing results of the ImmuNovo Program')
+  parser.add_argument('immunovo_results',
+                      dest='immunovo_results',
+                      help='A directory or file containing results of the ImmuNovo Program')
   
   parser.add_argument('--update',
                        action='store_true',
@@ -86,9 +86,9 @@ def parseArguments():
   
   arguments = UserInput.parseArguments(os.getcwd())
 
-  arguments.immunovo_results_dir = \
-        os.path.abspath(arguments.immunovo_results_dir)
-  checkExists(arguments.immunovo_results_dir)
+  arguments.immunovo_results = \
+        os.path.abspath(arguments.immunovo_results)
+  checkExists(arguments.immunovo_results)
   return arguments
 
 
@@ -336,19 +336,25 @@ def mergeDataFrames(denovoDF, decoyDF, databaseDF, qValue):
   return combinedDF
 
 def importDenovoData(denovoDir):
-  dataframeList = []
-  for fileName in os.listdir(denovoDir):
-    fileLocation = os.path.join(denovoDir, fileName)
-    dataframeList.append(pd.read_csv(fileLocation))
-  return pd.concat(dataframeList)
+  if os.path.isdir(denovoDir):
+    dataframeList = []
+    for fileName in os.listdir(denovoDir):
+      fileLocation = os.path.join(denovoDir, fileName)
+      dataframeList.append(pd.read_csv(fileLocation))
+    return pd.concat(dataframeList)
+  elif os.path.isfile(denovoDir):
+    return pd.read_csv(denovoDir)
 
 def importDatabaseData(databaseDir, databaseType, minPepLength, maxPepLength):
   # databaseType only MSGF for now
 
-  combinedResults = []
-  for fileName in os.listdir(databaseDir):
-    combinedResults.append(pd.read_csv(os.path.join(databaseDir, fileName), sep='\t'))
-  dbDF = pd.concat(combinedResults)
+  if os.path.isdir(databaseDir):
+    combinedResults = []
+    for fileName in os.listdir(databaseDir):
+      combinedResults.append(pd.read_csv(os.path.join(databaseDir, fileName), sep='\t'))
+    dbDF = pd.concat(combinedResults)
+  elif os.path.isfile(databaseDir):
+    dbDF = pd.read_csv(databaseDir)
 
   if QVALUE in dbDF:
     dbDF = dbDF[['Title', 'Peptide', QVALUE]]
@@ -654,7 +660,7 @@ if __name__ == '__main__':
 
   arguments = parseArguments()
 
-  getAnalysis(arguments.immunovo_results_dir,
+  getAnalysis(arguments.immunovo_results,
               arguments.database_results_dir,
               arguments.decoy_dir,
               arguments.spec_dir,
