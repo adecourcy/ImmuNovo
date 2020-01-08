@@ -137,7 +137,7 @@ def peptidesForSpectrum(spectrumData, peptideDict, massTolerance, maxDecoys):
     for i in range(len(newDecoyPeptides)):
       spectrumTitles.append(spec)
     decoyPeptides += newDecoyPeptides
-  df = pd.DataFrame({TITLE_SPECTRUM: spectrumTitles, DECOYS: decoyPeptides})
+  df = pd.DataFrame({TITLE_SPECTRUM: spectrumTitles, PEPTIDE: decoyPeptides})
   return df
 
 def getPeptideDict(decoyPeptideDirectory,
