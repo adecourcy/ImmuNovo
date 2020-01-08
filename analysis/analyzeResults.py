@@ -402,7 +402,8 @@ def dataframeSetup(denovoResultsDirectory,
                    databaseType=MSGF):
   
   denovoDF = resultsFilter(importDenovoData(denovoResultsDirectory))
-
+  if len(denovoDF) == 0:
+    sys.exit()
   if fdrOnly:
     databaseDF = ''
   else:
