@@ -118,7 +118,6 @@ def checkInputLength(args):
 
 if __name__ == '__main__':
 
-
   programDir = os.path.dirname(os.path.abspath(__file__))
 
   cPath = os.path.join(os.path.join(programDir, "scoring"))
