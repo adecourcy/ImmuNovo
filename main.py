@@ -286,7 +286,8 @@ if __name__ == '__main__':
     outputFile.close()
   
   analyzeOutputDir = os.path.join(arguments.output_dir, 'reports')
-  os.makedirs(analyzeOutputDir)
+  if not os.path.exists(analyzeOutputDir):
+    os.makedirs(analyzeOutputDir)
   AnalyzeResults.getAnalysis(os.path.join(arguments.output_dir, outputFile),
                              arguments.database_results_dir,
                              arguments.decoy_dir,
