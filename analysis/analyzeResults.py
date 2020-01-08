@@ -568,7 +568,7 @@ def getAnalysis(denovoResultsDirectory,
   else:
     mergedDF = pd.read_csv(os.path.join(outputDirectory, 'scoredPeptides'))
   
-  if not qValue or databaseDF != '':
+  if not qValue and databaseDF != '':
     denovoDF, decoyDF, databaseDF = separateDataFrames(mergedDF, qValue)
   else:
     denovoDF, decoyDF = separateDataFrames(mergedDF, qValue)
@@ -590,7 +590,7 @@ def getAnalysis(denovoResultsDirectory,
                        increment,
                        fdrCalculationType)
 
-  if not qValue or databaseDF != '':
+  if not qValue and databaseDF != '':
     fdrDatabaseDF = addFDR(fdrDatabaseDF,
                            fdrDecoyDF,
                            scoreComparisionType,
