@@ -406,7 +406,7 @@ def dataframeSetup(denovoResultsDirectory,
   if len(denovoDF) == 0:
     sys.exit()
 
-  if fdrOnly:
+  if fdrOnly or databaseResultsDirectory == '':
     databaseDF = ''
   else:
     databaseDF = resultsFilter(importDatabaseData(databaseResultsDirectory,
