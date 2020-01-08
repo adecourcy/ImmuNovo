@@ -541,8 +541,6 @@ def getAnalysis(denovoResultsDirectory,
   
   # Slower, but do this after merge because we need a list of all peptides
   # for the conversion dictionary
-  denovoDF = addPeptideLength(denovoDF, peptideConversionDict)
-  decoyDF = addPeptideLength(decoyDF, peptideConversionDict)
   if databaseDF != '':
     databaseDF = addPeptideLength(databaseDF, peptideConversionDict)
   mergedDF = addPeptideLength(mergedDF, peptideConversionDict)
@@ -570,8 +568,11 @@ def getAnalysis(denovoResultsDirectory,
   
   if not qValue and databaseDF != '':
     denovoDF, decoyDF, databaseDF = separateDataFrames(mergedDF, qValue)
+    databaseDF.reset_index(drop=True, inplace=True)
   else:
     denovoDF, decoyDF = separateDataFrames(mergedDF, qValue)
+  denovoDF.reset_index(drop=True, inplace=True)
+  decoyDF.reset_index(drop=True, inplace=True)
   
   # No FDR yet, but we're going to add it to this variable
   fdrDenovoDF = filterTopPeptides(denovoDF, scoreComparisionType)
