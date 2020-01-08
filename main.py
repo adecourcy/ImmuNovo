@@ -288,7 +288,7 @@ if __name__ == '__main__':
   analyzeOutputDir = os.path.join(arguments.output_dir, 'reports')
   if not os.path.exists(analyzeOutputDir):
     os.makedirs(analyzeOutputDir)
-  AnalyzeResults.getAnalysis(os.path.join(arguments.output_dir, outputFile),
+  AnalyzeResults.getAnalysis(os.path.join(arguments.output_dir, spectrumFileName + arguments.os),
                              arguments.database_results_dir,
                              arguments.decoy_dir,
                              arguments.spec_dir,
