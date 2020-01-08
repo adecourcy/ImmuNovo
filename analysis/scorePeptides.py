@@ -274,9 +274,9 @@ def scorePeptidesPssm(peptideDF, conversionDict, allPSSM):
       getMaximalPssmScores(uniquePeptideDict, conversionDict, allPSSM)
 
   peptideDF[TITLE_PSSM] = \
-    peptideDF.apply(lambda x: scoredPeptideDict[x[PEPTIDE]][0])
+    peptideDF.apply(lambda x: scoredPeptideDict[x[PEPTIDE]][0], axis=1)
   peptideDF[SCORE_PSSM] = \
-    peptideDF.apply(lambda x: scoredPeptideDict[x[PEPTIDE]][1])
+    peptideDF.apply(lambda x: scoredPeptideDict[x[PEPTIDE]][1], axis=1)
   
   return peptideDF
 
