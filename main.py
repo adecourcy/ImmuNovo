@@ -285,6 +285,8 @@ if __name__ == '__main__':
 
     outputFile.close()
   
+  analyzeOutputDir = os.path.join(arguments.output_dir, 'reports')
+  os.makedirs(analyzeOutputDir)
   AnalyzeResults.getAnalysis(arguments.output_dir,
                              arguments.database_results_dir,
                              arguments.decoy_dir,
@@ -295,7 +297,7 @@ if __name__ == '__main__':
                              arguments.scoreType,
                              arguments.pssm_dir,
                              arguments.acid_mass_file,
-                             os.path.join(arguments.output_dir, 'reports'),
+                             analyzeOutputDir,
                              arguments.dataset_name,
                              arguments.tsl,
                              arguments.fdrCalculation,
