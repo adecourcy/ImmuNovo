@@ -204,9 +204,8 @@ def peptideSpectrumDict(peptideDF):
 
 ###############################################################################
 
-def scorePeptidesSpectrumOverlap(peptideDF,
+def scorePeptideSpectrumOverlap(peptideDF,
                                  conversionDict,
-                                 allPSSM,
                                  acidMassTable,
                                  conversionTable,
                                  H2OMassAdjusted,
@@ -266,7 +265,7 @@ def scorePeptidesSpectrumOverlap(peptideDF,
   peptideDF[SCORE_GLOBAL] = \
     peptideDF.apply(lambda x: specToPeptideDict[x[TITLE_SPECTRUM]][x[PEPTIDE]], axis=1)
 
-  return peptideDF, allPSSM
+  return peptideDF
 
 def scorePeptidesPssm(peptideDF, conversionDict, allPSSM):
   uniquePeptideDict = \
@@ -291,6 +290,7 @@ def getPeptideScores(peptideDF,
                      protonMassAdjusted,
                      spectrumDirectory,
                      scoringFunction,
+                     allPSSM,
                      precision=4,
                      minPepLength=9,
                      maxPepLength=12,
@@ -300,9 +300,8 @@ def getPeptideScores(peptideDF,
   if scoringFunction == CALCULATION_NN:
     pass
   elif scoringFunction == CALCULATION_OVERLAP_NEW:
-    peptideDF, allPSSM = scorePeptidesSpectrumOverlap(peptideDF,
+    peptideDF = scorePeptideSpectrumOverlap(peptideDF,
                                                       peptideConversionDict,
-                                                      allPSSM,
                                                       acidMassTable,
                                                       conversionTable,
                                                       H2OMassAdjusted,
@@ -316,9 +315,8 @@ def getPeptideScores(peptideDF,
                                                       maxMassTolerance,
                                                       compression)
   elif scoringFunction == CALCULATION_OVERLAP_OLD:
-    peptideDF, allPSSM = scorePeptidesSpectrumOverlap(peptideDF,
+    peptideDF = scorePeptideSpectrumOverlap(peptideDF,
                                                       peptideConversionDict,
-                                                      allPSSM,
                                                       acidMassTable,
                                                       conversionTable,
                                                       H2OMassAdjusted,
