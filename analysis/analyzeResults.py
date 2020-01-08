@@ -391,7 +391,7 @@ def filterTopPeptides(peptideDF, scoreType):
 
 def addPeptideLength(peptideDF, conversionDict):
   peptideDF[LENGTH] = \
-      peptideDF.apply(lambda x: len(conversionDict(x[PEPTIDE])), axis=1)
+      peptideDF.apply(lambda x: len(conversionDict[x[PEPTIDE]]), axis=1)
   return peptideDF
 
 def dataframeSetup(denovoResultsDirectory,
