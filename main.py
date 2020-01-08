@@ -168,7 +168,7 @@ if __name__ == '__main__':
                         spectrumFileName))
       continue
 
-    outputFile.write("Filename,{},{},{},,"
+    outputFile.write("Filename,{},{},{},"
                      "Precursor Mass,Precursor Error\n".format(TITLE_SPECTRUM,
                                                                TITLE_PSSM,
                                                                PEPTIDE))
