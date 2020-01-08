@@ -47,6 +47,7 @@ import analysis.findFDR as FindFDR
 import analysis.scorePeptides as ScorePeptides
 import analysis.selectDecoys as SelectDecoys
 import analysis.findUniquePeptides as FindUniquePeptides
+import backend.Structures.pssm as PSSM
 import backend.userInput as UserInput
 import backend.PreProcessing.misc as Misc
 from backend.constants import *
@@ -404,6 +405,7 @@ def dataframeSetup(denovoResultsDirectory,
   denovoDF = resultsFilter(importDenovoData(denovoResultsDirectory))
   if len(denovoDF) == 0:
     sys.exit()
+
   if fdrOnly:
     databaseDF = ''
   else:
@@ -436,7 +438,11 @@ def spectrumVariableSetup(acidMassFile,
                                                      precision,
                                                      pssmDir,
                                                      minPepLength,
-                                                     maxPepLength)
+                                                     maxPepLength,
+                                                     False)
+
+  allPSSM = PSSM.setForward(allPSSM)
+  
   H2OMassAdjusted = int(H2OMASS * (10**precision))
   NH3MassAdjusted = int(NH3MASS * (10**precision))
   protonMassAdjusted = int(PROTONMASS * (10**precision))
