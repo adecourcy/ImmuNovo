@@ -387,7 +387,8 @@ def filterTopPeptides(peptideDF, scoreType):
   # Take dataframe filtered by FDR, with scores, and return a dataframe
   # with only the top scoring peptide for each spectrum
 
-  return peptideDF[peptideDF.groupby([TITLE_SPECTRUM])[scoreType].transform(max) == peptideDF[scoreType]]
+  return peptideDF.iloc[[entry[1][scoreType].idxmax() for entry in peptideDF.groupby(TITLE_SPECTRUM)]]
+  
 
 def addPeptideLength(peptideDF, conversionDict):
   peptideDF[LENGTH] = \
@@ -581,8 +582,8 @@ def getAnalysis(denovoResultsDirectory,
       fdrDatabaseDF.reset_index(drop=True, inplace=True)
     else:
       fdrDatabaseDF = databaseDF
-    fdrDenovoDF.reset_index(drop=True, inplace=True)
-    fdrDecoyDF.reset_index(drop=True, inplace=True)
+  fdrDenovoDF.reset_index(drop=True, inplace=True)
+  fdrDecoyDF.reset_index(drop=True, inplace=True)
   
   fdrDenovoDF = addFDR(fdrDenovoDF,
                        fdrDecoyDF,
