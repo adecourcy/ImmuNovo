@@ -371,6 +371,7 @@ def resultsFilter(peptideDF):
   else:
     peptideDF = peptideDF[[PEPTIDE, TITLE_SPECTRUM]]
   peptideDF = peptideDF[peptideDF[PEPTIDE] != NO_PEP]
+  print(peptideDF)
   peptideDF[PEPTIDE] = peptideDF.apply(lambda x: x[PEPTIDE].replace('I', 'L'))
   peptideDF = peptideDF.drop_duplicates()
 
