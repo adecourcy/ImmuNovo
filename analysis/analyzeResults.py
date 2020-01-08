@@ -79,6 +79,10 @@ def parseArguments():
                       dest='immunovo_results_dir',
                       help='A directory containing results of the ImmuNovo Program')
   
+  parser.add_argument('--update',
+                       action='store_true',
+                       help='Used for diagnostic purposes')
+  
   arguments = UserInput.parseArguments(os.getcwd())
 
   arguments.immunovo_results_dir = \
@@ -208,10 +212,10 @@ def getPssmLengthDistributionString(pssmLengthDict, pssmLengthDistribution):
 
 
 def getSpectrumHits(peptideDF):
-  return set(peptideDF[TITLE_SPECTRUM].drop_duplicates())
+  return set(peptideDF[TITLE_SPECTRUM])
 
 def uniquePeptides(peptideDF):
-  return set(peptideDF[PEPTIDE].drop_duplicates())
+  return set(peptideDF[PEPTIDE])
 
 def generateTSLPeptides(length, number):
   # Fixed Amino Acid List for now
@@ -282,7 +286,7 @@ def convertAllPeptides(peptideList, acidConversion):
   allConversions.sort(key=lambda x: len(x), reverse=True)
   
   convertedPeptides = []
-  for peptide in peptideList:
+  for peptide in set(peptideList):
     convertedPeptides.append(convertPeptide(peptide, allConversions, acidConversion))
 
   return convertedPeptides
@@ -346,9 +350,10 @@ def importDatabaseData(databaseDir, databaseType, minPepLength, maxPepLength):
 
   if QVALUE in dbDF:
     dbDF = dbDF[['Title', 'Peptide', QVALUE]]
+    dbDF = dbDF.rename(columns = {'Title': TITLE_SPECTRUM, 'Peptide': PEPTIDE, QVALUE: FDR})
   else:
     dbDF = dbDF[['Title', 'Peptide']] # Add QValue
-  dbDF = dbDF.rename(columns = {'Title': TITLE_SPECTRUM, 'Peptide': PEPTIDE, QVALUE: FDR})
+    dbDF = dbDF.rename(columns = {'Title': TITLE_SPECTRUM, 'Peptide': PEPTIDE})
 
   dbDF['length'] = \
     dbDF.apply(lambda x: len([y for y in x[PEPTIDE] if y in string.ascii_letters]), axis=1)
@@ -360,8 +365,10 @@ def importDatabaseData(databaseDir, databaseType, minPepLength, maxPepLength):
 def resultsFilter(peptideDF):
   # Assume column headers are standard for peptides and spectrum titles
   # Assume lengths are filtered
-  # Assume not using QValue
-  peptideDF = peptideDF[[PEPTIDE, TITLE_SPECTRUM]]
+  if QVALUE in peptideDF:
+    peptideDF = peptideDF[[PEPTIDE, TITLE_SPECTRUM, QVALUE]]
+  else:
+    peptideDF = peptideDF[[PEPTIDE, TITLE_SPECTRUM]]
   peptideDF = peptideDF[peptideDF[PEPTIDE] != NO_PEP]
   peptideDF[PEPTIDE] = peptideDF.apply(lambda x: x[PEPTIDE].replace('I', 'L'))
   peptideDF = peptideDF.drop_duplicates()
@@ -405,15 +412,15 @@ def dataframeSetup(denovoResultsDirectory,
                                                   maxPeptideLength))
 
   decoyDF = resultsFilter(SelectDecoys.selectDecoyPeptides(decoyPeptideDirectory,
-                                                          spectrumFileDirectory,
-                                                          acidMassTable,
-                                                          acidConversionTable,
-                                                          massTolerance,
-                                                          minPeptideLength,
-                                                          maxPeptideLength,
-                                                          maxDecoys,
-                                                          precision,
-                                                          reverse))
+                                                           spectrumFileDirectory,
+                                                           acidMassTable,
+                                                           acidConversionTable,
+                                                           massTolerance,
+                                                           minPeptideLength,
+                                                           maxPeptideLength,
+                                                           maxDecoys,
+                                                           precision,
+                                                           reverse))
 
   return denovoDF, decoyDF, databaseDF
 
@@ -472,6 +479,8 @@ def getAnalysis(denovoResultsDirectory,
                 dataSetName,
                 tslLocation,
                 fdrCalculationType,
+                fdrOnly,
+                update,
                 increment=0.01,
                 massTolerance=35,
                 minPeptideLength=9,
@@ -488,13 +497,14 @@ def getAnalysis(denovoResultsDirectory,
                                                                   minPeptideLength,
                                                                   maxPeptideLength,
                                                                   precision)
-  
+
   denovoDF, decoyDF, databaseDF = dataframeSetup(denovoResultsDirectory,
                                                  databaseResultsDirectory,
                                                  decoyPeptideDirectory,
                                                  spectrumFileDirectory,
                                                  acidMassTable,
                                                  acidConversionTable,
+                                                 fdrOnly,
                                                  massTolerance,
                                                  minPeptideLength,
                                                  maxPeptideLength,
@@ -505,29 +515,43 @@ def getAnalysis(denovoResultsDirectory,
   
   mergedDF = mergeDataFrames(denovoDF, decoyDF, databaseDF, qValue)
 
-  peptideConversionDict = \
-      createConversionDict(list(mergedDF[PEPTIDE]), acidConversionTable)
+  if not update:
+    peptideConversionDict = \
+        createConversionDict(list(mergedDF[PEPTIDE]), acidConversionTable)
+    
+    with open(os.path.join(outputDirectory, 'conversionDictionary'), 'w') as f:
+      f.write(peptideConversionDict)
+  else:
+    with open(os.path.join(outputDirectory, 'conversionDictionary')) as f:
+      peptideConversionDict = eval(f.read())
   
+  # Slower, but do this after merge because we need a list of all peptides
+  # for the conversion dictionary
   denovoDF = addPeptideLength(denovoDF, peptideConversionDict)
   decoyDF = addPeptideLength(decoyDF, peptideConversionDict)
   if databaseDF != '':
     databaseDF = addPeptideLength(databaseDF, peptideConversionDict)
-  mergedDF = addPeptideLength(denovoDF, peptideConversionDict)
+  mergedDF = addPeptideLength(mergedDF, peptideConversionDict)
 
-  mergedDF = ScorePeptides.getPeptideScores(mergedDF,
-                                            peptideConversionDict,
-                                            acidMassTable,
-                                            acidConversionTable,
-                                            H2OMASSAdjusted,
-                                            NH3MASSAdjusted,
-                                            protonMassAdjusted,
-                                            spectrumFileDirectory,
-                                            scoringFunctionChoice,
-                                            precision,
-                                            minPeptideLength,
-                                            maxPeptideLength,
-                                            massTolerance,
-                                            compression)
+  if not update:
+    mergedDF = ScorePeptides.getPeptideScores(mergedDF,
+                                              peptideConversionDict,
+                                              acidMassTable,
+                                              acidConversionTable,
+                                              H2OMASSAdjusted,
+                                              NH3MASSAdjusted,
+                                              protonMassAdjusted,
+                                              spectrumFileDirectory,
+                                              scoringFunctionChoice,
+                                              precision,
+                                              minPeptideLength,
+                                              maxPeptideLength,
+                                              massTolerance,
+                                              compression)
+    
+    mergedDF.to_csv(os.path.join(outputDirectory, 'scoredPeptides'))
+  else:
+    mergedDF = pd.read_csv(os.path.join(outputDirectory, 'scoredPeptides'))
   
   if not qValue or databaseDF != '':
     denovoDF, decoyDF, databaseDF = separateDataFrames(mergedDF, qValue)
@@ -566,7 +590,6 @@ def getAnalysis(denovoResultsDirectory,
 
   ############# Do Analysis ####################
 
-  # Using our original Dataframes
   outputFileName = os.path.join(outputDirectory, 'report.txt')
 
   with open(outputFileName, 'w') as f:
@@ -575,30 +598,33 @@ def getAnalysis(denovoResultsDirectory,
       uniquePeptidesDatabase = uniquePeptides(fdrDatabaseDF)
     f.write('FDR used: {}\n'.format(fdrCutoff))
     f.write('\n')
-    f.write('Denovo Spectrum Matches: {}\n'.format(getSpectrumHits(denovoDF)))
+    f.write('Denovo Spectrum Matches: {}\n'.format(len(getSpectrumHits(denovoDF))))
     if databaseDF != '':
-      f.write('Database Spectrum Matches: {}\n'.format(getSpectrumHits(databaseDF)))
+      f.write('Database Spectrum Matches: {}\n'.format(len(getSpectrumHits(databaseDF))))
     f.write('\n')
-    f.write('Denovo Unique Peptides Found: {}\n'.format(uniquePeptidesDenovo))
-    f.write('Database Unique Peptides Found: {}\n'.format(uniquePeptidesDatabase))
+    f.write('Denovo Unique Peptides Found: {}\n'.format(len(uniquePeptidesDenovo)))
     if databaseDF != '':
-      f.write('Overlap: {}\n'.format(getOverlap(fdrDenovoDF, fdrDatabaseDF)))
+      f.write('Database Unique Peptides Found: {}\n'.format(len(uniquePeptidesDatabase)))
+      f.write('Overlap: {}\n'.format(len(getOverlap(uniquePeptidesDenovo, \
+                                                    uniquePeptidesDatabase))))
     f.write('\n')
 
     f.write('Length Distribution:\n')
     lengthCountDenovo = getLengthCountDict(fdrDenovoDF)
-    if databaseDF != '':
-      lengthCountDatabase = getLengthCountDict(fdrDatabaseDF)
     lengthDistributionDenovo = \
       getLengthDistribution(lengthCountDenovo, uniquePeptidesDenovo)
-    lengthDistributionDatabase = \
-      getLengthDistribution(lengthCountDatabase, uniquePeptidesDatabase)
     f.write('Denovo Length Distribution:\n')
     f.write(getLengthDistributionString(lengthCountDenovo, lengthDistributionDenovo))
     f.write('\n')
-    f.write('Database Length Distribution:\n')
-    f.write(getLengthDistributionString(lengthCountDatabase, lengthDistributionDatabase))
-    f.write('\n\n')
+
+    if databaseDF != '':
+      lengthCountDatabase = getLengthCountDict(fdrDatabaseDF)
+      lengthDistributionDatabase = \
+        getLengthDistribution(lengthCountDatabase, uniquePeptidesDatabase)
+      f.write('Database Length Distribution:\n')
+      f.write(getLengthDistributionString(lengthCountDatabase, lengthDistributionDatabase))
+      f.write('\n')
+    f.write('\n')
 
 
     pssmDistributionDict = getPSSMDistributionDict(fdrDenovoDF)
@@ -634,6 +660,8 @@ if __name__ == '__main__':
               arguments.dataset_name,
               arguments.tsl,
               arguments.fdrCalculation,
+              arguments.fdrOnly,
+              arguments.update,
               arguments.increment,
               arguments.mmt,
               arguments.minP,

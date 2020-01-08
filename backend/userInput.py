@@ -207,6 +207,9 @@ def parseOptionalArguments(parser, programDirectory):
   parser.add_argument('--qValue',
                        action='store_true',
                        help='Use the qValue for MSGF FDR calculation')
+  parser.add_argument('--fdrOnly',
+                       action='store_true',
+                       help='Only calculate the FDR for ImmuNovo results, do not include database search')
       
   return parser
 

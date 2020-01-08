@@ -344,6 +344,8 @@ if __name__ == '__main__':
                              arguments.dataset_name,
                              arguments.tsl,
                              arguments.fdrCalculation,
+                             arguments.fdrOnly,
+                             False,
                              arguments.increment,
                              arguments.mmt,
                              arguments.minP,
