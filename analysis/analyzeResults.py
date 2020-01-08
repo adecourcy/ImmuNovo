@@ -48,7 +48,7 @@ import analysis.scorePeptides as ScorePeptides
 import analysis.selectDecoys as SelectDecoys
 import analysis.findUniquePeptides as FindUniquePeptides
 import backend.userInput as UserInput
-from main import getAminoVariables
+import backend.PreProcessing.misc as Misc
 from backend.constants import *
 
 QVALUE = 'QValue'
@@ -431,11 +431,11 @@ def spectrumVariableSetup(acidMassFile,
                           precision):
 
   allPSSM, acidMassTable, conversionTable = \
-                              getAminoVariables(acidMassFile,
-                                                precision,
-                                                pssmDir,
-                                                minPepLength,
-                                                maxPepLength)
+                              Misc.getAminoVariables(acidMassFile,
+                                                     precision,
+                                                     pssmDir,
+                                                     minPepLength,
+                                                     maxPepLength)
   H2OMassAdjusted = int(H2OMASS * (10**precision))
   NH3MassAdjusted = int(NH3MASS * (10**precision))
   protonMassAdjusted = int(PROTONMASS * (10**precision))

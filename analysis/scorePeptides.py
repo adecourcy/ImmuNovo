@@ -20,7 +20,7 @@ import backend.Structures.pssm as PSSM
 import backend.PostProcessing.processResults as processResults
 import backend.PostProcessing.processResultsOld as processResultsOld
 import backend.PreProcessing.acidConversion as AcidConversion
-from main import getAminoVariables
+import backend.PreProcessing.misc as Misc
 from backend.constants import *
 
 
@@ -175,11 +175,11 @@ def spectrumVariableSetup(acidMassFile,
                           precision):
 
   allPSSM, acidMassTable, conversionTable = \
-                              getAminoVariables(acidMassFile,
-                                                precision,
-                                                pssmDir,
-                                                minPepLength,
-                                                maxPepLength)
+                              Misc.getAminoVariables(acidMassFile,
+                                                     precision,
+                                                     pssmDir,
+                                                     minPepLength,
+                                                     maxPepLength)
   H2OMassAdjusted = int(H2OMASS * (10**precision))
   NH3MassAdjusted = int(NH3MASS * (10**precision))
   protonMassAdjusted = int(PROTONMASS * (10**precision))

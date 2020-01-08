@@ -11,6 +11,7 @@ import backend.Structures.spectrum as Spectrum
 import backend.PreProcessing.acidConversion as AcidConversion
 import backend.PreProcessing.spectrumConversion as SpectrumConversion
 import backend.PostProcessing.processResults as ProcessResults
+import backend.PreProcessing.misc as Misc
 import analysis.analyzeResults as AnalyzeResults
 from backend.constants import *
 from backend.userInput import *
@@ -115,51 +116,6 @@ def checkInputLength(args):
     improperNumArgumentsOutput()
 
 
-def getAminoVariables(acidMassFile,
-                      precision,
-                      pssmDir,
-                      minPepLength,
-                      maxPepLength,
-                      bEnd):
-
-  acidMassTable = \
-      AcidMassTable.adjustForPrecision(
-          AcidMassTableIO.getAminoMasses(acidMassFile),
-          precision)
-  
-  aminoAcids = AcidMassTable.getAcids(acidMassTable)
-
-  allPSSM = \
-      PSSM.adjustForPrecision(
-          PSSMIO.getAllPSSM(pssmDir,
-                            minPepLength,
-                            maxPepLength,
-                            aminoAcids,
-                            bEnd),
-          precision)
-
-  conversionTable = \
-      AcidConversion.createAcidConversionTable([acid for acid in acidMassTable])
-
-  if conversionTable == {}:
-    print("Currently this program only accepts up to 23 amino acids total\n")
-    print("The mass file you have provided has more than 23 amino acids defined\n")
-    print("Other files may also have too many masses but haven't been checked\n"
-          "by the program at this time\n")
-    clean(fileList)
-    exit()
-
-  # quick and dirty way to make sure all our amino masses match for now
-  sanityCheck(allPSSM, acidMassTable)
-
-  acidMassTable, allPSSM = \
-      AcidConversion.convertAcidModifications(acidMassTable,
-                                              allPSSM,
-                                              conversionTable)
-  
-  return allPSSM, acidMassTable, conversionTable
-
-
 if __name__ == '__main__':
 
 
@@ -188,12 +144,12 @@ if __name__ == '__main__':
 
   arguments = parseArguments(os.path.dirname(os.path.abspath(os.path.realpath(__file__))))
   allPSSM, acidMassTable, conversionTable = \
-                              getAminoVariables(arguments.acid_mass_file,
-                                                arguments.prec,
-                                                arguments.pssm_dir,
-                                                arguments.minP,
-                                                arguments.maxP,
-                                                arguments.bEnd)
+                              Misc.getAminoVariables(arguments.acid_mass_file,
+                                                     arguments.prec,
+                                                     arguments.pssm_dir,
+                                                     arguments.minP,
+                                                     arguments.maxP,
+                                                     arguments.bEnd)
 
 
   H2OMassAdjusted = int(H2OMASS * (10**arguments.prec))
