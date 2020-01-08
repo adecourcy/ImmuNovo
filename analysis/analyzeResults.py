@@ -331,9 +331,10 @@ def mergeDataFrames(denovoDF, decoyDF, databaseDF, qValue):
   combinedDF = pd.concat([denovoDF, decoyDF])
   print(databaseDF)
   print(databaseDF == '')
-  if (not qValue) or (databaseDF != ''):
-    databaseDF[SOURCE] = [SOURCE_DATABASE for i in range(len(databaseDF))]
-    combinedDF = pd.concat([combinedDF, databaseDF])
+  if not qValue:
+    if databaseDF != '':
+      databaseDF[SOURCE] = [SOURCE_DATABASE for i in range(len(databaseDF))]
+      combinedDF = pd.concat([combinedDF, databaseDF])
   return combinedDF
 
 def importDenovoData(denovoDir):
