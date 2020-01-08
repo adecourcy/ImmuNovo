@@ -568,11 +568,8 @@ def getAnalysis(denovoResultsDirectory,
   
   if not qValue and databaseDF != '':
     denovoDF, decoyDF, databaseDF = separateDataFrames(mergedDF, qValue)
-    databaseDF.reset_index(drop=True, inplace=True)
   else:
     denovoDF, decoyDF = separateDataFrames(mergedDF, qValue)
-  denovoDF.reset_index(drop=True, inplace=True)
-  decoyDF.reset_index(drop=True, inplace=True)
   
   # No FDR yet, but we're going to add it to this variable
   fdrDenovoDF = filterTopPeptides(denovoDF, scoreComparisionType)
@@ -581,8 +578,11 @@ def getAnalysis(denovoResultsDirectory,
   if databaseDF != '':
     if not qValue:
       fdrDatabaseDF = filterTopPeptides(databaseDF, scoreComparisionType)
+      fdrDatabaseDF.reset_index(drop=True, inplace=True)
     else:
       fdrDatabaseDF = databaseDF
+    fdrDenovoDF.reset_index(drop=True, inplace=True)
+    fdrDecoyDF.reset_index(drop=True, inplace=True)
   
   fdrDenovoDF = addFDR(fdrDenovoDF,
                        fdrDecoyDF,
