@@ -328,10 +328,10 @@ def separateDataFrames(df, qValue):
 def mergeDataFrames(denovoDF, decoyDF, databaseDF, qValue):
   denovoDF[SOURCE] = [SOURCE_DENOVO for i in range(len(denovoDF))]
   decoyDF[SOURCE] = [SOURCE_DECOY for i in range(len(decoyDF))]
-  combinedDF = pd.concat(denovoDF, decoyDF)
+  combinedDF = pd.concat([denovoDF, decoyDF])
   if not qValue or databaseDF != '':
     databaseDF[SOURCE] = [SOURCE_DATABASE for i in range(databaseDF)]
-    combinedDF = pd.concat(combinedDF, databaseDF)
+    combinedDF = pd.concat([combinedDF, databaseDF])
   return combinedDF
 
 def importDenovoData(denovoDir):
