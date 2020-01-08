@@ -1,5 +1,3 @@
-from decimal import Decimal
-
 import argparse
 import os
 import sys
@@ -274,7 +272,7 @@ def parseParameterInput(args):
        "minP": 9,
        "maxP": 12,
        "BIN": 5, # bin size
-       "BPEN": Decimal(0.5), # b-ion penalty
+       "BPEN": 0.5, # b-ion penalty
        "COMP": 2, # log compression rate
        "TOLP": 0.5, # mass tolerance penalty
        "DEBUG": 0,
@@ -300,7 +298,7 @@ def parseParameterInput(args):
           badValues.append((argKey, argValue))
           continue
 
-        defaultParameters[argKey] = Decimal(converted)
+        defaultParameters[argKey] = float(converted)
 
       elif argKey == "OUT":
         defaultParameters[argKey] = argValue

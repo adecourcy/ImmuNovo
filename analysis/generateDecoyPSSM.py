@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 from random import shuffle
-from decimal import Decimal
 import sys, os
 from copy import deepcopy
 
@@ -11,7 +10,7 @@ def decoyMatrixString(matrix):
   for entry in matrix:
     entry = entry.split()
     aminos.append(entry[0])
-    probs.append([Decimal(x) for x in entry[1:]])
+    probs.append([float(x) for x in entry[1:]])
 
   columnMatrix = []
   for col in range(len(probs[0])):

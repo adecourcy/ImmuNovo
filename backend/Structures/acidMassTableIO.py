@@ -1,4 +1,3 @@
-from decimal import Decimal
 
 def getAminoMasses(file):
   try:
@@ -11,5 +10,5 @@ def getAminoMasses(file):
 
   for line in aminoMassFile:
     amino, mass = line.split()
-    aminos[amino] = Decimal(mass)
+    aminos[amino] = float(mass)
   return aminos

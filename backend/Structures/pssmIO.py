@@ -1,4 +1,3 @@
-from decimal import Decimal
 from os import listdir, path
 import sys
 
@@ -67,7 +66,7 @@ def _parsePSSM(file, bEnd):
                          len(scores)))
         sys.exit()
 
-      pssm[length][acid] = [Decimal(x) for x in scores]
+      pssm[length][acid] = [float(x) for x in scores]
 
   return pssm
 

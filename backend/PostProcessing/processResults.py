@@ -1,16 +1,15 @@
 from typing import *
-from decimal import Decimal
 from math import sqrt
 
 class Node:
   def __init__(self,
                peptideString: str,
-               mass: Decimal,
-               precursorError: Decimal,
-               adjustedScore: Decimal,
-               unadjustedScore: Decimal,
-               massScore: Decimal,
-               aminoScore: Decimal,
+               mass: float,
+               precursorError: float,
+               adjustedScore: float,
+               unadjustedScore: float,
+               massScore: float,
+               aminoScore: float,
                globalScore,
                combinedScore):
     self.peptideString = peptideString
@@ -72,7 +71,7 @@ def processResults(resultsFile: str,
                    precision: int,
                    acidConversion: List[Tuple[str, str]]) -> List[Node]:
 
-  decPrec = Decimal(10 ** precision)
+  decPrec = float(10 ** precision)
   results = open(resultsFile, "r")
   nodes = []
 
@@ -81,12 +80,12 @@ def processResults(resultsFile: str,
     if peptideString == "":
       break
 
-    mass = Decimal(results.readline()) / decPrec
+    mass = float(results.readline()) / decPrec
     precursorMass = results.readline()
-    adjustedScore = Decimal(results.readline()) / decPrec
-    unadjustedScore = Decimal(results.readline()) / decPrec
-    massScore = Decimal(results.readline()) / decPrec
-    aminoScore = (Decimal(results.readline()) / decPrec) / len(peptideString)
+    adjustedScore = float(results.readline()) / decPrec
+    unadjustedScore = float(results.readline()) / decPrec
+    massScore = float(results.readline()) / decPrec
+    aminoScore = (float(results.readline()) / decPrec) / len(peptideString)
     globalScore  = 0
 
     combinedScore = 0

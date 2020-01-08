@@ -1,14 +1,13 @@
-from decimal import Decimal
 from math import log
 from typing import *
 
-def processSpectrum(spectrumMasses: List[Decimal],
-                    spectrumScores: List[Decimal],
-                    pepMass: Decimal,
-                    H2OMass: Decimal,
-                    protonMass: Decimal,
+def processSpectrum(spectrumMasses: List[float],
+                    spectrumScores: List[float],
+                    pepMass: float,
+                    H2OMass: float,
+                    protonMass: float,
                     charge: int,
-                    compressionRate: int) -> Tuple[List[Decimal], List[Decimal]]:
+                    compressionRate: int) -> Tuple[List[float], List[float]]:
 
   spectrumMasses, spectrumScores = _filterSpectrum(spectrumMasses,
                                                   spectrumScores)
@@ -42,8 +41,8 @@ def processSpectrum(spectrumMasses: List[Decimal],
           spectrumScores, spectrumScoresDouble)
 
 
-def _filterSpectrum(spectrumMasses: List[Decimal],
-                   spectrumScores: List[Decimal]) -> Tuple[List[Decimal], List[Decimal]]:
+def _filterSpectrum(spectrumMasses: List[float],
+                   spectrumScores: List[float]) -> Tuple[List[float], List[float]]:
 
   for i in range(len(spectrumMasses)-1, -1, -1):
     if spectrumScores[i] == 0:
@@ -53,20 +52,20 @@ def _filterSpectrum(spectrumMasses: List[Decimal],
   return (spectrumMasses, spectrumScores)
 
 
-def _compressScores(spectrumScores: List[Decimal],
-                   compressionRate: int) -> List[Decimal]:
+def _compressScores(spectrumScores: List[float],
+                   compressionRate: int) -> List[float]:
 
   for i in range(0, len(spectrumScores)):
-    spectrumScores[i] = Decimal(log(float(spectrumScores[i]), compressionRate))
+    spectrumScores[i] = log(float(spectrumScores[i]), compressionRate)
 
   return spectrumScores
 
 
-def _eliminatePepMass(spectrumMasses: List[Decimal],
-                     spectrumScores: List[Decimal],
-                     pepMass: Decimal,
-                     H2OMass: Decimal,
-                     charge: int) -> Tuple[List[Decimal], List[Decimal]]:
+def _eliminatePepMass(spectrumMasses: List[float],
+                     spectrumScores: List[float],
+                     pepMass: float,
+                     H2OMass: float,
+                     charge: int) -> Tuple[List[float], List[float]]:
 
   increment = int(10 / charge)
   if charge == 2:
@@ -137,21 +136,21 @@ def _eliminatePepMass(spectrumMasses: List[Decimal],
   return (spectrumMasses, spectrumScores)
 
 
-def _createDoubleChargeMassSpectrum(spectrumMasses: List[Decimal],
-                                   protonMass: Decimal) -> List[Decimal]:
+def _createDoubleChargeMassSpectrum(spectrumMasses: List[float],
+                                   protonMass: float) -> List[float]:
 
   doubleChargedSpectrum = [2*mass - protonMass for mass in spectrumMasses]
 
   return doubleChargedSpectrum
 
 
-def _addFinalMass(spectrumMasses: List[Decimal],
-                 spectrumMassesDouble: List[Decimal],
-                 spectrumScores: List[Decimal],
-                 pepMass: Decimal,
+def _addFinalMass(spectrumMasses: List[float],
+                 spectrumMassesDouble: List[float],
+                 spectrumScores: List[float],
+                 pepMass: float,
                  charge: int,
-                 protonMass: Decimal,
-                 H2OMass: Decimal) -> Tuple[List[Decimal], List[Decimal]]:
+                 protonMass: float,
+                 H2OMass: float) -> Tuple[List[float], List[float]]:
 
   spectrumScoresDouble = [x for x in spectrumScores]
   pepMass = (pepMass * charge) - (protonMass * (charge - 1))
@@ -167,7 +166,7 @@ def _addFinalMass(spectrumMasses: List[Decimal],
     spectrumScores = spectrumScores[:splitIndex]
     
   spectrumMasses.append(pepMass)
-  spectrumScores.append(Decimal(1))
+  spectrumScores.append(1.0)
 
   splitIndex = 0
   for i in range(0, len(spectrumMassesDouble)):
@@ -185,10 +184,10 @@ def _addFinalMass(spectrumMasses: List[Decimal],
   return (spectrumMasses, spectrumMassesDouble, spectrumScores, spectrumScoresDouble)
 
 
-def adjustSpectrumPrecision(spectrumMasses: List[Decimal],
-                            spectrumMassesDouble: List[Decimal],
-                            spectrumScores: List[Decimal],
-                            spectrumScoresDouble: List[Decimal],
+def adjustSpectrumPrecision(spectrumMasses: List[float],
+                            spectrumMassesDouble: List[float],
+                            spectrumScores: List[float],
+                            spectrumScoresDouble: List[float],
                             precision):
 
   spectrumMasses = [int(x * (10**precision)) for x in spectrumMasses]

@@ -1,8 +1,7 @@
-from decimal import Decimal
 
-PROTONMASS=Decimal("1.0072766")
-H2OMASS=Decimal("18.01528")
-NH3MASS=Decimal("17.03052")
+PROTONMASS=1.0072766
+H2OMASS=18.01528
+NH3MASS=17.03052
 
 
 # Constants for CSV Headers

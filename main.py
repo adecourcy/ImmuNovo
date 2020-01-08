@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import sys, os
-from decimal import Decimal
 
 import backend.Structures.pssmIO as PSSMIO
 import backend.Structures.acidMassTableIO as AcidMassTableIO

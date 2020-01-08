@@ -1,4 +1,3 @@
-from decimal import *
 
 def getSpectrums(file):
 
@@ -42,15 +41,15 @@ def _parseSpectrumFile(spectrumFile):
       nextLine = spectrumFile.readline()
       continue
     if 'PEPMASS=' in nextLine:
-      spectrum['pepMass'] = Decimal(nextLine.split('=')[1].split()[0])
+      spectrum['pepMass'] = float(nextLine.split('=')[1].split()[0])
     elif 'CHARGE=' in nextLine:
       spectrum['charge'] = int(nextLine.split('=')[1][0])
     elif 'TITLE=' in nextLine:
       spectrum['title'] = nextLine.split('=')[1].strip().replace(",", '').split()[0]
     elif nextLine[0].isdigit():
       mass, intensity = nextLine.split()
-      spectrum['masses'].append(Decimal(mass))
-      spectrum['intensities'].append(Decimal(intensity))
+      spectrum['masses'].append(float(mass))
+      spectrum['intensities'].append(float(intensity))
     nextLine = spectrumFile.readline()
 
   return spectrum

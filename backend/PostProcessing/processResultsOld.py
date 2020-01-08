@@ -1,16 +1,15 @@
 from typing import *
-from decimal import Decimal
 from math import sqrt
 
 class Node:
   def __init__(self,
                peptideString: str,
-               mass: Decimal,
-               precursorError: Decimal,
-               adjustedScore: Decimal,
-               totalScore: Decimal,
-               massScore: Decimal,
-               aminoScore: Decimal,
+               mass: float,
+               precursorError: float,
+               adjustedScore: float,
+               totalScore: float,
+               massScore: float,
+               aminoScore: float,
                globalScore):
     self.peptideString = peptideString
     self.mass = mass
@@ -74,7 +73,7 @@ def processResults(resultsFile: str,
                    precision: int,
                    acidConversion: List[Tuple[str, str]]) -> List[Node]:
 
-  decPrec = Decimal(10 ** precision)
+  decPrec = float(10 ** precision)
   results = open(resultsFile, "r")
   nodes = []
 
@@ -100,12 +99,12 @@ def processResults(resultsFile: str,
                                         maxMassTolerance)
       
     nodes.append(Node(deConvertPeptideString(peptideString[::-1], acidConversion),
-                      Decimal(mass) / decPrec,
-                      Decimal(precursorMass),
-                      Decimal(adjustedScore) / decPrec,
-                      Decimal(totalScore) / decPrec,
-                      Decimal(massScore) / decPrec,
-                      Decimal(aminoScore) / decPrec,
+                      float(mass) / decPrec,
+                      float(precursorMass),
+                      float(adjustedScore) / decPrec,
+                      float(totalScore) / decPrec,
+                      float(massScore) / decPrec,
+                      float(aminoScore) / decPrec,
                       globalScore))
 
   nodes.sort()
