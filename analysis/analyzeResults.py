@@ -289,15 +289,15 @@ def convertAllPeptides(peptideList, acidConversion):
   
   convertedPeptides = []
   for peptide in set(peptideList):
-    convertedPeptides.append(convertPeptide(peptide, allConversions, acidConversion))
+    convertedPeptides.append((peptide, convertPeptide(peptide, allConversions, acidConversion)))
 
   return convertedPeptides
 
 def createConversionDict(peptideList, conversionTable):
   convertedPeptides = convertAllPeptides(peptideList, conversionTable)
   conversionDict = {}
-  for pep, convertedPep in zip(peptideList, convertedPeptides):
-    conversionDict[pep] = convertedPep
+  for pepInfo in convertedPeptides:
+    conversionDict[pepInfo[0]] = pepInfo[1]
   return conversionDict
 
 def createPeptideByLengthDict(peptideDF):
@@ -541,10 +541,6 @@ def getAnalysis(denovoResultsDirectory,
     with open(os.path.join(outputDirectory, 'conversionDictionary')) as f:
       peptideConversionDict = eval(f.read())
   
-  # Slower, but do this after merge because we need a list of all peptides
-  # for the conversion dictionary
-  if databaseDF != '':
-    databaseDF = addPeptideLength(databaseDF, peptideConversionDict)
   mergedDF = addPeptideLength(mergedDF, peptideConversionDict)
 
   if not update:
