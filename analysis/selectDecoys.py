@@ -118,7 +118,6 @@ def getDecoys(mass, peptideDict, massTolerance, maxDecoys):
   possibles = []
 
   minDiff, maxDiff = massToleranceMaxDiff(mass, massTolerance)
-  # mass is wrong
   for mass in range(minDiff, maxDiff+1):
     if mass in peptideDict:
       possibles += peptideDict[mass]
