@@ -171,7 +171,7 @@ def fileToDict(peptideFileName,
     if pepLine == "":
       break
     length, peptide, mass = pepLine.strip().split(',')
-    mass = int(round((10 ** precision) * (float(mass) + PROTONMASS) ))
+    mass = int(round((10 ** precision) * (float(mass))))
     length = int(length)
 
     if reverse:
@@ -207,7 +207,6 @@ def selectDecoyPeptides(decoyPeptideDirectory,
                                minPeptideLength,
                                maxPeptideLength,
                                reverse)
-  print("******************** {}".format(sum([len(peptideDict[x]) for x in peptideDict])))
 
   decoyDataframe = \
       peptidesForSpectrum(spectrumData, peptideDict, massTolerance, maxDecoys)
