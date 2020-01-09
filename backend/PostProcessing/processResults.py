@@ -353,6 +353,7 @@ def generateTheoreticalSpectrum(acidMassTable: Dict[str, int],
                               True)
 
   spectrum = yEnd + bEnd
+  # add H20 mass here?
   final = protonMassModified
   for i in range(0, len(peptideString)):
     final += acidMassTable[peptideString[i]]
@@ -376,13 +377,13 @@ def generateSpectrumList(aminoMassesModified: Dict[str, int],
   else:
     additiveMass = protonMassModified
 
-  spectrum = [aminoMassesModified[peptideString[0]] + additiveMass]
+  spectrum = [int(aminoMassesModified[peptideString[0]] + additiveMass))]
 
   for i in range(1, len(peptideString)-1):
-    spectrum.append(spectrum[-1] + aminoMassesModified[peptideString[i]])
+    spectrum.append(int(spectrum[-1] + aminoMassesModified[peptideString[i]]))
 
-  spectrumMinusNH3 = [x - NH3MassModified for x in spectrum]
-  spectrumMinusH2O = [x - H2OMassModified for x in spectrum]
+  spectrumMinusNH3 = [int(x - NH3MassModified) for x in spectrum]
+  spectrumMinusH2O = [int(x - H2OMassModified) for x in spectrum]
 
   spectrum += spectrumMinusNH3
   spectrum += spectrumMinusH2O

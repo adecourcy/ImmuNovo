@@ -198,6 +198,7 @@ def adjustSpectrumPrecision(spectrumMasses: List[float],
   return spectrumMasses, spectrumMassesDouble, \
           spectrumScores, spectrumScoresDouble
 
+
 def mergeMassesScores(spec, specDouble, score, scoreDouble):
   specTup = []
   specDoubleTup = []

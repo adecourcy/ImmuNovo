@@ -13,12 +13,12 @@ def getMasses(spectrum):
 def getIntensities(spectrum):
   return spectrum['intensities']
 
-def adjustForPrecision(spectrum, precision):
+# def adjustForPrecision(spectrum, precision):
 
-  newSpectrum = {'title': spectrum['title'],
-                 'pepMass': int(spectrum['pepMass'] * precision),
-                 'charge': spectrum['charge'],
-                 'masses': [int(precision * x) for x in spectrum['masses']],
-                 'intensities': [int(precision * x) for x in spectrum['intensities']]}
+#   newSpectrum = {'title': spectrum['title'],
+#                  'pepMass': int(spectrum['pepMass'] * precision),
+#                  'charge': spectrum['charge'],
+#                  'masses': [int(precision * x) for x in spectrum['masses']],
+#                  'intensities': [int(precision * x) for x in spectrum['intensities']]}
 
-  return newSpectrum
+#   return newSpectrum

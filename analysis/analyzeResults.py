@@ -457,7 +457,7 @@ def spectrumVariableSetup(acidMassFile,
   protonMassAdjusted = int(PROTONMASS * (10**precision))
 
   return allPSSM, acidMassTable, conversionTable, \
-         H2OMASS, NH3MASS, protonMassAdjusted
+         H2OMassAdjusted, NH3MassAdjusted, protonMassAdjusted
 
 
 def addFDR(fdrTargetDF,
