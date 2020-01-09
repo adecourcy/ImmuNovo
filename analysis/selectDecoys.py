@@ -93,7 +93,9 @@ def extractSpectrumInformation(spectrumFileDirectory, precision):
     precursorMasses = []
     titles = []
     for spectrum in SpectrumIO.getSpectrums(spectrumFile):
-      precursorMasses.append(int(round((10 ** precision) * float(Spectrum.getPrecursorMass(spectrum)))))
+      charge = Spectrum.getCharge(spectrum)
+      precursorMasses.append(int(round((10 ** precision) * \
+          ((float(Spectrum.getPrecursorMass(spectrum) * charge) - (PROTONMASS * (charge - 1)))))))
       titles.append(Spectrum.getTitle(spectrum))
     return pd.DataFrame({TITLE_SPECTRUM: titles,
                          PRECURSOR_MASS: precursorMasses})
@@ -116,7 +118,7 @@ def getDecoys(mass, peptideDict, massTolerance, maxDecoys):
   possibles = []
 
   minDiff, maxDiff = massToleranceMaxDiff(mass, massTolerance)
-
+  # mass is wrong
   for mass in range(minDiff, maxDiff+1):
     if mass in peptideDict:
       possibles += peptideDict[mass]
