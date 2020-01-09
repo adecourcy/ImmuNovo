@@ -544,6 +544,7 @@ def getAnalysis(denovoResultsDirectory,
   mergedDF = addPeptideLength(mergedDF, peptideConversionDict)
 
   if not update:
+    mergedDF = mergedDF[mergedDF[SOURCE] == SOURCE_DECOY]
     mergedDF = ScorePeptides.getPeptideScores(mergedDF,
                                               peptideConversionDict,
                                               acidMassTable,
