@@ -207,6 +207,7 @@ def selectDecoyPeptides(decoyPeptideDirectory,
                                minPeptideLength,
                                maxPeptideLength,
                                reverse)
+  print("******************** {}".format(sum([len(peptideDict[x]) for x in peptideDict])))
 
   decoyDataframe = \
       peptidesForSpectrum(spectrumData, peptideDict, massTolerance, maxDecoys)
