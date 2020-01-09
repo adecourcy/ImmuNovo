@@ -91,8 +91,9 @@ def hitOrMissDataframe(resultsDF, decoyDF, scoreType):
     lambda row: True if row[RESULT_IMMUNO] - row[RESULTS_DECOY] >= 0 \
                      else False
 
-  merged[RESULTS_DELTA] = \
-      merged.apply(thresholdCalc, axis=1)
+  if len(merged) != 0:
+    merged[RESULTS_DELTA] = \
+        merged.apply(thresholdCalc, axis=1)
 
   return merged
 
@@ -214,6 +215,8 @@ def addFDR(dataFrame, fdrCutoffs, scoreType, increment=0.01):
 def addFDRToDataframe(targetDF, decoyDF, scoreType, precision=3, increment=0.01):
 
   hitOrMissDF = hitOrMissDataframe(targetDF, decoyDF, scoreType)
+  if len(hitOrMissDF) == 0:
+    return hitOrMissDF
   fdrCutoffs = findFDR(hitOrMissDF, precision)
   fdrDF = addFDR(targetDF, fdrCutoffs, scoreType, increment)
 

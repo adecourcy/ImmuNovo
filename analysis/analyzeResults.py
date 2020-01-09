@@ -387,7 +387,6 @@ def resultsFilter(peptideDF):
 def filterTopPeptides(peptideDF, scoreType):
   # Take dataframe filtered by FDR, with scores, and return a dataframe
   # with only the top scoring peptide for each spectrum
-  peptidDF = deepcopy(peptideDF)
 
   return peptideDF.loc[[entry[1][scoreType].idxmax() for entry in peptideDF.groupby(TITLE_SPECTRUM)]]
   
@@ -602,9 +601,12 @@ def getAnalysis(denovoResultsDirectory,
                            increment,
                            fdrCalculationType)
   
+  if len(fdrDenovoDF) == 0:
+    sys.exit()
+  
 
   fdrDenovoDF, fdrCutoff = closestFDR(fdrDenovoDF, fdrCutoff, increment)
-  if databaseDF != '':
+  if databaseDF != '' and len(fdrDatabaseDF) > 0:
     fdrDatabaseDF = fdrDatabaseDF[fdrDatabaseDF[FDR] >= fdrCutoff]
 
   ############# Do Analysis ####################
@@ -613,16 +615,16 @@ def getAnalysis(denovoResultsDirectory,
 
   with open(outputFileName, 'w') as f:
     uniquePeptidesDenovo = uniquePeptides(fdrDenovoDF)
-    if databaseDF != '':
+    if databaseDF != '' and len(fdrDatabaseDF) > 0:
       uniquePeptidesDatabase = uniquePeptides(fdrDatabaseDF)
     f.write('FDR used: {}\n'.format(fdrCutoff))
     f.write('\n')
     f.write('Denovo Spectrum Matches: {}\n'.format(len(getSpectrumHits(denovoDF))))
-    if databaseDF != '':
+    if databaseDF != '' and len(fdrDatabaseDF) > 0:
       f.write('Database Spectrum Matches: {}\n'.format(len(getSpectrumHits(databaseDF))))
     f.write('\n')
     f.write('Denovo Unique Peptides Found: {}\n'.format(len(uniquePeptidesDenovo)))
-    if databaseDF != '':
+    if databaseDF != '' and len(fdrDatabaseDF) > 0:
       f.write('Database Unique Peptides Found: {}\n'.format(len(uniquePeptidesDatabase)))
       f.write('Overlap: {}\n'.format(len(getOverlap(uniquePeptidesDenovo, \
                                                     uniquePeptidesDatabase))))
@@ -636,7 +638,7 @@ def getAnalysis(denovoResultsDirectory,
     f.write(getLengthDistributionString(lengthCountDenovo, lengthDistributionDenovo))
     f.write('\n')
 
-    if databaseDF != '':
+    if databaseDF != '' and len(fdrDatabaseDF) > 0:
       lengthCountDatabase = getLengthCountDict(fdrDatabaseDF)
       lengthDistributionDatabase = \
         getLengthDistribution(lengthCountDatabase, uniquePeptidesDatabase)
