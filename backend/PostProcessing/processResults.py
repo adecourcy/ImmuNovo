@@ -377,13 +377,13 @@ def generateSpectrumList(aminoMassesModified: Dict[str, int],
   else:
     additiveMass = protonMassModified
 
-  spectrum = [int(aminoMassesModified[peptideString[0]] + additiveMass))]
+  spectrum = [aminoMassesModified[peptideString[0]] + additiveMass]
 
   for i in range(1, len(peptideString)-1):
-    spectrum.append(int(spectrum[-1] + aminoMassesModified[peptideString[i]]))
+    spectrum.append(spectrum[-1] + aminoMassesModified[peptideString[i]])
 
-  spectrumMinusNH3 = [int(x - NH3MassModified) for x in spectrum]
-  spectrumMinusH2O = [int(x - H2OMassModified) for x in spectrum]
+  spectrumMinusNH3 = [x - NH3MassModified for x in spectrum]
+  spectrumMinusH2O = [x - H2OMassModified for x in spectrum]
 
   spectrum += spectrumMinusNH3
   spectrum += spectrumMinusH2O
