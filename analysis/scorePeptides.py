@@ -332,7 +332,7 @@ def getPeptideScores(peptideDF,
                                             compression)
 
   peptideDF = scorePeptidesPssm(peptideDF, peptideConversionDict, allPSSM)
-  peptideDF[SCORE_PSSM] /= (10 ** precision) # sloppy place to put this, but too late
+  peptideDF[SCORE_PSSM] /= (10 ** precision) # sloppy place to put this, but it was an afterthought
 
   peptideDF[SCORE_COMBINED] = peptideDF[SCORE_GLOBAL] * peptideDF[SCORE_PSSM]
   

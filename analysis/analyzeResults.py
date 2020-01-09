@@ -387,7 +387,7 @@ def filterTopPeptides(peptideDF, scoreType):
   # Take dataframe filtered by FDR, with scores, and return a dataframe
   # with only the top scoring peptide for each spectrum
 
-  return peptideDF.iloc[[entry[1][scoreType].idxmax() for entry in peptideDF.groupby(TITLE_SPECTRUM)]]
+  return peptideDF.loc[[entry[1][scoreType].idxmax() for entry in peptideDF.groupby(TITLE_SPECTRUM)]]
   
 
 def addPeptideLength(peptideDF, conversionDict):
