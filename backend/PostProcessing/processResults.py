@@ -208,6 +208,8 @@ def calculateGlobalScore(acidMassTable: Dict[str, int],
                                   H2OMassModified,
                                   NH3MassModified,
                                   peptideString)
+  print(theoreticalSpectrum[-1])
+  print(experimentalSpectrum[-1])
 
   experimentalVector, experimentalIntenseVector = \
         createExperimentalVector(theoreticalSpectrum,
