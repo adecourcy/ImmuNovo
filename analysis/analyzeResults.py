@@ -51,6 +51,7 @@ import backend.Structures.pssm as PSSM
 import backend.userInput as UserInput
 import backend.PreProcessing.misc as Misc
 from backend.constants import *
+from copy import deepcopy
 
 QVALUE = 'QValue'
 SOURCE = 'SOURCE'
@@ -386,6 +387,7 @@ def resultsFilter(peptideDF):
 def filterTopPeptides(peptideDF, scoreType):
   # Take dataframe filtered by FDR, with scores, and return a dataframe
   # with only the top scoring peptide for each spectrum
+  peptidDF = deepcopy(peptideDF)
 
   return peptideDF.loc[[entry[1][scoreType].idxmax() for entry in peptideDF.groupby(TITLE_SPECTRUM)]]
   
