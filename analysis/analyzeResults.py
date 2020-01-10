@@ -78,7 +78,6 @@ def parseArguments():
   parser = argparse.ArgumentParser()
 
   parser.add_argument('immunovo_results',
-                      dest='immunovo_results',
                       help='A directory or file containing results of the ImmuNovo Program')
   
   parser.add_argument('--update',
