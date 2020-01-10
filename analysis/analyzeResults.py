@@ -79,14 +79,12 @@ def parseArguments():
 
   parser.add_argument('immunovo_results',
                       help='A directory or file containing results of the ImmuNovo Program')
-  #parser = UserInput.parseDefaultArguments(parser)
-  #parser = UserInput.parseOptionalArguments(parser, os.getcwd())
   
   parser.add_argument('--update',
                        action='store_true',
                        help='Used for diagnostic purposes')
   
-  arguments = UserInput.parseArguments(os.getcwd())
+  arguments = UserInput.parseArgumentsHelper(os.getcwd(), parser)
 
   arguments.immunovo_results = \
         os.path.abspath(arguments.immunovo_results)
