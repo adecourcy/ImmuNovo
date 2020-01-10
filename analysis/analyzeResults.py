@@ -552,6 +552,8 @@ def getAnalysis(denovoResultsDirectory,
       peptideConversionDict = eval(f.read())
 
   mergedDF = addPeptideLength(mergedDF, peptideConversionDict)
+  mergedDF = mergedDF[mergedDF[LENGTH] >= minPeptideLength]
+  mergedDF = mergedDF[mergedDF[LENGTH] <= maxPeptideLength]
 
   if not update:
     mergedDF = ScorePeptides.getPeptideScores(mergedDF,
