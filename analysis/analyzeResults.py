@@ -84,7 +84,7 @@ def parseArguments():
                        action='store_true',
                        help='Used for diagnostic purposes')
   
-  arguments = UserInput.parseArgumentsHelper(os.getcwd(), parser)
+  arguments = UserInput.parseArgumentsSetup(os.getcwd(), parser)
 
   arguments.immunovo_results = \
         os.path.abspath(arguments.immunovo_results)
