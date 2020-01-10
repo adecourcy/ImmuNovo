@@ -404,6 +404,7 @@ def dataframeSetup(denovoResultsDirectory,
                    acidMassTable,
                    acidConversionTable,
                    fdrOnly,
+                   update,
                    massTolerance=35,
                    minPeptideLength=9,
                    maxPeptideLength=12,
@@ -522,6 +523,7 @@ def getAnalysis(denovoResultsDirectory,
                                                  acidMassTable,
                                                  acidConversionTable,
                                                  fdrOnly,
+                                                 update,
                                                  massTolerance,
                                                  minPeptideLength,
                                                  maxPeptideLength,
@@ -538,14 +540,10 @@ def getAnalysis(denovoResultsDirectory,
     
     with open(os.path.join(outputDirectory, 'conversionDictionary'), 'w') as f:
       f.write(str(peptideConversionDict))
+  # Also need to write decoy selection, otherwised this won't match
   else:
     with open(os.path.join(outputDirectory, 'conversionDictionary')) as f:
       peptideConversionDict = eval(f.read())
-  
-  for entry in peptideConversionDict:
-    if peptideConversionDict[entry] != entry:
-      print('{}: {}'.format(entry, peptideConversionDict[entry]))
-  sys.exit()
 
   mergedDF = addPeptideLength(mergedDF, peptideConversionDict)
 
