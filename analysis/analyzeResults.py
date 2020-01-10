@@ -542,6 +542,11 @@ def getAnalysis(denovoResultsDirectory,
     with open(os.path.join(outputDirectory, 'conversionDictionary')) as f:
       peptideConversionDict = eval(f.read())
   
+  for entry in peptideConversionDict:
+    if peptideConversionDict[entry] != entry:
+      print('{}: {}'.format(entry, peptideConversionDict[entry]))
+  sys.exit()
+
   mergedDF = addPeptideLength(mergedDF, peptideConversionDict)
 
   if not update:
