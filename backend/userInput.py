@@ -6,6 +6,16 @@ from backend.constants import *
 
 
 def parseArguments(programDirectory, parser=None):
+  
+  if parser == None:
+    parser = argparse.ArgumentParser()
+  parser = parseDefaultArguments(parser)
+  parser = parseOptionalArguments(parser, programDirectory)
+
+  return parseArgumentsSetup(programDirectory, parser)
+
+
+def parseArgumentsSetup(programDirectory, parser):
 
   def getAbsPath(location):
     return os.path.abspath(location)
@@ -18,11 +28,6 @@ def parseArguments(programDirectory, parser=None):
   def createDir(directory):
     if not os.path.exists(directory):
       os.makedirs(directory)
-
-  if parser == None:
-    parser = argparse.ArgumentParser()
-  parser = parseDefaultArguments(parser)
-  parser = parseOptionalArguments(parser, programDirectory)
 
   arguments = parser.parse_args()
 
