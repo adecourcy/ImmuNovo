@@ -405,6 +405,7 @@ def dataframeSetup(denovoResultsDirectory,
                    acidConversionTable,
                    fdrOnly,
                    update,
+                   outputDirectory,
                    massTolerance=35,
                    minPeptideLength=9,
                    maxPeptideLength=12,
@@ -425,16 +426,20 @@ def dataframeSetup(denovoResultsDirectory,
                                                   minPeptideLength,
                                                   maxPeptideLength))
 
-  decoyDF = resultsFilter(SelectDecoys.selectDecoyPeptides(decoyPeptideDirectory,
-                                                           spectrumFileDirectory,
-                                                           acidMassTable,
-                                                           acidConversionTable,
-                                                           massTolerance,
-                                                           minPeptideLength,
-                                                           maxPeptideLength,
-                                                           maxDecoys,
-                                                           precision,
-                                                           reverse))
+  if not update:
+    decoyDF = resultsFilter(SelectDecoys.selectDecoyPeptides(decoyPeptideDirectory,
+                                                            spectrumFileDirectory,
+                                                            acidMassTable,
+                                                            acidConversionTable,
+                                                            massTolerance,
+                                                            minPeptideLength,
+                                                            maxPeptideLength,
+                                                            maxDecoys,
+                                                            precision,
+                                                            reverse))
+    decoyDF.to_csv(os.path.join(outputDirectory, 'decoy_peptides.csv'))
+  else:
+    decoyDF = pd.read_csv(os.path.join(outputDirectory, 'decoy_peptides.csv'))
 
   return denovoDF, decoyDF, databaseDF
 
@@ -524,6 +529,7 @@ def getAnalysis(denovoResultsDirectory,
                                                  acidConversionTable,
                                                  fdrOnly,
                                                  update,
+                                                 outputDirectory,
                                                  massTolerance,
                                                  minPeptideLength,
                                                  maxPeptideLength,
