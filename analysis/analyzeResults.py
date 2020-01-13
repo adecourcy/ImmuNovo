@@ -556,11 +556,12 @@ def getAnalysis(denovoResultsDirectory,
     with open(os.path.join(outputDirectory, 'conversionDictionary')) as f:
       peptideConversionDict = eval(f.read())
 
-  mergedDF = addPeptideLength(mergedDF, peptideConversionDict)
-  mergedDF = mergedDF[mergedDF[LENGTH] >= minPeptideLength]
-  mergedDF = mergedDF[mergedDF[LENGTH] <= maxPeptideLength]
-
   if not update:
+
+    mergedDF = addPeptideLength(mergedDF, peptideConversionDict)
+    mergedDF = mergedDF[mergedDF[LENGTH] >= minPeptideLength]
+    mergedDF = mergedDF[mergedDF[LENGTH] <= maxPeptideLength]
+
     mergedDF = ScorePeptides.getPeptideScores(mergedDF,
                                               peptideConversionDict,
                                               acidMassTable,
