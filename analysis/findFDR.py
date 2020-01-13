@@ -85,7 +85,7 @@ def hitOrMissDataframe(resultsDF, decoyDF, scoreType):
 
   merged = \
     pd.merge(resultsDF.rename(columns={scoreType: RESULT_IMMUNO})[[TITLE_SPECTRUM, RESULT_IMMUNO]],
-              decoyDF.rename(columns={scoreType: RESULTS_DECOY}))[[TITLE_SPECTRUM, RESULTS_DECOY]]
+              decoyDF.rename(columns={scoreType: RESULTS_DECOY})[[TITLE_SPECTRUM, RESULTS_DECOY]])
   
   thresholdCalc = \
     lambda row: True if row[RESULT_IMMUNO] - row[RESULTS_DECOY] >= 0 \
