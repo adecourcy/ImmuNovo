@@ -414,7 +414,12 @@ def dataframeSetup(denovoResultsDirectory,
                    reverse=False,
                    databaseType=MSGF):
   
-  denovoDF = resultsFilter(importDenovoData(denovoResultsDirectory))
+  if not update:
+    denovoDF = resultsFilter(importDenovoData(denovoResultsDirectory))
+    denovoDF.to_csv(os.path.join(outputDirectory, 'denovo_peptides.csv'))
+  else:
+    denovoDF = pd.read_csv(os.path.join(outputDirectory, 'denovo_peptides.csv'))
+
   if len(denovoDF) == 0:
     sys.exit()
 
