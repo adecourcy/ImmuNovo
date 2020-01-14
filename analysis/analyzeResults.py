@@ -342,7 +342,7 @@ def mergeDataFrames(denovoDF, decoyDF, databaseDF, qValue):
   if not qValue:
     if databaseDF != '':
       databaseDF[SOURCE] = [SOURCE_DATABASE for i in range(len(databaseDF))]
-      combinedDF = pd.concat([combinedDF, databaseDF])
+      combinedDF = pd.concat([combinedDF, databaseDF[[PEPTIDE, TITLE_SPECTRUM]]])
   return combinedDF
 
 def importDenovoData(denovoDir):
@@ -366,8 +366,8 @@ def importDatabaseData(databaseDir, databaseType, minPepLength, maxPepLength):
   elif os.path.isfile(databaseDir):
     dbDF = pd.read_csv(databaseDir)
 
-  if FDR in dbDF:
-    dbDF = dbDF[['Title', 'Peptide', FDR]]
+  if QVALUE in dbDF:
+    dbDF = dbDF[['Title', 'Peptide', QVALUE]]
     dbDF = dbDF.rename(columns = {'Title': TITLE_SPECTRUM, 'Peptide': PEPTIDE, QVALUE: FDR})
   else:
     dbDF = dbDF[['Title', 'Peptide']] # Add QValue
@@ -556,9 +556,9 @@ def getAnalysis(denovoResultsDirectory,
                                                  databaseType,
                                                  decoyFile)
   
-  mergedDF = mergeDataFrames(denovoDF, decoyDF, databaseDF, qValue)
-
   if not update:
+    mergedDF = mergeDataFrames(denovoDF, decoyDF, databaseDF, qValue)
+
     peptideConversionDict = \
         createConversionDict(list(mergedDF[PEPTIDE]), acidConversionTable)
     
