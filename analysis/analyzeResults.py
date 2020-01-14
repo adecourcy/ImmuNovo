@@ -80,6 +80,10 @@ def parseArguments():
   parser.add_argument('immunovo_results',
                       help='A directory or file containing results of the ImmuNovo Program')
   parser = UserInput.parseDefaultArguments(parser)
+  parser.add_argument('-df', '--decoy-file',
+      dest='decoy_file',
+      default='',
+      help='File of decoy peptides for a spectrum file')
   parser = UserInput.parseOptionalArguments(parser, os.getcwd())
   
   parser.add_argument('--update',
@@ -178,10 +182,10 @@ def getPssmLengthDistribution(pssmByLengthDict):
     totalFinds = 0
     lengthDistribution = {}
     for length in lengthDict:
-      totalFinds += lengthDict[length]
+      totalFinds += len(lengthDict[length])
     for length in lengthDict:
       lengthDistribution[length] = \
-          round((lengthDict[length] / totalFinds) * 10**2, 2)
+          round((len(lengthDict[length]) / totalFinds) * 10**2, 2)
     return lengthDistribution
   pssmLengthDistribution = {}
   for pssmTitle in pssmByLengthDict:
@@ -412,7 +416,8 @@ def dataframeSetup(denovoResultsDirectory,
                    maxDecoys=10,
                    precision=4,
                    reverse=False,
-                   databaseType=MSGF):
+                   databaseType=MSGF,
+                   decoyFile=''):
   
   if not update:
     denovoDF = resultsFilter(importDenovoData(denovoResultsDirectory))
@@ -431,7 +436,7 @@ def dataframeSetup(denovoResultsDirectory,
                                                   minPeptideLength,
                                                   maxPeptideLength))
 
-  if not update:
+  if (not update) and (decoyFile == ''):
     decoyDF = resultsFilter(SelectDecoys.selectDecoyPeptides(decoyPeptideDirectory,
                                                             spectrumFileDirectory,
                                                             acidMassTable,
@@ -443,8 +448,10 @@ def dataframeSetup(denovoResultsDirectory,
                                                             precision,
                                                             reverse))
     decoyDF.to_csv(os.path.join(outputDirectory, 'decoy_peptides.csv'))
-  else:
+  elif update:
     decoyDF = pd.read_csv(os.path.join(outputDirectory, 'decoy_peptides.csv'))
+  else:
+    decoyDF = pd.read_csv(decoyFile)
 
   return denovoDF, decoyDF, databaseDF
 
@@ -517,7 +524,8 @@ def getAnalysis(denovoResultsDirectory,
                 precision=4,
                 compression=2,
                 reverse=False,
-                databaseType=MSGF):
+                databaseType=MSGF,
+                decoyFile=''):
 
   allPSSM, acidMassTable, acidConversionTable, H2OMASSAdjusted, \
     NH3MASSAdjusted, protonMassAdjusted = spectrumVariableSetup(acidMassFile,
@@ -541,7 +549,8 @@ def getAnalysis(denovoResultsDirectory,
                                                  maxDecoys,
                                                  precision,
                                                  reverse,
-                                                 databaseType)
+                                                 databaseType,
+                                                 decoyFile)
   
   mergedDF = mergeDataFrames(denovoDF, decoyDF, databaseDF, qValue)
 
@@ -705,4 +714,5 @@ if __name__ == '__main__':
               arguments.prec,
               arguments.comp,
               arguments.reverse,
-              arguments.database)
+              arguments.database,
+              arguments.decoy_file)
