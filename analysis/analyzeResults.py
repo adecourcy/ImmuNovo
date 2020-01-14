@@ -243,6 +243,9 @@ def printGraphicTSL(pssmDistributionDict, dataSetName, tslLocation, outputDirect
     # We're just going to strip the peptide modifications and call it good
     # enough for this
     return ''.join([x for x in peptide if x in string.ascii_letters])
+  
+  oldCWD = os.getcwd()
+  os.chdir(os.path.dirname(tslLocation))
 
   tmpPeptideFile = os.path.join(outputDirectory, 'tmpPep.txt')
   tmpDecoyFile = os.path.join(outputDirectory, 'tmpDecoy.txt')
@@ -266,6 +269,7 @@ def printGraphicTSL(pssmDistributionDict, dataSetName, tslLocation, outputDirect
                                                                                 pssmName.replace('.csv.pssm', '')).split())
   os.remove(tmpPeptideFile)
   os.remove(tmpDecoyFile)
+  os.chdir(oldCWD)
 
 def getPSSMDistributionDict(peptideDF):
   # Return a dictionary: dict[pssmTitel][peptideLength] = set(peptides)
@@ -680,10 +684,10 @@ def getAnalysis(denovoResultsDirectory,
     pssmLengthDistributionDict = getPssmLengthDistribution(pssmDistributionDict)
     f.write(getPssmLengthDistributionString(pssmDistributionDict, pssmLengthDistributionDict))
 
-  # printGraphicTSL(getPSSMDistributionDict(fdrDenovoDF),
-  #                 dataSetName,
-  #                 tslLocation,
-  #                 outputDirectory)
+  printGraphicTSL(getPSSMDistributionDict(fdrDenovoDF),
+                  dataSetName,
+                  tslLocation,
+                  outputDirectory)
 
 
 if __name__ == '__main__':
