@@ -264,14 +264,17 @@ def findFDROld(targetScores, decoyScores):
   targetIndex = 0
   decoyIndex = 0
 
+  numTargetPeptides = len(targetScores)
+  numDecoyPeptides = len(decoyScores)
+
   while targetIndex < len(targetScores):
     decoyIndex = \
         nextDecoyIndex(decoyIndex, decoyScores, targetScores[targetIndex])
     if decoyIndex == -1:
       fdrList.append(0.0)
     else:
-      fdrList.append(len(decoyScores[decoyIndex:]) / \
-            (len(decoyScores[decoyIndex:]) + len(targetScores[targetIndex:])))
+      fdrList.append((numDecoyPeptides - decoyIndex) / \
+            ((numDecoyPeptides - decoyIndex) + (numTargetPeptides - targetIndex)))
     targetIndex += 1
   
   return dynamicFDR(max(fdrList), targetScores, fdrList)
