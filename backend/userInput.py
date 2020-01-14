@@ -86,10 +86,12 @@ def parseOptionalArguments(parser, programDirectory):
       help='The name of the current dataset being processed')
   parser.add_argument('-f', '--FDR',
       dest='fdr',
+      type=float,
       default = 0.01,
       help='The target FDR', type=float)
   parser.add_argument('-i', '--increment',
       dest='increment',
+      type=float,
       default=0.01,
       help='If the target FDR is not found, increment FDR by this amount until a valid FDR is found')
   
@@ -167,6 +169,7 @@ def parseOptionalArguments(parser, programDirectory):
   
   parser.add_argument('-md', '--max-decoys',
                         dest='decoys',
+                        type=int,
                         default=10,
                         help='The number of decoy peptides to be considered in calculating FDR')
 
@@ -188,12 +191,14 @@ def parseOptionalArguments(parser, programDirectory):
   parser.add_argument('-sc', '--Spectrum-Comparsion',
                         dest='spectrumComparison',
                         choices=[0,1],
+                        type=int,
                         default=0,
                         help='The spectrum comparison function to be used:\n' \
                              '0 for the new comparison function\n' \
                              '1 for the old comparison function')
   parser.add_argument('-fc', '--FDR-Calculation',
                         choices=[0,1],
+                        type=int,
                         dest='fdrCalculation',
                         default=0,
                         help='The fdr calculation to be used:\n' \
