@@ -88,7 +88,7 @@ def parseOptionalArguments(parser, programDirectory):
       dest='fdr',
       type=float,
       default = 0.01,
-      help='The target FDR', type=float)
+      help='The target FDR')
   parser.add_argument('-i', '--increment',
       dest='increment',
       type=float,
