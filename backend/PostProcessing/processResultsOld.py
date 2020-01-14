@@ -1,5 +1,7 @@
 from typing import *
 from math import sqrt
+import sys
+import os
 
 # cheap hack until I can figure out how to do this properly in
 # python 3.6
