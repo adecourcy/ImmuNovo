@@ -106,14 +106,14 @@ def dynamicFDR(maxFDR, scoreList, calculatedFDRs, increment=0.01, scoreIndex=0, 
 
   # Return (score, fdr) sorted lowest to highest by fdr
 
-  def getMinScoreIndex(calcs):
-    minScore = math.inf
-    minIndex = -1
-    for i in range(len(calcs)):
-      if calcs[i] < minScore:
-        minScore = calcs[i]
-        minIndex = i
-    return minScore, minIndex
+  # def getMinScoreIndex(calcs):
+  #   minScore = math.inf
+  #   minIndex = -1
+  #   for i in range(len(calcs)):
+  #     if calcs[i] < minScore:
+  #       minScore = calcs[i]
+  #       minIndex = i
+  #   return minScore, minIndex
   
 
   def createThresholdList(theoreticalFDRs):
@@ -139,23 +139,34 @@ def dynamicFDR(maxFDR, scoreList, calculatedFDRs, increment=0.01, scoreIndex=0, 
   # We don't need to track paths, only score to FDR thresholds
   prevThresholdList = createThresholdList(theoreticalFDRs)
 
+  scoreIndexTracker = [0 for i in range(len(theoreticalFDRs))]
+
   for cIndex in range(1, len(calculatedFDRs)):
-    currentCalc = []
     cFDR = calculatedFDRs[cIndex] #### !!!!! Is this right? Should be cIndex-1? !!!!! 
     prevScore = scoreList[cIndex - 1]
     newThresholdList = {}
     for tIndex in range(len(theoreticalFDRs)):
-      minPrevScore, minPrevIndex = getMinScoreIndex(prevCalc[:tIndex+1])
+      #minPrevScore, minPrevIndex = getMinScoreIndex(prevCalc[:tIndex+1])
+      minPrevScore, minPrevIndex = scoreIndexTracker[tIndex]
+
       tFDR = theoreticalFDRs[tIndex]
       prevFDR = theoreticalFDRs[minPrevIndex]
 
-      currentCalc.append(abs(cFDR - tFDR) + minPrevScore)
+      currentScore = abs(cFDR - tFDR) + minPrevScore
+      if tIndex == 0:
+        scoreIndexTracker[0] = (currentScore, 0)
+      elif currentScore < oldScore:
+        scoreIndexTracker[tIndex] = (currentScore, tIndex)
+      else:
+        scoreIndexTracker[tIndex] = (oldScore, oldIndex)
+      oldScore, oldIndex = scoreIndexTracker[tIndex]
+
       newThresholdList[tFDR] = deepcopy(prevThresholdList[prevFDR])
       newThresholdList[tFDR][prevFDR] = prevScore
     
-    prevThresholdList = deepcopy(newThresholdList)
-    prevCalc = deepcopy(currentCalc)
+    prevThresholdList = newThresholdList
   
+
   finalThresholds = prevThresholdList[maxFDR]
   if finalThresholds[maxFDR] == 0:
     finalThresholds[maxFDR] = scoreList[-1]
