@@ -642,9 +642,9 @@ def getAnalysis(denovoResultsDirectory,
       uniquePeptidesDatabase = uniquePeptides(fdrDatabaseDF)
     f.write('FDR used: {}\n'.format(fdrCutoff))
     f.write('\n')
-    f.write('Denovo Spectrum Matches: {}\n'.format(len(getSpectrumHits(denovoDF))))
+    f.write('Denovo Spectrum Matches: {}\n'.format(len(getSpectrumHits(fdrDenovoDF))))
     if databaseDF != '' and len(fdrDatabaseDF) > 0:
-      f.write('Database Spectrum Matches: {}\n'.format(len(getSpectrumHits(databaseDF))))
+      f.write('Database Spectrum Matches: {}\n'.format(len(getSpectrumHits(fdrDatabaseDF))))
     f.write('\n')
     f.write('Denovo Unique Peptides Found: {}\n'.format(len(uniquePeptidesDenovo)))
     if databaseDF != '' and len(fdrDatabaseDF) > 0:

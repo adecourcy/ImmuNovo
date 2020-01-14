@@ -1,6 +1,12 @@
 from typing import *
 from math import sqrt
 
+# cheap hack until I can figure out how to do this properly in
+# python 3.6
+sys.path.append(os.path.split(os.path.split(os.path.split(os.path.realpath(__file__))[0])[0])[0])
+
+import backend.PostProcessing.processResults as ProcessResults
+
 class Node:
   def __init__(self,
                peptideString: str,
@@ -123,12 +129,12 @@ def calculateGlobalScore(aminoMassesModified: Dict[str, int],
                          maxMassTolerance: int) -> float:
 
   theoreticalSpectrum, yEnd, bEnd = \
-      generateTheoreticalSpectrum(aminoMassesModified,
-                                  peptideString,
-                                  protonMassModified,
-                                  H2OMassModified,
-                                  NH3MassModified,
-                                  peptideString)
+      ProcessResults.generateTheoreticalSpectrum(aminoMassesModified,
+                                                 peptideString,
+                                                 protonMassModified,
+                                                 H2OMassModified,
+                                                 NH3MassModified,
+                                                 peptideString)
 
   theoreticalVector = createTheoreticalVector(theoreticalSpectrum,
                                               experimentalSpectrum,
@@ -201,62 +207,62 @@ def massTolerance(calculatedMass: int,
               * 1000000))
 
 
-def generateTheoreticalSpectrum(aminoMassesModified: Dict[str, int],
-                                peptideString: str,
-                                protonMassModified: int,
-                                H2OMassModified: int,
-                                NH3MassModified: int,
-                                peptideCharge: int) -> List[int]:
+# def generateTheoreticalSpectrum(aminoMassesModified: Dict[str, int],
+#                                 peptideString: str,
+#                                 protonMassModified: int,
+#                                 H2OMassModified: int,
+#                                 NH3MassModified: int,
+#                                 peptideCharge: int) -> List[int]:
 
-  bEnd = generateSpectrumList(aminoMassesModified,
-                              peptideString,
-                              protonMassModified,
-                              H2OMassModified,
-                              NH3MassModified,
-                              peptideCharge,
-                              False)
+#   bEnd = generateSpectrumList(aminoMassesModified,
+#                               peptideString,
+#                               protonMassModified,
+#                               H2OMassModified,
+#                               NH3MassModified,
+#                               peptideCharge,
+#                               False)
 
-  yEnd = generateSpectrumList(aminoMassesModified,
-                              peptideString[::-1],
-                              protonMassModified,
-                              H2OMassModified,
-                              NH3MassModified,
-                              peptideCharge,
-                              True)
+#   yEnd = generateSpectrumList(aminoMassesModified,
+#                               peptideString[::-1],
+#                               protonMassModified,
+#                               H2OMassModified,
+#                               NH3MassModified,
+#                               peptideCharge,
+#                               True)
 
-  spectrum = yEnd + bEnd
-  final = protonMassModified
-  for i in range(0, len(peptideString)):
-    final += aminoMassesModified[peptideString[i]]
+#   spectrum = yEnd + bEnd
+#   final = protonMassModified
+#   for i in range(0, len(peptideString)):
+#     final += aminoMassesModified[peptideString[i]]
 
-  spectrum.append(final)
-
-
-  return (spectrum, yEnd, bEnd)
+#   spectrum.append(final)
 
 
-def generateSpectrumList(aminoMassesModified: Dict[str, int],
-                         peptideString: str,
-                         protonMassModified: int,
-                         H2OMassModified: int,
-                         NH3MassModified: int,
-                         peptideCharge: int,
-                         yEnd: bool) -> List[int]:
+#   return (spectrum, yEnd, bEnd)
 
-  if yEnd:
-    additiveMass = H2OMassModified + protonMassModified
-  else:
-    additiveMass = protonMassModified
 
-  spectrum = [aminoMassesModified[peptideString[0]] + additiveMass]
+# def generateSpectrumList(aminoMassesModified: Dict[str, int],
+#                          peptideString: str,
+#                          protonMassModified: int,
+#                          H2OMassModified: int,
+#                          NH3MassModified: int,
+#                          peptideCharge: int,
+#                          yEnd: bool) -> List[int]:
 
-  for i in range(1, len(peptideString)-1):
-    spectrum.append(spectrum[-1] + aminoMassesModified[peptideString[i]])
+#   if yEnd:
+#     additiveMass = H2OMassModified + protonMassModified
+#   else:
+#     additiveMass = protonMassModified
 
-  spectrumMinusNH3 = [x - NH3MassModified for x in spectrum]
-  spectrumMinusH2O = [x - H2OMassModified for x in spectrum]
+#   spectrum = [aminoMassesModified[peptideString[0]] + additiveMass]
 
-  spectrum += spectrumMinusNH3
-  spectrum += spectrumMinusH2O
+#   for i in range(1, len(peptideString)-1):
+#     spectrum.append(spectrum[-1] + aminoMassesModified[peptideString[i]])
 
-  return spectrum
+#   spectrumMinusNH3 = [x - NH3MassModified for x in spectrum]
+#   spectrumMinusH2O = [x - H2OMassModified for x in spectrum]
+
+#   spectrum += spectrumMinusNH3
+#   spectrum += spectrumMinusH2O
+
+#   return spectrum
