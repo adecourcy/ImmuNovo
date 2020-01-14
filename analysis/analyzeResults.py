@@ -680,10 +680,10 @@ def getAnalysis(denovoResultsDirectory,
     pssmLengthDistributionDict = getPssmLengthDistribution(pssmDistributionDict)
     f.write(getPssmLengthDistributionString(pssmDistributionDict, pssmLengthDistributionDict))
 
-  printGraphicTSL(getPSSMDistributionDict(fdrDenovoDF),
-                  dataSetName,
-                  tslLocation,
-                  outputDirectory)
+  # printGraphicTSL(getPSSMDistributionDict(fdrDenovoDF),
+  #                 dataSetName,
+  #                 tslLocation,
+  #                 outputDirectory)
 
 
 if __name__ == '__main__':
