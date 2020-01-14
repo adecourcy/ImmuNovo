@@ -132,14 +132,26 @@ def dynamicFDR(maxFDR, scoreList, calculatedFDRs, increment=0.01, scoreIndex=0, 
   # List going from the min to max FDR by "increment"
   theoreticalFDRs = [round((x * increment), 2) for x in range(1, round((maxFDR+increment)/increment))]
 
-  # Dinstance between the calculate FDR, and each potential FDR label
-  # for the first entry. Used to start off the dynamic programming
-  prevCalc = [abs(calculatedFDRs[0] - x) for x in theoreticalFDRs]
 
   # We don't need to track paths, only score to FDR thresholds
   prevThresholdList = createThresholdList(theoreticalFDRs)
 
+  # Dinstance between the calculate FDR, and each potential FDR label
+  # for the first entry. Used to start off the dynamic programming
+  prevCalc = [abs(calculatedFDRs[0] - x) for x in theoreticalFDRs]
+
   scoreIndexTracker = [0 for i in range(len(theoreticalFDRs))]
+
+  for tIndex in range(len(theoreticalFDRs)):
+    currentScore = abs(calculatedFDRs[0] - theoreticalFDRs[tIndex])
+    if tIndex == 0:
+      scoreIndexTracker[0] = (currentScore, 0)
+    elif currentScore < oldScore:
+      scoreIndexTracker[tIndex] = (currentScore, tIndex)
+    else:
+      scoreIndexTracker[tIndex] = (oldScore, oldIndex)
+    oldScore, oldIndex = scoreIndexTracker[tIndex]
+
 
   for cIndex in range(1, len(calculatedFDRs)):
     cFDR = calculatedFDRs[cIndex] #### !!!!! Is this right? Should be cIndex-1? !!!!! 
