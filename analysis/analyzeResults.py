@@ -366,8 +366,8 @@ def importDatabaseData(databaseDir, databaseType, minPepLength, maxPepLength):
   elif os.path.isfile(databaseDir):
     dbDF = pd.read_csv(databaseDir)
 
-  if QVALUE in dbDF:
-    dbDF = dbDF[['Title', 'Peptide', QVALUE]]
+  if FDR in dbDF:
+    dbDF = dbDF[['Title', 'Peptide', FDR]]
     dbDF = dbDF.rename(columns = {'Title': TITLE_SPECTRUM, 'Peptide': PEPTIDE, QVALUE: FDR})
   else:
     dbDF = dbDF[['Title', 'Peptide']] # Add QValue
