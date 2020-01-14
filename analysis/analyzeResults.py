@@ -206,14 +206,14 @@ def getLengthCountDict(peptideDF):
   return lengthCount
 
 def getLengthDistributionString(lengthCounts, lengthPercents):
-  return ' '.join(['{}: {} ({}%)'.format(length, lengthCounts[length], lengthPercents[length]) for length in lengthCounts])
+  return ' '.join(['{}: {} ({}%)'.format(length, lengthCounts[length], round(lengthPercents[length], 2)) for length in lengthCounts])
 
 def getPssmDistributionString(pssmDistribution):
   return '\n'.join(['{}: {}%'.format(pssmTitle, pssmDistribution[pssmTitle]) for pssmTitle in pssmDistribution])
 
 def getPssmLengthDistributionString(pssmLengthDict, pssmLengthDistribution):
   def distributionString(lengthCounts, lengthPercents):
-    return ' '.join(['{}: {} ({}%)'.format(length, lengthCounts[length], lengthPercents[length]) for length in lengthCounts])
+    return ' '.join(['{}: {} ({}%)'.format(length, len(lengthCounts[length]), lengthPercents[length]) for length in lengthCounts])
   return '\n'.join(['{} -- {}'.format(pssmTitle, distributionString(pssmLengthDict[pssmTitle], pssmLengthDistribution[pssmTitle])) for pssmTitle in pssmLengthDict])
 
 
@@ -379,8 +379,8 @@ def importDatabaseData(databaseDir, databaseType, minPepLength, maxPepLength):
 def resultsFilter(peptideDF):
   # Assume column headers are standard for peptides and spectrum titles
   # Assume lengths are filtered
-  if QVALUE in peptideDF:
-    peptideDF = peptideDF[[PEPTIDE, TITLE_SPECTRUM, QVALUE]]
+  if FDR in peptideDF:
+    peptideDF = peptideDF[[PEPTIDE, TITLE_SPECTRUM, FDR]]
   else:
     peptideDF = peptideDF[[PEPTIDE, TITLE_SPECTRUM]]
   peptideDF = peptideDF[peptideDF[PEPTIDE] != NO_PEP]
