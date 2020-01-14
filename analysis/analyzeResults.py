@@ -214,7 +214,7 @@ def getPssmDistributionString(pssmDistribution):
 def getPssmLengthDistributionString(pssmLengthDict, pssmLengthDistribution):
   def distributionString(lengthCounts, lengthPercents):
     return ' '.join(['{}: {} ({}%)'.format(length, lengthCounts[length], lengthPercents[length]) for length in lengthCounts])
-  return '\n'.joint(['{} -- {}'.format(pssmTitle, distributionString(pssmLengthDict[pssmTitle], pssmLengthDistribution[pssmTitle])) for pssmTitle in pssmLengthDict])
+  return '\n'.join(['{} -- {}'.format(pssmTitle, distributionString(pssmLengthDict[pssmTitle], pssmLengthDistribution[pssmTitle])) for pssmTitle in pssmLengthDict])
 
 
 
