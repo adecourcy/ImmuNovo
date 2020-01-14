@@ -242,7 +242,7 @@ def printGraphicTSL(pssmDistributionDict, dataSetName, tslLocation, outputDirect
   def stripModifications(peptide):
     # We're just going to strip the peptide modifications and call it good
     # enough for this
-    return [x for x in peptide if x in string.ascii_letters]
+    return ''.join([x for x in peptide if x in string.ascii_letters])
 
   tmpPeptideFile = os.path.join(outputDirectory, 'tmpPep.txt')
   tmpDecoyFile = os.path.join(outputDirectory, 'tmpDecoy.txt')
