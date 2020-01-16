@@ -342,7 +342,7 @@ def mergeDataFrames(denovoDF, decoyDF, databaseDF, qValue):
   if not qValue:
     if type(databaseDF) != type(''):
       databaseDF[SOURCE] = [SOURCE_DATABASE for i in range(len(databaseDF))]
-      combinedDF = pd.concat([combinedDF, databaseDF[[PEPTIDE, TITLE_SPECTRUM]]])
+      combinedDF = pd.concat([combinedDF, databaseDF[[PEPTIDE, TITLE_SPECTRUM, SOURCE]]])
   return combinedDF
 
 def importDenovoData(denovoDir):
