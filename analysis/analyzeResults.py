@@ -340,7 +340,7 @@ def mergeDataFrames(denovoDF, decoyDF, databaseDF, qValue):
   decoyDF[SOURCE] = [SOURCE_DECOY for i in range(len(decoyDF))]
   combinedDF = pd.concat([denovoDF, decoyDF])
   if not qValue:
-    if databaseDF != '':
+    if type(databaseDF) != type(''):
       databaseDF[SOURCE] = [SOURCE_DATABASE for i in range(len(databaseDF))]
       combinedDF = pd.concat([combinedDF, databaseDF[[PEPTIDE, TITLE_SPECTRUM]]])
   return combinedDF
@@ -595,7 +595,7 @@ def getAnalysis(denovoResultsDirectory,
   else:
     mergedDF = pd.read_csv(os.path.join(outputDirectory, 'scoredPeptides'))
   
-  if not qValue and databaseDF != '':
+  if not qValue and type(databaseDF) != type(''):
     denovoDF, decoyDF, databaseDF = separateDataFrames(mergedDF, qValue)
   else:
     denovoDF, decoyDF = separateDataFrames(mergedDF, qValue)
@@ -604,7 +604,7 @@ def getAnalysis(denovoResultsDirectory,
   fdrDenovoDF = filterTopPeptides(denovoDF, scoreComparisionType)
   fdrDecoyDF = filterTopPeptides(decoyDF, scoreComparisionType)
 
-  if databaseDF != '':
+  if type(databaseDF) != type(''):
     if not qValue:
       fdrDatabaseDF = filterTopPeptides(databaseDF, scoreComparisionType)
       fdrDatabaseDF.reset_index(drop=True, inplace=True)
@@ -620,7 +620,7 @@ def getAnalysis(denovoResultsDirectory,
                        increment,
                        fdrCalculationType)
 
-  if not qValue and databaseDF != '':
+  if not qValue and type(databaseDF) != type(''):
     fdrDatabaseDF = addFDR(fdrDatabaseDF,
                            fdrDecoyDF,
                            scoreComparisionType,
@@ -633,7 +633,7 @@ def getAnalysis(denovoResultsDirectory,
   
 
   fdrDenovoDF, fdrCutoff = closestFDR(fdrDenovoDF, fdrCutoff, increment)
-  if databaseDF != '' and len(fdrDatabaseDF) > 0:
+  if type(databaseDF) != type('') and len(fdrDatabaseDF) > 0:
     fdrDatabaseDF = fdrDatabaseDF[fdrDatabaseDF[FDR] >= fdrCutoff]
 
   ############# Do Analysis ####################
@@ -642,16 +642,16 @@ def getAnalysis(denovoResultsDirectory,
 
   with open(outputFileName, 'w') as f:
     uniquePeptidesDenovo = uniquePeptides(fdrDenovoDF)
-    if databaseDF != '' and len(fdrDatabaseDF) > 0:
+    if type(databaseDF) != type('') and len(fdrDatabaseDF) > 0:
       uniquePeptidesDatabase = uniquePeptides(fdrDatabaseDF)
     f.write('FDR used: {}\n'.format(fdrCutoff))
     f.write('\n')
     f.write('Denovo Spectrum Matches: {}\n'.format(len(getSpectrumHits(fdrDenovoDF))))
-    if databaseDF != '' and len(fdrDatabaseDF) > 0:
+    if type(databaseDF) != type('') and len(fdrDatabaseDF) > 0:
       f.write('Database Spectrum Matches: {}\n'.format(len(getSpectrumHits(fdrDatabaseDF))))
     f.write('\n')
     f.write('Denovo Unique Peptides Found: {}\n'.format(len(uniquePeptidesDenovo)))
-    if databaseDF != '' and len(fdrDatabaseDF) > 0:
+    if type(databaseDF) != type('') and len(fdrDatabaseDF) > 0:
       f.write('Database Unique Peptides Found: {}\n'.format(len(uniquePeptidesDatabase)))
       f.write('Overlap: {}\n'.format(len(getOverlap(uniquePeptidesDenovo, \
                                                     uniquePeptidesDatabase))))
@@ -665,7 +665,7 @@ def getAnalysis(denovoResultsDirectory,
     f.write(getLengthDistributionString(lengthCountDenovo, lengthDistributionDenovo))
     f.write('\n')
 
-    if databaseDF != '' and len(fdrDatabaseDF) > 0:
+    if type(databaseDF) != type('') and len(fdrDatabaseDF) > 0:
       lengthCountDatabase = getLengthCountDict(fdrDatabaseDF)
       lengthDistributionDatabase = \
         getLengthDistribution(lengthCountDatabase, uniquePeptidesDatabase)
