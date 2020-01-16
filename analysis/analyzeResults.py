@@ -328,7 +328,7 @@ def separateDataFrames(df, qValue):
   dfDict = {}
   for item in df.groupby(SOURCE):
     dfDict[item[0]] = item[1]
-  if not qValue:
+  if qValue:
     return dfDict[SOURCE_DENOVO].drop(SOURCE, axis=1), \
            dfDict[SOURCE_DECOY].drop(SOURCE, axis=1)
   return dfDict[SOURCE_DENOVO].drop(SOURCE, axis=1), \
