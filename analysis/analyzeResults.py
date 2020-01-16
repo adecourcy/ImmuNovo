@@ -568,6 +568,9 @@ def getAnalysis(denovoResultsDirectory,
   else:
     with open(os.path.join(outputDirectory, 'conversionDictionary')) as f:
       peptideConversionDict = eval(f.read())
+  
+  if qValue:
+    databaseDF = addPeptideLength(databaseDF, peptideConversionDict)
 
   if not update:
 

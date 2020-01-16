@@ -202,6 +202,8 @@ def selectDecoyPeptides(decoyPeptideDirectory,
   
   spectrumData = extractSpectrumInformation(spectrumFileDirectory, precision)
 
+  df = pd.read_csv(decoyPeptideDirectory)
+
   peptideDict = getPeptideDict(decoyPeptideDirectory,
                                precision,
                                minPeptideLength,
