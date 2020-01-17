@@ -32,7 +32,8 @@ def parseArgumentsSetup(programDirectory, parser):
   arguments = parser.parse_args()
 
   if arguments.dataset_name == '':
-    arguments.dataset_name = arguments.spec_dir
+    arguments.dataset_name = \
+        os.path.basename(os.path.dirname(arguments.spec_dir))
 
   arguments.spec_dir = getAbsPath(arguments.spec_dir)
   arguments.acid_mass_file = getAbsPath(arguments.acid_mass_file)
