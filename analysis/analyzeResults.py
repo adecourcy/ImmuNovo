@@ -243,7 +243,7 @@ def printGraphicTSL(pssmDistributionDict, dataSetName, tslLocation, outputDirect
     # We're just going to strip the peptide modifications and call it good
     # enough for this
     return ''.join([x for x in peptide if x in string.ascii_letters])
-  
+
   oldCWD = os.getcwd()
   os.chdir(os.path.dirname(tslLocation))
 

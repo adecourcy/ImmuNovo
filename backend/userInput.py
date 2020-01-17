@@ -37,6 +37,7 @@ def parseArgumentsSetup(programDirectory, parser):
   arguments.spec_dir = getAbsPath(arguments.spec_dir)
   arguments.acid_mass_file = getAbsPath(arguments.acid_mass_file)
   arguments.pssm_dir = getAbsPath(arguments.pssm_dir)
+  arguments.output_dir = getAbsPath(arguments.output_dir)
   
   createDir(arguments.output_dir)
 
