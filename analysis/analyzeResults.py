@@ -324,11 +324,11 @@ def closestFDR(resultsDF, fdrCutoff, increment=0.01):
     fdrCutoff += increment
   return resultsDF[resultsDF[FDR] >= fdrCutoff], fdrCutoff
 
-def separateDataFrames(df, qValue):
+def separateDataFrames(df, includeDatabase):
   dfDict = {}
   for item in df.groupby(SOURCE):
     dfDict[item[0]] = item[1]
-  if qValue:
+  if not includeDatabase:
     return dfDict[SOURCE_DENOVO].drop(SOURCE, axis=1), \
            dfDict[SOURCE_DECOY].drop(SOURCE, axis=1)
   return dfDict[SOURCE_DENOVO].drop(SOURCE, axis=1), \
@@ -603,9 +603,9 @@ def getAnalysis(denovoResultsDirectory,
     mergedDF = pd.read_csv(os.path.join(outputDirectory, 'scoredPeptides'))
   
   if not qValue and type(databaseDF) != type(''):
-    denovoDF, decoyDF, databaseDF = separateDataFrames(mergedDF, qValue)
+    denovoDF, decoyDF, databaseDF = separateDataFrames(mergedDF, True)
   else:
-    denovoDF, decoyDF = separateDataFrames(mergedDF, qValue)
+    denovoDF, decoyDF = separateDataFrames(mergedDF, False)
   
   # No FDR yet, but we're going to add it to this variable
   fdrDenovoDF = filterTopPeptides(denovoDF, scoreComparisionType)
