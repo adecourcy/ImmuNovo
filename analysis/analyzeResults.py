@@ -559,8 +559,12 @@ def getAnalysis(denovoResultsDirectory,
   if not update:
     mergedDF = mergeDataFrames(denovoDF, decoyDF, databaseDF, qValue)
 
-    peptideConversionDict = \
-        createConversionDict(list(mergedDF[PEPTIDE]) + list(databaseDF[PEPTIDE]), acidConversionTable)
+    if type(databaseDF) != type(''):
+      peptideConversionDict = \
+          createConversionDict(list(mergedDF[PEPTIDE]) + list(databaseDF[PEPTIDE]), acidConversionTable)
+    else:
+      peptideConversionDict = \
+          createConversionDict(list(mergedDF[PEPTIDE])), acidConversionTable)
     
     with open(os.path.join(outputDirectory, 'conversionDictionary'), 'w') as f:
       f.write(str(peptideConversionDict))
