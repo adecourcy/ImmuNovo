@@ -564,7 +564,7 @@ def getAnalysis(denovoResultsDirectory,
           createConversionDict(list(mergedDF[PEPTIDE]) + list(databaseDF[PEPTIDE]), acidConversionTable)
     else:
       peptideConversionDict = \
-          createConversionDict(list(mergedDF[PEPTIDE])), acidConversionTable)
+          createConversionDict(list(mergedDF[PEPTIDE]), acidConversionTable)
     
     with open(os.path.join(outputDirectory, 'conversionDictionary'), 'w') as f:
       f.write(str(peptideConversionDict))
