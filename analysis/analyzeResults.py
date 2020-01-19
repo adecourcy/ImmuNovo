@@ -319,10 +319,16 @@ def createPeptideByLengthDict(peptideDF):
 def getOverlap(denovoPeptides, databasePeptides):
   return denovoPeptides.intersection(databasePeptides)
 
-def closestFDR(resultsDF, fdrCutoff, increment=0.01):
-  while len(resultsDF[resultsDF[FDR] >= fdrCutoff]) == 0:
-    fdrCutoff += increment
-  return resultsDF[resultsDF[FDR] >= fdrCutoff], fdrCutoff
+def closestFDR(resultsDF, fdrCutoff, increment=(0.01, 0.05, 0.10, 0.15, 0.20)):
+  for fdr in increment:
+    if fdr < fdrCutoff:
+      continue
+    elif len(resultsDF[resultsDF[FDR] >= fdrCutoff]) == 0:
+      continue
+    else:
+      return resultsDF[resultsDF[FDR] >= fdrCutoff], fdrCutoff
+  return resultsDF[resultsDF[0.01]], 1
+
 
 def separateDataFrames(df, includeDatabase):
   dfDict = {}
@@ -636,12 +642,13 @@ def getAnalysis(denovoResultsDirectory,
                            fdrCalculationType)
   
   if len(fdrDenovoDF) == 0:
-    sys.exit()
+    sys.exit("No valid peptides found")
   
-
-  fdrDenovoDF, fdrCutoff = closestFDR(fdrDenovoDF, fdrCutoff, increment)
+  fdrDenovoDF, denovoFdrCutoff = closestFDR(fdrDenovoDF, fdrCutoff)
+  if len(fdrDenovoDF) == 0:
+    sys.exit("No valid peptides found")
   if type(databaseDF) != type('') and len(fdrDatabaseDF) > 0:
-    fdrDatabaseDF = fdrDatabaseDF[fdrDatabaseDF[FDR] >= fdrCutoff]
+    fdrDatabaseDF, databaseFdrCutoff = closestFDR(fdrDatabaseDF, denovoFdrCutoff)
 
   ############# Do Analysis ####################
 
@@ -651,10 +658,11 @@ def getAnalysis(denovoResultsDirectory,
     uniquePeptidesDenovo = uniquePeptides(fdrDenovoDF)
     if type(databaseDF) != type('') and len(fdrDatabaseDF) > 0:
       uniquePeptidesDatabase = uniquePeptides(fdrDatabaseDF)
-    f.write('FDR used: {}\n'.format(fdrCutoff))
+    f.write('Denovo FDR used: {}\n'.format(denovoFdrCutoff))
+    f.write('Database FDR used: {}\n'.format(databaseFdrCutoff))
     f.write('\n')
     f.write('Denovo Spectrum Matches: {}\n'.format(len(getSpectrumHits(fdrDenovoDF))))
-    if type(databaseDF) != type('') and len(fdrDatabaseDF) > 0:
+    if type(databaseDF) != type(''):
       f.write('Database Spectrum Matches: {}\n'.format(len(getSpectrumHits(fdrDatabaseDF))))
     f.write('\n')
     f.write('Denovo Unique Peptides Found: {}\n'.format(len(uniquePeptidesDenovo)))
