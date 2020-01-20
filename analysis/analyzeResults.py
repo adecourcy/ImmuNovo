@@ -327,7 +327,7 @@ def closestFDR(resultsDF, fdrCutoff, increment=(0.01, 0.05, 0.10, 0.15, 0.20)):
       continue
     else:
       return resultsDF[resultsDF[FDR] >= fdrCutoff], fdrCutoff
-  return resultsDF[resultsDF[0.01]], 1
+  return resultsDF[resultsDF[FDR] >= 0.01], 1
 
 
 def separateDataFrames(df, includeDatabase):
