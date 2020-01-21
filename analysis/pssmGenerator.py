@@ -59,6 +59,7 @@ def createTable(peptides, unknownAminos):
            "V",
            "T",
            "C",
+           "C+57.021",
            "L",
            "I",
            "N",
@@ -93,6 +94,8 @@ def createTable(peptides, unknownAminos):
         table[i][peptide[i]] += 1
         if peptide[i] == "M":
             table[i]["M+15.995"] += 1
+        if peptide[i] == "C":
+            table[i]["C+57.021"] += 1
 
 
   for column in table:
