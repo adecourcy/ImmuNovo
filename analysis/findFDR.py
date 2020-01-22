@@ -98,6 +98,7 @@ def hitOrMissDataframe(resultsDF, decoyDF, scoreType):
   return merged
 
 def dynamicFDR(maxFDR, scoreList, calculatedFDRs, increment=0.01, scoreIndex=0, fdrIndex=1):
+  print('Max FDR: {}'.format(maxFDR))
   # Given a sets of scores vs FDR calculations, use dynamic programming to find
   # an optimal, monotonically decreasing step function to match scores vs FDRs
 
@@ -229,19 +230,14 @@ def addFDR(dataFrame, fdrCutoffs, scoreType, increment=0.01):
   # fdrCutoffs = (scores, fdr)
 
   def findCutoff(score, fdrCutoffs, increment):
-    print(score)
     for elm in fdrCutoffs:
-      print(elm)
-      input()
       if score > elm[0]:
-        print('found')
         return round(elm[1], 2)
         # pretty sure this was a bug
         # return round(elm[1] + increment, 2)
 
   # sort (score, fdr) from highest to lowest by score
   fdrCutoffs.sort(key=lambda x: x[0], reverse=True)
-  print(fdrCutoffs)
   
   dataFrame[FDR] = \
     dataFrame.apply(lambda row: findCutoff(row[scoreType], fdrCutoffs, increment), axis=1)
