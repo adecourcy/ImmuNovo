@@ -192,6 +192,13 @@ def dynamicFDR(maxFDR, scoreList, calculatedFDRs, increment=0.01, scoreIndex=0, 
   
   thresholdList.sort(key=lambda x: x[1])
 
+  scores = [x[0] for x in thresholdList]
+  fdrs = [x[1] for x in thresholdList]
+
+  plt.step(scores, fdrs)
+  plt.scatter(cscoreList, calculatedFDRs)
+  plt.savefig('./currentFig.png')
+
   return thresholdList
 
 def findFDR(mergedScores, precision=3):
@@ -251,14 +258,14 @@ def findFDROld(targetScores, decoyScores):
   def nextDecoyIndex(currentDecoyIndex, decoyScores, targetScore):
     if currentDecoyIndex == -1:
       return -1
-    while decoyScores[currentDecoyIndex] > targetScore:
+    while decoyScores[currentDecoyIndex] < targetScore:
       currentDecoyIndex += 1
       if currentDecoyIndex >= len(decoyScores):
         return -1
     return currentDecoyIndex
 
-  targetScores.sort(reverse=True)
-  decoyScores.sort(reverse=True)
+  targetScores.sort()
+  decoyScores.sort()
   fdrList = []
 
   targetIndex = 0
