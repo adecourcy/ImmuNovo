@@ -229,14 +229,19 @@ def addFDR(dataFrame, fdrCutoffs, scoreType, increment=0.01):
   # fdrCutoffs = (scores, fdr)
 
   def findCutoff(score, fdrCutoffs, increment):
+    print(score)
     for elm in fdrCutoffs:
+      print(elm)
+      input()
       if score > elm[0]:
+        print('found')
         return round(elm[1], 2)
         # pretty sure this was a bug
         # return round(elm[1] + increment, 2)
 
   # sort (score, fdr) from highest to lowest by score
   fdrCutoffs.sort(key=lambda x: x[0], reverse=True)
+  print(fdrCutoffs)
   
   dataFrame[FDR] = \
     dataFrame.apply(lambda row: findCutoff(row[scoreType], fdrCutoffs, increment), axis=1)
