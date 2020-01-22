@@ -370,7 +370,7 @@ def importDatabaseData(databaseDir, databaseType, minPepLength, maxPepLength):
       combinedResults.append(pd.read_csv(os.path.join(databaseDir, fileName), sep='\t'))
     dbDF = pd.concat(combinedResults)
   elif os.path.isfile(databaseDir):
-    dbDF = pd.read_csv(databaseDir)
+    dbDF = pd.read_csv(databaseDir, sep='\t')
 
   if QVALUE in dbDF:
     dbDF = dbDF[['Title', 'Peptide', QVALUE]]
@@ -383,6 +383,8 @@ def importDatabaseData(databaseDir, databaseType, minPepLength, maxPepLength):
     dbDF.apply(lambda x: len([y for y in x[PEPTIDE] if y in string.ascii_letters]), axis=1)
   dbDF = dbDF[dbDF['length'] >= minPepLength]
   dbDF = dbDF[dbDF['length'] <= maxPepLength]
+
+  dbDF[TITLE_SPECTRUM] = [x.split(" ")[0] for x in list(dbDF[TITLE_SPECTRUM])]
 
   return dbDF.drop('length', axis=1)
 
@@ -649,6 +651,8 @@ def getAnalysis(denovoResultsDirectory,
     sys.exit("No valid peptides found")
   if type(databaseDF) != type('') and len(fdrDatabaseDF) > 0:
     fdrDatabaseDF, databaseFdrCutoff = closestFDR(fdrDatabaseDF, denovoFdrCutoff)
+  if len(fdrDatabaseDF) == 0:
+    databaseFdrCutoff = 1
 
   ############# Do Analysis ####################
 
