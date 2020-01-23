@@ -323,11 +323,11 @@ def closestFDR(resultsDF, fdrCutoff, increment=(0.01, 0.05, 0.10, 0.15, 0.20)):
   for fdr in increment:
     if fdr < fdrCutoff:
       continue
-    elif len(resultsDF[resultsDF[FDR] >= fdrCutoff]) == 0:
+    elif len(resultsDF[resultsDF[FDR] <= fdrCutoff]) == 0:
       continue
     else:
-      return resultsDF[resultsDF[FDR] >= fdrCutoff], fdrCutoff
-  return resultsDF[resultsDF[FDR] >= 0.01], 1
+      return resultsDF[resultsDF[FDR] <= fdrCutoff], fdrCutoff
+  return resultsDF[resultsDF[FDR] <= 0.01], 1
 
 
 def separateDataFrames(df, includeDatabase):
@@ -622,9 +622,10 @@ def getAnalysis(denovoResultsDirectory,
   if type(databaseDF) != type(''):
     if not qValue:
       fdrDatabaseDF = filterTopPeptides(databaseDF, scoreComparisionType)
-      fdrDatabaseDF.reset_index(drop=True, inplace=True)
     else:
-      fdrDatabaseDF = databaseDF
+      fdrDatabaseDF = /
+        fdrDatabaseDF.loc[[entry[1][FDR].idxmin() for entry in  fdrDatabaseDF.groupby(TITLE_SPECTRUM)]]
+    fdrDatabaseDF.reset_index(drop=True, inplace=True)
   fdrDenovoDF.reset_index(drop=True, inplace=True)
   fdrDecoyDF.reset_index(drop=True, inplace=True)
   
