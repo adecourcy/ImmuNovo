@@ -98,7 +98,7 @@ def hitOrMissDataframe(resultsDF, decoyDF, scoreType):
   return merged
 
 def dynamicFDR(maxFDR, scoreList, calculatedFDRs, increment=0.01, scoreIndex=0, fdrIndex=1):
-  print('Max FDR: {}'.format(maxFDR))
+ 
   # Given a sets of scores vs FDR calculations, use dynamic programming to find
   # an optimal, monotonically decreasing step function to match scores vs FDRs
 
@@ -196,11 +196,11 @@ def dynamicFDR(maxFDR, scoreList, calculatedFDRs, increment=0.01, scoreIndex=0, 
   scores = [x[0] for x in thresholdList]
   fdrs = [x[1] for x in thresholdList]
 
-  print(thresholdList)
-  plt.clf()
-  plt.step(scores, fdrs, color='r')
-  plt.scatter(scoreList, calculatedFDRs)
-  plt.savefig('./currentFig.png')
+  # print(thresholdList)
+  # plt.clf()
+  # plt.step(scores, fdrs, color='r')
+  # plt.scatter(scoreList, calculatedFDRs)
+  # plt.savefig('./currentFig.png')
 
   return thresholdList
 
