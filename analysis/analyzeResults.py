@@ -677,22 +677,24 @@ def getAnalysis(denovoResultsDirectory,
                                                     uniquePeptidesDatabase))))
     f.write('\n')
 
-    f.write('Length Distribution:\n')
-    lengthCountDenovo = getLengthCountDict(fdrDenovoDF)
-    lengthDistributionDenovo = \
-      getLengthDistribution(lengthCountDenovo, uniquePeptidesDenovo)
-    f.write('Denovo Length Distribution:\n')
-    f.write(getLengthDistributionString(lengthCountDenovo, lengthDistributionDenovo))
-    f.write('\n')
+    ####### This code hase a bug. getLengthCountDict is not counting on the *unique* peptides
+    
+    # f.write('Length Distribution:\n')
+    # lengthCountDenovo = getLengthCountDict(fdrDenovoDF)
+    # lengthDistributionDenovo = \
+    #   getLengthDistribution(lengthCountDenovo, uniquePeptidesDenovo)
+    # f.write('Denovo Length Distribution:\n')
+    # f.write(getLengthDistributionString(lengthCountDenovo, lengthDistributionDenovo))
+    # f.write('\n')
 
-    if type(databaseDF) != type('') and len(fdrDatabaseDF) > 0:
-      lengthCountDatabase = getLengthCountDict(fdrDatabaseDF)
-      lengthDistributionDatabase = \
-        getLengthDistribution(lengthCountDatabase, uniquePeptidesDatabase)
-      f.write('Database Length Distribution:\n')
-      f.write(getLengthDistributionString(lengthCountDatabase, lengthDistributionDatabase))
-      f.write('\n')
-    f.write('\n')
+    # if type(databaseDF) != type('') and len(fdrDatabaseDF) > 0:
+    #   lengthCountDatabase = getLengthCountDict(fdrDatabaseDF)
+    #   lengthDistributionDatabase = \
+    #     getLengthDistribution(lengthCountDatabase, uniquePeptidesDatabase)
+    #   f.write('Database Length Distribution:\n')
+    #   f.write(getLengthDistributionString(lengthCountDatabase, lengthDistributionDatabase))
+    #   f.write('\n')
+    # f.write('\n')
 
 
     pssmDistributionDict = getPSSMDistributionDict(fdrDenovoDF)
