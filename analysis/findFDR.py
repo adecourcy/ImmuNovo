@@ -217,7 +217,7 @@ def findFDR(mergedScores, precision=3):
   immuNovoScores.sort()
 
   for entry in scoreCheck:
-    fdrList.append(decoys / forward)
+    fdrList.append(decoys / (forward + decoys))
     forward -= entry[1]
     decoys -= (1 - entry[1])
 
