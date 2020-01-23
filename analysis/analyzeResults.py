@@ -623,7 +623,7 @@ def getAnalysis(denovoResultsDirectory,
     if not qValue:
       fdrDatabaseDF = filterTopPeptides(databaseDF, scoreComparisionType)
     else:
-      fdrDatabaseDF = /
+      fdrDatabaseDF = \
         fdrDatabaseDF.loc[[entry[1][FDR].idxmin() for entry in  fdrDatabaseDF.groupby(TITLE_SPECTRUM)]]
     fdrDatabaseDF.reset_index(drop=True, inplace=True)
   fdrDenovoDF.reset_index(drop=True, inplace=True)
