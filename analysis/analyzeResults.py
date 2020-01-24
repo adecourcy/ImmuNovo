@@ -319,9 +319,9 @@ def createPeptideByLengthDict(peptideDF):
 def getOverlap(denovoPeptides, databasePeptides):
   return denovoPeptides.intersection(databasePeptides)
 
-def closestFDR(resultsDF, fdrCutoff, increment=(0.01, 0.05, 0.10, 0.15, 0.20)):
+def closestFDR(resultsDF, fdrCutoff=0.20, increment=(0.01, 0.05, 0.10, 0.15, 0.20)):
   for fdr in increment:
-    if fdr < fdrCutoff:
+    if fdr <= fdrCutoff:
       continue
     elif len(resultsDF[resultsDF[FDR] <= fdrCutoff]) == 0:
       continue
@@ -647,11 +647,11 @@ def getAnalysis(denovoResultsDirectory,
   if len(fdrDenovoDF) == 0:
     sys.exit("No valid peptides found")
   
-  fdrDenovoDF, denovoFdrCutoff = closestFDR(fdrDenovoDF, fdrCutoff)
+  fdrDenovoDF, denovoFdrCutoff = closestFDR(fdrDenovoDF)
   if len(fdrDenovoDF) == 0:
     sys.exit("No valid peptides found")
   if type(databaseDF) != type('') and len(fdrDatabaseDF) > 0:
-    fdrDatabaseDF, databaseFdrCutoff = closestFDR(fdrDatabaseDF, denovoFdrCutoff)
+    fdrDatabaseDF, databaseFdrCutoff = closestFDR(fdrDatabaseDF)
   if len(fdrDatabaseDF) == 0:
     databaseFdrCutoff = 1
 
