@@ -196,11 +196,11 @@ def dynamicFDR(maxFDR, scoreList, calculatedFDRs, increment=0.01, scoreIndex=0, 
   scores = [x[0] for x in thresholdList]
   fdrs = [x[1] for x in thresholdList]
 
-  # print(thresholdList)
-  # plt.clf()
-  # plt.step(scores, fdrs, color='r')
-  # plt.scatter(scoreList, calculatedFDRs)
-  # plt.savefig('./currentFig.png')
+  print(thresholdList)
+  plt.clf()
+  plt.step(scores, fdrs, color='r')
+  plt.scatter(scoreList, calculatedFDRs)
+  plt.savefig('./currentFig.png')
 
   return thresholdList
 
