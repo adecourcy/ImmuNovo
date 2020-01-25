@@ -97,28 +97,27 @@ def hitOrMissDataframe(resultsDF, decoyDF, scoreType):
 
   return merged
 
+  # print(thresholdList)
+  # plt.clf()
+  # plt.step(scores, fdrs, color='r')
+  # plt.scatter(scoreList, calculatedFDRs)
+  # plt.savefig('./currentFig.png')
+
 def dynamicFDR(maxFDR, scoreList, calculatedFDRs, increment=0.01, scoreIndex=0, fdrIndex=1):
- 
   # Given a sets of scores vs FDR calculations, use dynamic programming to find
   # an optimal, monotonically decreasing step function to match scores vs FDRs
 
-  # Assumes scoreList and calculatedFDRs are ordered by greatest to least based
-  # on scoreList entries
-
-  # Return (score, fdr) sorted lowest to highest by fdr
-
-  # def getMinScoreIndex(calcs):
-  #   minScore = math.inf
-  #   minIndex = -1
-  #   for i in range(len(calcs)):
-  #     if calcs[i] < minScore:
-  #       minScore = calcs[i]
-  #       minIndex = i
-  #   return minScore, minIndex
+  def getMinScoreIndex(calcs, indexCutoff):
+    minScore = math.inf
+    minIndex = -1
+    for i in range(indexCutoff):
+      if calcs[i] < minScore:
+        minScore = calcs[i]
+        minIndex = i
+    return minScore, minIndex
   
 
   def createThresholdList(theoreticalFDRs):
-    # Create a matrix of optimal threshold scores for each FDR
     thresholds = {}
     for tFDR in theoreticalFDRs:
       thresholds[tFDR] = 0
@@ -128,58 +127,38 @@ def dynamicFDR(maxFDR, scoreList, calculatedFDRs, increment=0.01, scoreIndex=0, 
     return thresholdList
 
   maxFDR = round(maxFDR, 2)
-  # Rounded version of the actual, calculated FDRs
   calculatedFDRs = [round(x, 2) for x in calculatedFDRs]
-  # List going from the min to max FDR by "increment"
   theoreticalFDRs = [round((x * increment), 2) for x in range(1, round((maxFDR+increment)/increment))]
 
+  prevCalc = [abs(calculatedFDRs[0] - x) for x in theoreticalFDRs]
 
   # We don't need to track paths, only score to FDR thresholds
   prevThresholdList = createThresholdList(theoreticalFDRs)
 
-  # Dinstance between the calculate FDR, and each potential FDR label
-  # for the first entry. Used to start off the dynamic programming
-  prevCalc = [abs(calculatedFDRs[0] - x) for x in theoreticalFDRs]
-
-  scoreIndexTracker = [0 for i in range(len(theoreticalFDRs))]
-
-  for tIndex in range(len(theoreticalFDRs)):
-    currentScore = abs(calculatedFDRs[0] - theoreticalFDRs[tIndex])
-    if tIndex == 0:
-      scoreIndexTracker[0] = (currentScore, 0)
-    elif currentScore < oldScore:
-      scoreIndexTracker[tIndex] = (currentScore, tIndex)
-    else:
-      scoreIndexTracker[tIndex] = (oldScore, oldIndex)
-    oldScore, oldIndex = scoreIndexTracker[tIndex]
-
-
   for cIndex in range(1, len(calculatedFDRs)):
-    cFDR = calculatedFDRs[cIndex] #### !!!!! Is this right? Should be cIndex-1? !!!!! 
+    currentCalc = []
+    cFDR = calculatedFDRs[cIndex]
     prevScore = scoreList[cIndex - 1]
+    #print(prevScore)
     newThresholdList = {}
+    # print(prevCalc)
+    # input()
     for tIndex in range(len(theoreticalFDRs)):
-      #minPrevScore, minPrevIndex = getMinScoreIndex(prevCalc[:tIndex+1])
-      minPrevScore, minPrevIndex = scoreIndexTracker[tIndex]
-
+      minPrevScore, minPrevIndex = getMinScoreIndex(preCalc, tIndex+1)
       tFDR = theoreticalFDRs[tIndex]
       prevFDR = theoreticalFDRs[minPrevIndex]
+      # print(minPrevScore)
+      # print(minPrevIndex)
+      # print(prevFDR)
+      # input()
 
-      currentScore = abs(cFDR - tFDR) + minPrevScore
-      if tIndex == 0:
-        scoreIndexTracker[0] = (currentScore, 0)
-      elif currentScore < oldScore:
-        scoreIndexTracker[tIndex] = (currentScore, tIndex)
-      else:
-        scoreIndexTracker[tIndex] = (oldScore, oldIndex)
-      oldScore, oldIndex = scoreIndexTracker[tIndex]
-
+      currentCalc.append(abs(cFDR - tFDR) + minPrevScore)
       newThresholdList[tFDR] = deepcopy(prevThresholdList[prevFDR])
       newThresholdList[tFDR][prevFDR] = prevScore
     
-    prevThresholdList = newThresholdList
+    prevThresholdList = deepcopy(newThresholdList)
+    prevCalc = deepcopy(currentCalc)
   
-
   finalThresholds = prevThresholdList[maxFDR]
   if finalThresholds[maxFDR] == 0:
     finalThresholds[maxFDR] = scoreList[-1]
@@ -193,16 +172,8 @@ def dynamicFDR(maxFDR, scoreList, calculatedFDRs, increment=0.01, scoreIndex=0, 
   
   thresholdList.sort(key=lambda x: x[1])
 
-  scores = [x[0] for x in thresholdList]
-  fdrs = [x[1] for x in thresholdList]
-
-  # print(thresholdList)
-  # plt.clf()
-  # plt.step(scores, fdrs, color='r')
-  # plt.scatter(scoreList, calculatedFDRs)
-  # plt.savefig('./currentFig.png')
-
   return thresholdList
+
 
 def findFDR(mergedScores, precision=3):
 
@@ -225,7 +196,7 @@ def findFDR(mergedScores, precision=3):
   immuNovoScores, fdrList = zip(*sorted(zip(immuNovoScores, fdrList), reverse=True))
   maxFDR = max(fdrList)
 
-  return dynamicFDR(maxFDR, immuNovoScores, fdrList)
+  return dynamicFDR(maxFDR, immuNovoScores, fdrList), immuNovoScores, fdrList
 
 def addFDR(dataFrame, fdrCutoffs, scoreType, increment=0.01):
   # fdrCutoffs = (scores, fdr)
@@ -250,10 +221,10 @@ def addFDRToDataframe(targetDF, decoyDF, scoreType, precision=3, increment=0.01)
   hitOrMissDF = hitOrMissDataframe(targetDF, decoyDF, scoreType)
   if len(hitOrMissDF) == 0:
     return hitOrMissDF
-  fdrCutoffs = findFDR(hitOrMissDF, precision)
+  fdrCutoffs, scoreList, calculatedFDRs = findFDR(hitOrMissDF, precision)
   fdrDF = addFDR(targetDF, fdrCutoffs, scoreType, increment)
 
-  return fdrDF
+  return fdrDF, scoreList, calculatedFDRs, fdrCutoffs
 
 
 def findFDROld(targetScores, decoyScores):
@@ -287,13 +258,14 @@ def findFDROld(targetScores, decoyScores):
             ((numDecoyPeptides - decoyIndex) + (numTargetPeptides - targetIndex)))
     targetIndex += 1
   
-  return dynamicFDR(max(fdrList), targetScores, fdrList)
+  return dynamicFDR(max(fdrList), targetScores, fdrList), targetScores, fdrList
 
 
 def addFDRToDataframeOld(targetDF, decoyDF, scoreType, precision=3, increment=0.01):
   
-  fdrCutoffs = findFDROld(list(targetDF[scoreType]), list(decoyDF[scoreType]))
-  return addFDR(targetDF, fdrCutoffs, scoreType, increment)
+  fdrCutoffs, scoreList, calculatedFDRs = \
+      findFDROld(list(targetDF[scoreType]), list(decoyDF[scoreType]))
+  return addFDR(targetDF, fdrCutoffs, scoreType, increment), scoreList, calculatedFDRs, fdrCutoffs
   
 
 

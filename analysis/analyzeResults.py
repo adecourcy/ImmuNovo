@@ -629,20 +629,30 @@ def getAnalysis(denovoResultsDirectory,
   fdrDenovoDF.reset_index(drop=True, inplace=True)
   fdrDecoyDF.reset_index(drop=True, inplace=True)
   
-  fdrDenovoDF = addFDR(fdrDenovoDF,
+  fdrDenovoDF, denovoScoreList, denovoCalculatedFDR, denovoFDRCutoffs = \
+                addFDR(fdrDenovoDF,
                        fdrDecoyDF,
                        scoreComparisionType,
                        precision,
                        increment,
                        fdrCalculationType)
 
+  plt.scatter(denovoScoreList, denovoCalculatedFDR)
+  plt.step([x[0] for x in denovoFDRCutoffs], [x[1] for x in denovoFDRCutoffs], color='r')
+  plt.savefig(os.path.join(outputDirectory, 'denovoCutoff.png'), dpi=600)
+
   if not qValue and type(databaseDF) != type(''):
-    fdrDatabaseDF = addFDR(fdrDatabaseDF,
+    fdrDatabaseDF, databaseScoreList, databaseCalculatedFDR, databaseFDRCutoffs = \
+                    addFDR(fdrDatabaseDF,
                            fdrDecoyDF,
                            scoreComparisionType,
                            precision,
                            increment,
                            fdrCalculationType)
+
+    plt.scatter(databaseScoreList, databaseCalculatedFDR)
+    plt.step([x[0] for x in databaseFDRCutoffs], [x[1] for x in databaseFDRCutoffs], color='r')
+    plt.savefig(os.path.join(outputDirectory, 'databaseCutoff.png'), dpi=600)
   
   if len(fdrDenovoDF) == 0:
     sys.exit("No valid peptides found")
@@ -656,6 +666,7 @@ def getAnalysis(denovoResultsDirectory,
     databaseFdrCutoff = 1
 
   ############# Do Analysis ####################
+
 
   outputFileName = os.path.join(outputDirectory, 'report.txt')
 
