@@ -144,7 +144,7 @@ def dynamicFDR(maxFDR, scoreList, calculatedFDRs, increment=0.01, scoreIndex=0, 
     # print(prevCalc)
     # input()
     for tIndex in range(len(theoreticalFDRs)):
-      minPrevScore, minPrevIndex = getMinScoreIndex(preCalc, tIndex+1)
+      minPrevScore, minPrevIndex = getMinScoreIndex(prevCalc, tIndex+1)
       tFDR = theoreticalFDRs[tIndex]
       prevFDR = theoreticalFDRs[minPrevIndex]
       # print(minPrevScore)
