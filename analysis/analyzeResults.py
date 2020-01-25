@@ -654,6 +654,8 @@ def getAnalysis(denovoResultsDirectory,
     plt.step([x[0] for x in databaseFDRCutoffs], [x[1] for x in databaseFDRCutoffs], color='r')
     plt.savefig(os.path.join(outputDirectory, 'databaseCutoff.png'), dpi=600)
   
+  sys.exit()
+  
   if len(fdrDenovoDF) == 0:
     sys.exit("No valid peptides found")
   
