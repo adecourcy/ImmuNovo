@@ -640,6 +640,7 @@ def getAnalysis(denovoResultsDirectory,
   plt.scatter(denovoScoreList, denovoCalculatedFDR)
   plt.step([x[0] for x in denovoFDRCutoffs], [x[1] for x in denovoFDRCutoffs], color='r')
   plt.savefig(os.path.join(outputDirectory, 'denovoCutoff.png'), dpi=600)
+  plt.clf()
 
   if not qValue and type(databaseDF) != type(''):
     fdrDatabaseDF, databaseScoreList, databaseCalculatedFDR, databaseFDRCutoffs = \
@@ -653,6 +654,7 @@ def getAnalysis(denovoResultsDirectory,
     plt.scatter(databaseScoreList, databaseCalculatedFDR)
     plt.step([x[0] for x in databaseFDRCutoffs], [x[1] for x in databaseFDRCutoffs], color='r')
     plt.savefig(os.path.join(outputDirectory, 'databaseCutoff.png'), dpi=600)
+    plt.clf()
   
   
   if len(fdrDenovoDF) == 0:
