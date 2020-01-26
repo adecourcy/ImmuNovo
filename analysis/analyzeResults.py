@@ -321,7 +321,7 @@ def getOverlap(denovoPeptides, databasePeptides):
 
 def closestFDR(resultsDF, fdrCutoff=0.20, increment=(0.01, 0.05, 0.10, 0.15, 0.20)):
   for fdr in increment:
-    if len(resultsDF[resultsDF[FDR] <= fdrCutoff]) == 0:
+    if len(resultsDF[resultsDF[FDR] <= fdrCutoff]) < 500:
       continue
     else:
       return resultsDF[resultsDF[FDR] <= fdrCutoff], fdr
@@ -655,9 +655,6 @@ def getAnalysis(denovoResultsDirectory,
     plt.clf()
   
   
-  if len(fdrDenovoDF) == 0:
-    sys.exit("No valid peptides found")
-  
   fdrDenovoDF, denovoFdrCutoff = closestFDR(fdrDenovoDF)
   if len(fdrDenovoDF) == 0:
     sys.exit("No valid peptides found")
@@ -665,6 +662,17 @@ def getAnalysis(denovoResultsDirectory,
     fdrDatabaseDF, databaseFdrCutoff = closestFDR(fdrDatabaseDF)
   if len(fdrDatabaseDF) == 0:
     databaseFdrCutoff = 1
+  
+  if len(fdrDenovoDF) == 0:
+    if type(databaseDF) != type('') and len(fdrDatabaseDF) > 0:
+      outputFileName = os.path.join(outputDirectory, 'report.txt')
+      with open(outputFileName, 'w') as f:
+        f.write('Database FDR used: {}\n'.format(databaseFdrCutoff))
+        f.write('Database Spectrum Matches: {}\n'.format(len(getSpectrumHits(fdrDatabaseDF))))
+        f.write('Database Unique Peptides Found: {}\n'.format(len(uniquePeptidesDatabase)))
+
+
+    sys.exit("No valid peptides found")
 
   ############# Do Analysis ####################
 
