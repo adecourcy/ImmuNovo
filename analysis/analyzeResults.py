@@ -321,12 +321,10 @@ def getOverlap(denovoPeptides, databasePeptides):
 
 def closestFDR(resultsDF, fdrCutoff=0.20, increment=(0.01, 0.05, 0.10, 0.15, 0.20)):
   for fdr in increment:
-    if fdr <= fdrCutoff:
-      continue
-    elif len(resultsDF[resultsDF[FDR] <= fdrCutoff]) == 0:
+    if len(resultsDF[resultsDF[FDR] <= fdrCutoff]) == 0:
       continue
     else:
-      return resultsDF[resultsDF[FDR] <= fdrCutoff], fdrCutoff
+      return resultsDF[resultsDF[FDR] <= fdrCutoff], fdr
   return resultsDF[resultsDF[FDR] <= 0.01], 1
 
 
