@@ -188,7 +188,7 @@ def parseOptionalArguments(parser, programDirectory):
                         help='The database search program used (currently only MSGF)')
   parser.add_argument('-st', '--Score-Type',
                         dest='scoreType',
-                        default=SCORE_GLOBAL,
+                        default=SCORE_COMBINED,
                         help='Score type to compare (defaults to combined score)')
   parser.add_argument('-sc', '--Spectrum-Comparsion',
                         dest='spectrumComparison',
