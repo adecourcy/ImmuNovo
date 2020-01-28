@@ -258,6 +258,8 @@ def findFDROld(targetScores, decoyScores):
             ((numDecoyPeptides - decoyIndex) + (numTargetPeptides - targetIndex)))
     targetIndex += 1
   
+  targetScores, fdrList = zip(*sorted(zip(targetScores, fdrList), reverse=True))
+  
   return dynamicFDR(max(fdrList), targetScores, fdrList), targetScores, fdrList
 
 
