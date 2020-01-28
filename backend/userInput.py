@@ -56,9 +56,9 @@ def parseArgumentsSetup(programDirectory, parser):
   elif arguments.fdrCalculation == 1:
     arguments.fdrCalculation = FDR_DISTRIBUTION
   
-  if argument.scoreType == 0:
-    argument.scoreType = SCORE_COMBINED
-  elif argument.scoreType == 1:
+  if arguments.scoreType == 0:
+    arguments.scoreType = SCORE_COMBINED
+  elif arguments.scoreType == 1:
     arguments.scoreType = SCORE_GLOBAL
 
   return arguments
