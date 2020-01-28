@@ -55,6 +55,11 @@ def parseArgumentsSetup(programDirectory, parser):
     arguments.fdrCalculation = FDR_TDA
   elif arguments.fdrCalculation == 1:
     arguments.fdrCalculation = FDR_DISTRIBUTION
+  
+  if argument.scoreType == 0:
+    argument.scoreType = SCORE_COMBINED
+  elif argument.scoreType == 1:
+    arguments.scoreType = SCORE_GLOBAL
 
   return arguments
 
@@ -187,9 +192,13 @@ def parseOptionalArguments(parser, programDirectory):
                         default=MSGF,
                         help='The database search program used (currently only MSGF)')
   parser.add_argument('-st', '--Score-Type',
+                        choices=[0,1],
+                        type=int,
                         dest='scoreType',
-                        default=SCORE_COMBINED,
-                        help='Score type to compare (defaults to combined score)')
+                        default=0,
+                        help='The score to be used in calculating FDR:\n' \
+                             '0 for Combination of PSSM and Spectrum score\n' \
+                             '1 for spectrum score only\n')
   parser.add_argument('-sc', '--Spectrum-Comparsion',
                         dest='spectrumComparison',
                         choices=[0,1],
