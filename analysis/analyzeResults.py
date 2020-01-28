@@ -510,6 +510,15 @@ def addFDR(fdrTargetDF,
                                         increment)
 
 
+def scatterPlotScores(dataFrame, fileName, output_dir):
+  plt.scatter(list(dataFrame[SCORE_GLOBAL]), list(dataFrame[SCORE_PSSM])),
+  plt.xlim(0,1)
+  plt.ylim(0,1)
+  plt.xlabel("Spectra Matching")
+  plt.ylabel("PSSM Matching")
+  plt.savefig(os.path.join(output_dir, fileName), dpi=600)
+
+
 def getAnalysis(denovoResultsDirectory,
                 databaseResultsDirectory,
                 decoyPeptideDirectory,
@@ -615,11 +624,14 @@ def getAnalysis(denovoResultsDirectory,
   
   # No FDR yet, but we're going to add it to this variable
   fdrDenovoDF = filterTopPeptides(denovoDF, scoreComparisionType)
+  scatterPlotScores(fdrDenovoDF, 'fdrRawDenovo.png', outputDirectory)
   fdrDecoyDF = filterTopPeptides(decoyDF, scoreComparisionType)
+  scatterPlotScores(fdrDecoyDF, 'fdrRawDecoy.png', outputDirectory)
 
   if type(databaseDF) != type(''):
     if not qValue:
       fdrDatabaseDF = filterTopPeptides(databaseDF, scoreComparisionType)
+      scatterPlotScores(fdrDatabaseDF, 'fdrRawDatabase.png', outputDirectory)
     else:
       fdrDatabaseDF = \
         databaseDF.loc[[entry[1][FDR].idxmin() for entry in  databaseDF.groupby(TITLE_SPECTRUM)]]
@@ -634,6 +646,8 @@ def getAnalysis(denovoResultsDirectory,
                        precision,
                        increment,
                        fdrCalculationType)
+  
+  fdrDenovoDF.to_csv(os.path.join(outputDirectory, 'fdrDenovoPeptides.csv'), index=False)
 
   plt.scatter(denovoScoreList, denovoCalculatedFDR)
   plt.step([x[0] for x in denovoFDRCutoffs], [x[1] for x in denovoFDRCutoffs], color='r')
@@ -648,6 +662,8 @@ def getAnalysis(denovoResultsDirectory,
                            precision,
                            increment,
                            fdrCalculationType)
+    
+    fdrDatabaseDF.to_csv(os.path.join(outputDirectory, 'fdrDatabasePeptides.csv'), index=False)
 
     plt.scatter(databaseScoreList, databaseCalculatedFDR)
     plt.step([x[0] for x in databaseFDRCutoffs], [x[1] for x in databaseFDRCutoffs], color='r')
@@ -656,8 +672,6 @@ def getAnalysis(denovoResultsDirectory,
   
   
   fdrDenovoDF, denovoFdrCutoff = closestFDR(fdrDenovoDF)
-  if len(fdrDenovoDF) == 0:
-    sys.exit("No valid peptides found")
   if type(databaseDF) != type('') and len(fdrDatabaseDF) > 0:
     fdrDatabaseDF, databaseFdrCutoff = closestFDR(fdrDatabaseDF)
   if len(fdrDatabaseDF) == 0:
@@ -673,6 +687,10 @@ def getAnalysis(denovoResultsDirectory,
 
 
     sys.exit("No valid peptides found")
+  
+  scatterPlotScores(fdrDenovoDF, 'fdrFilteredDenovo.png', outputDirectory)
+  if not qValue and type(databaseDF) != type('') and len(fdrDatabaseDF) != 0:
+    scatterPlotScores(fdrDatabaseDF, 'fdrFilteredDatabase.png', outputDirectory)
 
   ############# Do Analysis ####################
 
