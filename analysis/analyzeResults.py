@@ -511,12 +511,14 @@ def addFDR(fdrTargetDF,
 
 
 def scatterPlotScores(dataFrame, fileName, output_dir):
-  plt.scatter(list(dataFrame[SCORE_GLOBAL]), list(dataFrame[SCORE_PSSM])),
+  plt.scatter(list(dataFrame[SCORE_GLOBAL]), list(dataFrame[SCORE_PSSM]), s=5),
   plt.xlim(0,1)
   plt.ylim(0,1)
   plt.xlabel("Spectra Matching")
   plt.ylabel("PSSM Matching")
   plt.savefig(os.path.join(output_dir, fileName), dpi=600)
+  plt.clf()
+  plt.close()
 
 
 def getAnalysis(denovoResultsDirectory,
@@ -653,6 +655,7 @@ def getAnalysis(denovoResultsDirectory,
   plt.step([x[0] for x in denovoFDRCutoffs], [x[1] for x in denovoFDRCutoffs], color='r')
   plt.savefig(os.path.join(outputDirectory, 'denovoCutoff.png'), dpi=600)
   plt.clf()
+  plt.close()
 
   if not qValue and type(databaseDF) != type(''):
     fdrDatabaseDF, databaseScoreList, databaseCalculatedFDR, databaseFDRCutoffs = \
@@ -669,6 +672,7 @@ def getAnalysis(denovoResultsDirectory,
     plt.step([x[0] for x in databaseFDRCutoffs], [x[1] for x in databaseFDRCutoffs], color='r')
     plt.savefig(os.path.join(outputDirectory, 'databaseCutoff.png'), dpi=600)
     plt.clf()
+    plt.close()
   
   
   fdrDenovoDF, denovoFdrCutoff = closestFDR(fdrDenovoDF)
