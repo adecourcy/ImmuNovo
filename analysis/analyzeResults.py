@@ -142,8 +142,8 @@ def plotMatches(immuNovoDict, numMatch, num2AA, outputDir, plotTitle):
   plt.ylabel('count')
   plt.title(plotTitle)
 
-  plt.savefig(os.path.join(outputDir, 'matches.png'), dpi=600)
-  plt.clf()
+  plt.savefig(os.path.join(outputDir, 'matches.png'), s=3, dpi=600)
+  plt.close()
 
 def plotLengths(immuNovoDict, outputDir, plotTitle):
   lengthStrings = []
@@ -321,10 +321,10 @@ def getOverlap(denovoPeptides, databasePeptides):
 
 def closestFDR(resultsDF, fdrCutoff=0.20, increment=(0.01, 0.05, 0.10, 0.15, 0.20)):
   for fdr in increment:
-    if len(resultsDF[resultsDF[FDR] <= fdrCutoff]) < 500:
+    if len(resultsDF[resultsDF[FDR] <= fdr]) < 500:
       continue
     else:
-      return resultsDF[resultsDF[FDR] <= fdrCutoff], fdr
+      return resultsDF[resultsDF[FDR] <= fdr], fdr
   return resultsDF[resultsDF[FDR] <= 0.01], 1
 
 
@@ -676,7 +676,10 @@ def getAnalysis(denovoResultsDirectory,
     fdrDatabaseDF, databaseFdrCutoff = closestFDR(fdrDatabaseDF)
   if len(fdrDatabaseDF) == 0:
     databaseFdrCutoff = 1
-  
+
+  if not qValue and type(databaseDF) != type('') and len(fdrDatabaseDF) != 0:
+    scatterPlotScores(fdrDatabaseDF, 'fdrFilteredDatabase.png', outputDirectory)
+
   if len(fdrDenovoDF) == 0:
     if type(databaseDF) != type('') and len(fdrDatabaseDF) > 0:
       outputFileName = os.path.join(outputDirectory, 'report.txt')
@@ -689,8 +692,7 @@ def getAnalysis(denovoResultsDirectory,
     sys.exit("No valid peptides found")
   
   scatterPlotScores(fdrDenovoDF, 'fdrFilteredDenovo.png', outputDirectory)
-  if not qValue and type(databaseDF) != type('') and len(fdrDatabaseDF) != 0:
-    scatterPlotScores(fdrDatabaseDF, 'fdrFilteredDatabase.png', outputDirectory)
+
 
   ############# Do Analysis ####################
 

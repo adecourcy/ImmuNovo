@@ -86,6 +86,7 @@ def hitOrMissDataframe(resultsDF, decoyDF, scoreType):
   merged = \
     pd.merge(resultsDF.rename(columns={scoreType: RESULT_IMMUNO})[[TITLE_SPECTRUM, RESULT_IMMUNO]],
               decoyDF.rename(columns={scoreType: RESULTS_DECOY})[[TITLE_SPECTRUM, RESULTS_DECOY]])
+
   
   thresholdCalc = \
     lambda row: True if row[RESULT_IMMUNO] - row[RESULTS_DECOY] >= 0 \
@@ -179,18 +180,31 @@ def findFDR(mergedScores, precision=3):
 
   immuNovoScores = list(mergedScores[RESULT_IMMUNO])
   deltas = [1 if x == True else 0 for x in list(mergedScores[RESULTS_DELTA])]
-  forward = sum(deltas) # How many scores >= decoy scores
-  decoys = len(deltas) - forward # How many scores < decoy scores
 
   fdrList = []
-  scoreCheck = list(zip(immuNovoScores, deltas))
-  scoreCheck.sort(key=lambda x: x[0])
-  immuNovoScores.sort()
 
-  for entry in scoreCheck:
-    fdrList.append(decoys / (forward + decoys))
-    forward -= entry[1]
-    decoys -= (1 - entry[1])
+  immuNovoScores, deltas = zip(*sorted(zip(immuNovoScores, deltas)))
+
+
+
+  def getNextIndex(currentIndex, immuNovoScores, fdrList, fdr):
+    currentScore = immuNovoScores[currentIndex]
+    currentIndex += 1
+    while currentIndex < len(immuNovoScores):
+      if currentScore == immuNovoScores[currentIndex]:
+        fdrList.append(fdr)
+        currentIndex += 1
+      else:
+        return currentIndex
+    return len(immuNovoScores)
+
+  index = 0
+  while index < len(deltas):
+    forward = sum(deltas[index:])       # How many scores >= decoy scores
+    decoys = len(deltas[index:]) - forward # How many scores < decoy scores
+    fdr = decoys / (forward + decoys)
+    fdrList.append(fdr)
+    index = getNextIndex(index, immuNovoScores, fdrList, fdr)
 
   
   immuNovoScores, fdrList = zip(*sorted(zip(immuNovoScores, fdrList), reverse=True))
@@ -203,7 +217,7 @@ def addFDR(dataFrame, fdrCutoffs, scoreType, increment=0.01):
 
   def findCutoff(score, fdrCutoffs, increment):
     for elm in fdrCutoffs:
-      if score > elm[0]:
+      if score >= elm[0]:
         return round(elm[1], 2)
         # pretty sure this was a bug
         # return round(elm[1] + increment, 2)
@@ -237,6 +251,17 @@ def findFDROld(targetScores, decoyScores):
       if currentDecoyIndex >= len(decoyScores):
         return -1
     return currentDecoyIndex
+  
+  def nextTargetIndex(currentTargetIndex, targetScores, fdrList, fdr):
+    currentTargetScore = targetScores[currentTargetIndex]
+    currentTargetIndex += 1
+    while currentTargetIndex < len(targetScores):
+      if targetScores[currentTargetIndex] == currentTargetScore:
+        currentTargetIndex += 1
+        fdrList.append(fdr)
+      else:
+        return currentTargetIndex
+    return len(targetScores)
 
   targetScores.sort()
   decoyScores.sort()
@@ -254,9 +279,11 @@ def findFDROld(targetScores, decoyScores):
     if decoyIndex == -1:
       fdrList.append(0.0)
     else:
-      fdrList.append((numDecoyPeptides - decoyIndex) / \
-            ((numDecoyPeptides - decoyIndex) + (numTargetPeptides - targetIndex)))
-    targetIndex += 1
+      fdr = (numDecoyPeptides - decoyIndex) / \
+            ((numDecoyPeptides - decoyIndex) + (numTargetPeptides - targetIndex))
+      fdrList.append(fdr)
+
+    targetIndex = nextTargetIndex(targetIndex, targetScores, fdrList, fdr)
   
   targetScores, fdrList = zip(*sorted(zip(targetScores, fdrList), reverse=True))
   
