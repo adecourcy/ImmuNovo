@@ -630,10 +630,22 @@ def getAnalysis(denovoResultsDirectory,
   fdrDecoyDF = filterTopPeptides(decoyDF, scoreComparisionType)
   scatterPlotScores(fdrDecoyDF, 'fdrRawDecoy.png', outputDirectory)
 
+  plt.hist(list(fdrDenovoDF[scoreComparisionType]), bins=100, histtype='step', color='b')
+  plt.hist(list(fdrDecoyDF[scoreComparisionType]), bins=100, histtype='step', color='r')
+  plt.savefig(os.path.join(output_dir, 'denovoHist.png'), dpi=600)
+  plt.clf()
+  plt.close()
+
   if type(databaseDF) != type(''):
     if not qValue:
       fdrDatabaseDF = filterTopPeptides(databaseDF, scoreComparisionType)
       scatterPlotScores(fdrDatabaseDF, 'fdrRawDatabase.png', outputDirectory)
+      
+      plt.hist(list(fdrDatabaseDF[scoreComparisionType]), bins=100, histtype='step', color='b')
+      plt.hist(list(fdrDecoyDF[scoreComparisionType]), bins=100, histtype='step', color='r')
+      plt.savefig(os.path.join(output_dir, 'databaseHist.png'), dpi=600)
+      plt.clf()
+      plt.close()
     else:
       fdrDatabaseDF = \
         databaseDF.loc[[entry[1][FDR].idxmin() for entry in  databaseDF.groupby(TITLE_SPECTRUM)]]
