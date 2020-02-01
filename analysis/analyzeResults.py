@@ -632,7 +632,7 @@ def getAnalysis(denovoResultsDirectory,
 
   plt.hist(list(fdrDenovoDF[scoreComparisionType]), bins=100, histtype='step', color='b')
   plt.hist(list(fdrDecoyDF[scoreComparisionType]), bins=100, histtype='step', color='r')
-  plt.savefig(os.path.join(output_dir, 'denovoHist.png'), dpi=600)
+  plt.savefig(os.path.join(outputDirectory, 'denovoHist.png'), dpi=600)
   plt.clf()
   plt.close()
 
@@ -643,7 +643,7 @@ def getAnalysis(denovoResultsDirectory,
       
       plt.hist(list(fdrDatabaseDF[scoreComparisionType]), bins=100, histtype='step', color='b')
       plt.hist(list(fdrDecoyDF[scoreComparisionType]), bins=100, histtype='step', color='r')
-      plt.savefig(os.path.join(output_dir, 'databaseHist.png'), dpi=600)
+      plt.savefig(os.path.join(outputDirectory, 'databaseHist.png'), dpi=600)
       plt.clf()
       plt.close()
     else:
