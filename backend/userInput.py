@@ -203,7 +203,7 @@ def parseOptionalArguments(parser, programDirectory):
                         dest='spectrumComparison',
                         choices=[0,1],
                         type=int,
-                        default=0,
+                        default=1,
                         help='The spectrum comparison function to be used:\n' \
                              '0 for the new comparison function\n' \
                              '1 for the old comparison function')
@@ -211,7 +211,7 @@ def parseOptionalArguments(parser, programDirectory):
                         choices=[0,1],
                         type=int,
                         dest='fdrCalculation',
-                        default=0,
+                        default=1,
                         help='The fdr calculation to be used:\n' \
                               '0 for TDA\n' \
                               '1 for distribution comparison')
