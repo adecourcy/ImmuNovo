@@ -224,7 +224,7 @@ def getSpectrumHits(peptideDF):
 def uniquePeptides(peptideDF):
   return set(peptideDF[PEPTIDE])
 
-def generateTSLPeptides(length, number):
+def generateTSLPeptides(length, number, weights=None):
   # Fixed Amino Acid List for now
   aaList = ['G', 'A', 'S', 'P',
             'V', 'T', 'L', 
@@ -232,10 +232,51 @@ def generateTSLPeptides(length, number):
             'E', 'M', 'H', 'F',
             'R', 'C', 'Y', 'W']
   
-  decoys = set()
-  while len(decoys) < number:
-     decoys.add(''.join([random.choice(aaList) for i in range(length)]))
-  return decoys
+  if weights == None:
+    decoys = set()
+    while len(decoys) < number:
+      decoys.add(''.join([random.choice(aaList) for i in range(length)]))
+    return decoys
+
+  else:
+    selectedAcids = []
+    for position in weights:
+      selectedAcids.append(random.choices(aaList, weights[position], k=number))
+    decoys = set()
+    for aNumber in range(number):
+      currentAcid = []
+      for i in range(len(selectedAcids)):
+        currentAcid.append(selectedAcids[i][aNumber])
+      decoys.add(''.join(currentAcid))
+    return decoys
+
+
+def getPssmWeightMatrix(allPSSM, length, title):
+  
+  def transposeMatrix(matrix):
+    newMatrix = []
+    for index in range(len(matrix)):
+      newRow = []
+      for entry in matrix:
+        newRow.append(entry[index])
+      newMatrix.append(newRow)
+    return newMatrix
+
+  # Fixed Amino Acid List for now
+  aaList = ['G', 'A', 'S', 'P',
+            'V', 'T', 'L', 
+            'N', 'D', 'Q', 'K',
+            'E', 'M', 'H', 'F',
+            'R', 'C', 'Y', 'W']
+
+  lengthMatrix = PSSM.getMatrixOfLength(allPSSM[title])
+  acidMatrix = []
+  for acid in aaList:
+    acidMatrix.append(PSSM.getAcidProbabilities(lengthMatrix, acid))
+  
+  return transposeMatrix(acidMatrix)
+
+
 
 def printGraphicTSL(pssmDistributionDict, dataSetName, tslLocation, outputDirectory):
 
@@ -766,6 +807,22 @@ def getAnalysis(denovoResultsDirectory,
                   dataSetName,
                   tslLocation,
                   outputDirectory)
+  
+  comparisonPeptides = {}
+  
+  for title in allPSSM:
+    pepOfLength = {}
+    for length in allPSSM[title]:
+      weights = getPssmWeightMatrix(allPSSM, length, title)
+      pssmPeptides = generateTSLPeptides(length, 10000, weights)
+      pepOfLength[length] = pssmPeptides
+    comparisonPeptides[title] = pepOfLength
+
+  printGraphicTSL(pssmPeptides,
+                  'Original_{}'.format(dataSetName),
+                  tslLocation,
+                  outputDirectory)
+    
 
 
 if __name__ == '__main__':
