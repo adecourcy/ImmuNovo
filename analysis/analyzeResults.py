@@ -217,6 +217,13 @@ def getPssmLengthDistributionString(pssmLengthDict, pssmLengthDistribution):
   return '\n'.join(['{} -- {}'.format(pssmTitle, distributionString(pssmLengthDict[pssmTitle], pssmLengthDistribution[pssmTitle])) for pssmTitle in pssmLengthDict])
 
 
+def getDistributionString(peptideDistribution):
+  totalPeptides = 0
+  for length in peptideDistribution:
+    totalPeptides += len(peptideDistribution[length])
+    ''.join(['{} - {} ({}%)'.format(length, len(peptideDistribution[length]), round(len(peptideDistribution[length]) / totalPeptides, 2)) for length in peptideDistribution])
+
+
 
 def getSpectrumHits(peptideDF):
   return set(peptideDF[TITLE_SPECTRUM])
@@ -250,7 +257,6 @@ def generateTSLPeptides(length, number, weights=None):
       decoys.add(''.join(currentAcid))
     return decoys
 
-
 def getPssmWeightMatrix(allPSSM, length, title):
   
   def transposeMatrix(matrix):
@@ -275,8 +281,6 @@ def getPssmWeightMatrix(allPSSM, length, title):
     acidMatrix.append(PSSM.getAcidProbabilities(lengthMatrix, acid))
   
   return transposeMatrix(acidMatrix)
-
-
 
 def printGraphicTSL(pssmDistributionDict, dataSetName, tslLocation, outputDirectory):
 
@@ -320,6 +324,14 @@ def getPSSMDistributionDict(peptideDF):
     for lengthItem in pssmItem[1].groupby(LENGTH):
       pssmDistributionDict[pssmItem[0]][lengthItem[0]] = \
                                       set(lengthItem[1][PEPTIDE])
+  return pssmDistributionDict
+
+
+def getDistributionDict(peptideDF):
+  # Return a dictionary: dict[pssmTitel][peptideLength] = set(peptides)
+  pssmDistributionDict = {}
+  for lengthItem in peptideDF.groupby(LENGTH):
+    pssmDistributionDict[lengthItem[0]] = set(lengthItem[1][PEPTIDE])
   return pssmDistributionDict
 
 def convertPeptide(peptideString, allConversions, acidConversion):
@@ -367,7 +379,6 @@ def closestFDR(resultsDF, fdrCutoff=0.20, increment=(0.01, 0.05, 0.10, 0.15, 0.2
     else:
       return resultsDF[resultsDF[FDR] <= fdr], fdr
   return resultsDF[resultsDF[FDR] <= 0.01], 1
-
 
 def separateDataFrames(df, includeDatabase):
   dfDict = {}
@@ -446,7 +457,6 @@ def filterTopPeptides(peptideDF, scoreType):
 
   return peptideDF.loc[[entry[1][scoreType].idxmax() for entry in peptideDF.groupby(TITLE_SPECTRUM)]]
   
-
 def addPeptideLength(peptideDF, conversionDict):
   peptideDF[LENGTH] = \
       peptideDF.apply(lambda x: len(conversionDict[x[PEPTIDE]]), axis=1)
@@ -529,7 +539,6 @@ def spectrumVariableSetup(acidMassFile,
   return allPSSM, acidMassTable, conversionTable, \
          H2OMassAdjusted, NH3MassAdjusted, protonMassAdjusted
 
-
 def addFDR(fdrTargetDF,
            fdrDecoyDF,
            scoreComparisionType,
@@ -549,7 +558,6 @@ def addFDR(fdrTargetDF,
                                         scoreComparisionType,
                                         precision,
                                         increment)
-
 
 def scatterPlotScores(dataFrame, fileName, output_dir):
   plt.scatter(list(dataFrame[SCORE_GLOBAL]), list(dataFrame[SCORE_PSSM]), s=5),
@@ -776,23 +784,10 @@ def getAnalysis(denovoResultsDirectory,
 
     ####### This code hase a bug. getLengthCountDict is not counting on the *unique* peptides
     
-    # f.write('Length Distribution:\n')
-    # lengthCountDenovo = getLengthCountDict(fdrDenovoDF)
-    # lengthDistributionDenovo = \
-    #   getLengthDistribution(lengthCountDenovo, uniquePeptidesDenovo)
-    # f.write('Denovo Length Distribution:\n')
-    # f.write(getLengthDistributionString(lengthCountDenovo, lengthDistributionDenovo))
-    # f.write('\n')
-
-    # if type(databaseDF) != type('') and len(fdrDatabaseDF) > 0:
-    #   lengthCountDatabase = getLengthCountDict(fdrDatabaseDF)
-    #   lengthDistributionDatabase = \
-    #     getLengthDistribution(lengthCountDatabase, uniquePeptidesDatabase)
-    #   f.write('Database Length Distribution:\n')
-    #   f.write(getLengthDistributionString(lengthCountDatabase, lengthDistributionDatabase))
-    #   f.write('\n')
-    # f.write('\n')
-
+    f.write('Length Distribution:\n')
+    denovoDistribution = getDistributionDict(fdrDenovoDF)
+    f.write(getDistributionString(denovoDistribution))
+    f.write('\n\n')
 
     pssmDistributionDict = getPSSMDistributionDict(fdrDenovoDF)
     f.write('PSSM Distribution:\n')
