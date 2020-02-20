@@ -808,7 +808,7 @@ def getAnalysis(denovoResultsDirectory,
   
   for title in allPSSM:
     pepOfLength = {}
-    for length in allPSSM[title]:
+    for length in range(minPeptideLength, maxPeptideLength):
       weights = getPssmWeightMatrix(allPSSM, length, title)
       pssmPeptides = generateTSLPeptides(length, 10000, weights)
       pepOfLength[length] = pssmPeptides
