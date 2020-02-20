@@ -276,7 +276,7 @@ def getPssmWeightMatrix(allPSSM, length, title):
             'E', 'M', 'H', 'F',
             'R', 'C', 'Y', 'W']
 
-  lengthMatrix = PSSM.getMatrixOfLength(allPSSM[title])
+  lengthMatrix = PSSM.getMatrixOfLength(title, length, allPSSM)
   acidMatrix = []
   for acid in aaList:
     acidMatrix.append(PSSM.getAcidProbabilities(lengthMatrix, acid))
