@@ -221,7 +221,8 @@ def getDistributionString(peptideDistribution):
   totalPeptides = 0
   for length in peptideDistribution:
     totalPeptides += len(peptideDistribution[length])
-    ''.join(['{} - {} ({}%)'.format(length, len(peptideDistribution[length]), round(len(peptideDistribution[length]) / totalPeptides, 2)) for length in peptideDistribution])
+  
+  return ''.join(['{} - {} ({}%)'.format(length, len(peptideDistribution[length]), round(len(peptideDistribution[length]) / totalPeptides, 2)) for length in peptideDistribution])
 
 
 
