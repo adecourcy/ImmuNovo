@@ -262,7 +262,7 @@ def getPssmWeightMatrix(allPSSM, length, title):
   
   def transposeMatrix(matrix):
     newMatrix = []
-    for index in range(len(matrix)):
+    for index in range(len(matrix[0])):
       newRow = []
       for entry in matrix:
         newRow.append(entry[index])
