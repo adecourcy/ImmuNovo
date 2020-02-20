@@ -271,7 +271,7 @@ def generateTSLPeptides(length, number, weights=None):
   else:
     selectedAcids = []
     for position in range(len(weights)):
-      selectedAcids.append(choices(aaList, weights[position], k=number))
+      selectedAcids.append(choices(aaList, weights[position], number))
     decoys = set()
     for aNumber in range(number):
       currentAcid = []
