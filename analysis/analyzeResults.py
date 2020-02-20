@@ -59,6 +59,28 @@ SOURCE_DENOVO = 'SOURCE_DENOVO'
 SOURCE_DECOY = 'SOURCE_DECOY'
 SOURCE_DATABASE = 'SOURCE_DATABASE'
 
+# substitute for the python module random.choices, which isn't available on the
+# server
+def choices(population, weights, number):
+  def convertToCumulative(weights):
+    cumWeights = []
+    for i in range(len(weights)):
+      cumWeights.append(sum(weights[:i+1]))
+    cumWeights[-1] = 1 # in case of rounding errors
+    return cumWeights
+  
+  cumWeights = convertToCumulative(weights)
+  selectedPopulation = []
+  for num in range(number):
+    selection = random.random()
+    for index in range(len(cumWeights)):
+      if selection < cumWeights[index]:
+        selectedPopulation.append(population[index])
+        break
+  return selectedPopulation
+
+
+
 def parseArguments():
 
 # denovoResultsDirectory    -- required (add to analyzeResults)
@@ -249,7 +271,7 @@ def generateTSLPeptides(length, number, weights=None):
   else:
     selectedAcids = []
     for position in weights:
-      selectedAcids.append(random.choices(aaList, weights[position], k=number))
+      selectedAcids.append(choices(aaList, weights[position], k=number))
     decoys = set()
     for aNumber in range(number):
       currentAcid = []
