@@ -313,7 +313,6 @@ def getPssmWeightMatrix(allPSSM, length, title):
     acidMatrix.append(PSSM.getAcidProbabilities(lengthMatrix, acid))
   
   print("{}\n\n".format(acidMatrix))
-  print("{}\n\n".format(transposeMatrix(acidMatrix)))
   
   return normalizeMatrix(transposeMatrix(acidMatrix))
 
@@ -848,6 +847,7 @@ def getAnalysis(denovoResultsDirectory,
     pepOfLength = {}
     for length in range(minPeptideLength, maxPeptideLength):
       weights = getPssmWeightMatrix(allPSSM, length, title)
+      print(weights)
       pssmPeptides = generateTSLPeptides(length, 10000, weights)
       pepOfLength[length] = pssmPeptides
     comparisonPeptides[title] = pepOfLength
