@@ -291,6 +291,14 @@ def getPssmWeightMatrix(allPSSM, length, title):
         newRow.append(entry[index])
       newMatrix.append(newRow)
     return newMatrix
+  
+  def normalizeMatrix(matrix):
+    normalizedMatrix = []
+    for row in matrix:
+      rowSum = sum(row)
+      normalizeMatrix.append([x / rowSum for x in row])
+    return normalizeMatrix
+
 
   # Fixed Amino Acid List for now
   aaList = ['G', 'A', 'S', 'P',
@@ -307,7 +315,7 @@ def getPssmWeightMatrix(allPSSM, length, title):
   print("{}\n\n".format(acidMatrix))
   print("{}\n\n".format(transposeMatrix(acidMatrix)))
   
-  return transposeMatrix(acidMatrix)
+  return normalizeMatrix(transposeMatrix(acidMatrix))
 
 def printGraphicTSL(pssmDistributionDict, dataSetName, tslLocation, outputDirectory):
 
