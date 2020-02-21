@@ -293,11 +293,11 @@ def getPssmWeightMatrix(allPSSM, length, title):
     return newMatrix
   
   def normalizeMatrix(matrix):
-    normalizedMatrix = []
+    newMatrix = []
     for row in matrix:
       rowSum = sum(row)
-      normalizeMatrix.append([x / rowSum for x in row])
-    return normalizeMatrix
+      newMatrix.append([x / rowSum for x in row])
+    return newMatrix
 
 
   # Fixed Amino Acid List for now
@@ -774,19 +774,21 @@ def getAnalysis(denovoResultsDirectory,
   fdrDenovoDF, denovoFdrCutoff = closestFDR(fdrDenovoDF)
   if type(databaseDF) != type('') and len(fdrDatabaseDF) > 0:
     fdrDatabaseDF, databaseFdrCutoff = closestFDR(fdrDatabaseDF)
-  if len(fdrDatabaseDF) == 0:
-    databaseFdrCutoff = 1
+    if len(fdrDatabaseDF) == 0:
+      databaseFdrCutoff = 1
 
-  if not qValue and type(databaseDF) != type('') and len(fdrDatabaseDF) != 0:
-    scatterPlotScores(fdrDatabaseDF, 'fdrFilteredDatabase.png', outputDirectory)
+  if not qValue and type(databaseDF) != type(''):
+    if len(fdrDatabaseDF) != 0:
+      scatterPlotScores(fdrDatabaseDF, 'fdrFilteredDatabase.png', outputDirectory)
 
   if len(fdrDenovoDF) == 0:
-    if type(databaseDF) != type('') and len(fdrDatabaseDF) > 0:
-      outputFileName = os.path.join(outputDirectory, 'report.txt')
-      with open(outputFileName, 'w') as f:
-        f.write('Database FDR used: {}\n'.format(databaseFdrCutoff))
-        f.write('Database Spectrum Matches: {}\n'.format(len(getSpectrumHits(fdrDatabaseDF))))
-        f.write('Database Unique Peptides Found: {}\n'.format(len(uniquePeptidesDatabase)))
+    if type(databaseDF) != type(''):
+      if len(fdrDatabaseDF) > 0:
+        outputFileName = os.path.join(outputDirectory, 'report.txt')
+        with open(outputFileName, 'w') as f:
+          f.write('Database FDR used: {}\n'.format(databaseFdrCutoff))
+          f.write('Database Spectrum Matches: {}\n'.format(len(getSpectrumHits(fdrDatabaseDF))))
+          f.write('Database Unique Peptides Found: {}\n'.format(len(uniquePeptidesDatabase)))
 
 
     sys.exit("No valid peptides found")
