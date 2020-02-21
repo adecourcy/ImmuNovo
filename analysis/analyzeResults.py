@@ -836,7 +836,7 @@ def getAnalysis(denovoResultsDirectory,
       pepOfLength[length] = pssmPeptides
     comparisonPeptides[title] = pepOfLength
 
-  printGraphicTSL(pepOfLength,
+  printGraphicTSL(comparisonPeptides,
                   'Original_{}'.format(dataSetName),
                   tslLocation,
                   outputDirectory)
