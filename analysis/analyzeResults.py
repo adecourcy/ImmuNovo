@@ -278,7 +278,6 @@ def generateTSLPeptides(length, number, weights=None):
       for i in range(len(selectedAcids)):
         currentAcid.append(selectedAcids[i][aNumber])
       decoys.append(''.join(currentAcid))
-    print("{}\n\n".format(decoys))
     return decoys
 
 def getPssmWeightMatrix(allPSSM, length, title):
@@ -312,7 +311,6 @@ def getPssmWeightMatrix(allPSSM, length, title):
   for acid in aaList:
     acidMatrix.append(PSSM.getAcidProbabilities(lengthMatrix, acid))
   
-  print("{}\n\n".format(acidMatrix))
   
   return normalizeMatrix(transposeMatrix(acidMatrix))
 
@@ -840,19 +838,14 @@ def getAnalysis(denovoResultsDirectory,
                   outputDirectory)
   
   comparisonPeptides = {}
-
-  print("{}\n\n".format(allPSSM))
   
   for title in allPSSM:
     pepOfLength = {}
     for length in range(minPeptideLength, maxPeptideLength):
       weights = getPssmWeightMatrix(allPSSM, length, title)
-      print(weights)
       pssmPeptides = generateTSLPeptides(length, 10000, weights)
       pepOfLength[length] = pssmPeptides
     comparisonPeptides[title] = pepOfLength
-  
-  print("{}\n\n".format(comparisonPeptides))
 
   printGraphicTSL(comparisonPeptides,
                   'Original_{}'.format(dataSetName),
