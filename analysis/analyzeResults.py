@@ -426,6 +426,7 @@ def separateDataFrames(df, includeDatabase):
 def mergeDataFrames(denovoDF, decoyDF, databaseDF, qValue):
   denovoDF[SOURCE] = [SOURCE_DENOVO for i in range(len(denovoDF))]
   decoyDF[SOURCE] = [SOURCE_DECOY for i in range(len(decoyDF))]
+  decoyDF[PRECURSOR_MASS] = [-100 for i in range(len(decoyDF))]
   combinedDF = pd.concat([denovoDF, decoyDF])
   if not qValue:
     if type(databaseDF) != type(''):
@@ -473,10 +474,15 @@ def importDatabaseData(databaseDir, databaseType, minPepLength, maxPepLength):
 def resultsFilter(peptideDF):
   # Assume column headers are standard for peptides and spectrum titles
   # Assume lengths are filtered
+
+  subset = [PEPTIDE, TITLE_SPECTRUM]
   if FDR in peptideDF:
-    peptideDF = peptideDF[[PEPTIDE, TITLE_SPECTRUM, FDR]]
-  else:
-    peptideDF = peptideDF[[PEPTIDE, TITLE_SPECTRUM]]
+    subset.append(FDR)
+  if PRECURSOR_MASS in peptideDF:
+    subset.append(PRECURSOR_MASS)
+  peptideDF = peptideDF[subset]
+  
+
   peptideDF = peptideDF[peptideDF[PEPTIDE] != NO_PEP]
   peptideDF[PEPTIDE] = peptideDF.apply(lambda x: x[PEPTIDE].replace('I', 'L'), axis=1)
   peptideDF = peptideDF.drop_duplicates()
