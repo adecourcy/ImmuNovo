@@ -168,9 +168,10 @@ if __name__ == '__main__':
       continue
 
     outputFile.write("Filename,{},{},{},"
-                     "Precursor Mass,Precursor Error\n".format(TITLE_SPECTRUM,
-                                                               TITLE_PSSM,
-                                                               PEPTIDE))
+                     "Precursor Mass,{}\n".format(TITLE_SPECTRUM,
+                                                  TITLE_PSSM,
+                                                  PEPTIDE,
+                                                  PRECURSOR_ERROR))
 
     for spectrum in SpectrumIO.getSpectrums(spectrumFile):
       spectrumMasses, spectrumMassesDouble, \

@@ -33,6 +33,7 @@ FDR = 'FDR'
 MSGF = 'MSGF'
 
 PRECURSOR_MASS = 'PRECURSOR_MASS'
+PRECURSOR_ERROR = 'Precursor Error'
 
 LENGTH = 'length'
 
