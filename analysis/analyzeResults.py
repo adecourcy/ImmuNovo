@@ -479,7 +479,7 @@ def resultsFilter(peptideDF):
   subset = [PEPTIDE, TITLE_SPECTRUM]
   if FDR in peptideDF:
     subset.append(FDR)
-  if PRECURSOR_MASS in peptideDF:
+  if PRECURSOR_ERROR in peptideDF:
     subset.append(PRECURSOR_ERROR)
   peptideDF = peptideDF[subset]
   
