@@ -426,12 +426,12 @@ def separateDataFrames(df, includeDatabase):
 def mergeDataFrames(denovoDF, decoyDF, databaseDF, qValue):
   denovoDF[SOURCE] = [SOURCE_DENOVO for i in range(len(denovoDF))]
   decoyDF[SOURCE] = [SOURCE_DECOY for i in range(len(decoyDF))]
-  decoyDF[PRECURSOR_MASS] = [-100 for i in range(len(decoyDF))]
+  decoyDF[PRECURSOR_ERROR] = [-100 for i in range(len(decoyDF))]
   combinedDF = pd.concat([denovoDF, decoyDF])
   if not qValue:
     if type(databaseDF) != type(''):
       databaseDF[SOURCE] = [SOURCE_DATABASE for i in range(len(databaseDF))]
-      databaseDF[PRECURSOR_MASS] = [-100 for i in range(len(databaseDF))]
+      databaseDF[PRECURSOR_ERROR] = [-100 for i in range(len(databaseDF))]
       combinedDF = pd.concat([combinedDF, databaseDF[[PEPTIDE, TITLE_SPECTRUM, SOURCE]]])
   return combinedDF
 
