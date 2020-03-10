@@ -663,8 +663,6 @@ def getAnalysis(denovoResultsDirectory,
   
   if not update:
     mergedDF = mergeDataFrames(denovoDF, decoyDF, databaseDF, qValue)
-    print(mergedDF.head())
-    print('***********************')
 
     if type(databaseDF) != type(''):
       peptideConversionDict = \
@@ -688,8 +686,6 @@ def getAnalysis(denovoResultsDirectory,
     mergedDF = addPeptideLength(mergedDF, peptideConversionDict)
     mergedDF = mergedDF[mergedDF[LENGTH] >= minPeptideLength]
     mergedDF = mergedDF[mergedDF[LENGTH] <= maxPeptideLength]
-    print(mergedDF.head())
-    print('**************************')
 
     mergedDF = ScorePeptides.getPeptideScores(mergedDF,
                                               peptideConversionDict,
@@ -706,8 +702,6 @@ def getAnalysis(denovoResultsDirectory,
                                               maxPeptideLength,
                                               massTolerance,
                                               compression)
-    
-    print(mergedDF.head())
     
     mergedDF.to_csv(os.path.join(outputDirectory, 'scoredPeptides'))
   else:
