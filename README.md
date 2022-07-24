@@ -40,3 +40,5 @@ Missing data:
 And random noise:
 
 ![Spec4](images/spec4.png)
+
+Ultimately, the goal is to use this messy spectrum data to accurately find which peptide generated it (a bit of reverse engineering). I like to use the following analogy to sum up this problem more simply: say you are trying to put together a puzzle, but you aren't given a picture of the puzzle or simply given the puzzle pieces. Rather, someone takes 100 copies of the puzzle you are trying to put together, along with a dozen random puzzles, shakes the pieces all together, takes a handful of pieces out, and dumps everything on the floor. From this, you have to re-construct the original puzzle.
