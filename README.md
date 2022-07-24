@@ -29,7 +29,7 @@ Which might generate a spectrum like this:
 
 ![Spec1](images/Spec-1.png)
 
-However, there are many problems to content with, such inaccurate measurements:
+However, there are many problems to contend with, such inaccurate measurements:
 
 ![Spec2](images/Spec-2.png)
 
